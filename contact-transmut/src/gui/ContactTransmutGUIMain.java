@@ -81,13 +81,13 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     .addComponent(jMainLabel2)
                     .addContainerGap(70, Short.MAX_VALUE))
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                    .addContainerGap(364, Short.MAX_VALUE)
+                    .addContainerGap(373, Short.MAX_VALUE)
                     .addComponent(jBackButton2)
                     .addGap(4, 4, 4)
                     .addComponent(jNextButton2)
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(jCancelButton2)
-                    .addGap(19, 19, 19))
+                    .addContainerGap())
             );
             jPanel2Layout.setVerticalGroup(
                 jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -118,6 +118,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
             setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
             setTitle("Contact Transmutator 1.0");
+            setResizable(false);
 
             jMainLabel1.setFont(new java.awt.Font("Chiller", 1, 48)); // NOI18N
             jMainLabel1.setText("Contact Transmutator 1.0");
@@ -149,11 +150,11 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             jPanel1Layout.setHorizontalGroup(
                 jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addGap(138, 168, Short.MAX_VALUE)
+                    .addGap(168, 168, 168)
                     .addComponent(jInputFileTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(jBrowseButton1)
-                    .addGap(87, 87, 87))
+                    .addContainerGap(87, Short.MAX_VALUE))
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addGap(80, 80, 80)
                     .addComponent(jMainLabel1)
@@ -163,13 +164,13 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     .addComponent(jSelectInputLabel1)
                     .addContainerGap(276, Short.MAX_VALUE))
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                    .addContainerGap(364, Short.MAX_VALUE)
+                    .addContainerGap(373, Short.MAX_VALUE)
                     .addComponent(jBackButton1)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jNextButton1)
                     .addGap(4, 4, 4)
+                    .addComponent(jNextButton1)
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(jCancelButton1)
-                    .addGap(19, 19, 19))
+                    .addContainerGap())
             );
             jPanel1Layout.setVerticalGroup(
                 jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -182,7 +183,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(jBrowseButton1)
                         .addComponent(jInputFileTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGap(141, 141, 141)
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 141, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addComponent(jBackButton1)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -201,7 +202,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             );
             layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             );
 
             pack();
@@ -214,7 +215,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
     private void jBrowseButton1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jBrowseButton1MouseReleased
         jFileChooser1.setVisible(true);
-        //jFileChooser1.requestFocus();
+        
     }//GEN-LAST:event_jBrowseButton1MouseReleased
 
     private void jNextButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jNextButton2MouseReleased
