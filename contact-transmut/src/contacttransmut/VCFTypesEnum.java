@@ -8,6 +8,10 @@ package contacttransmut;
  *
  * @author ovečka
  */
+
+/*
+ * this is good for VCFHelper, better for checking typos and auto-completion in IDE
+ */
 public enum VCFTypesEnum {
 
 Name ("Name"),
@@ -87,7 +91,6 @@ Public_Key_work ("Public_Key_work"),
 Public_Key_home ("Public_Key_home");
 
 
-
     private final String name;
 
     private VCFTypesEnum(String newName) {
@@ -97,5 +100,9 @@ Public_Key_home ("Public_Key_home");
     @Override
     public String toString() {
         return name;
+    }
+
+    public boolean equals(VCFTypesEnum other) {
+        return this.toString().equals(other.toString());
     }
 }
