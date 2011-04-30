@@ -11,11 +11,19 @@
 
 package gui;
 
+import java.awt.Component;
+import java.io.File;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+
 /**
  *
  * @author Martin
  */
 public class ContactTransmutGUIMain extends javax.swing.JFrame {
+
+            
+    private File inputFile;
 
     /** Creates new form ContactTransmutGUIMain */
     public ContactTransmutGUIMain() {
@@ -32,13 +40,13 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jFileChooser1 = new javax.swing.JFileChooser();
         jFrame1 = new javax.swing.JFrame();
         jPanel2 = new javax.swing.JPanel();
         jMainLabel2 = new javax.swing.JLabel();
         jNextButton2 = new javax.swing.JButton();
         jCancelButton2 = new javax.swing.JButton();
         jBackButton2 = new javax.swing.JButton();
+        jFileChooser1 = new javax.swing.JFileChooser();
         jPanel1 = new javax.swing.JPanel();
         jMainLabel1 = new javax.swing.JLabel();
         jBrowseButton1 = new javax.swing.JButton();
@@ -48,165 +56,173 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jCancelButton1 = new javax.swing.JButton();
         jBackButton1 = new javax.swing.JButton();
 
-        jFileChooser1.setCurrentDirectory(new java.io.File("C:\\"));
+        jFrame1.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        jFrame1.setTitle("Contact Transmutator 1.0");
 
-            jFrame1.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-            jFrame1.setTitle("Contact Transmutator 1.0");
+        jMainLabel2.setFont(new java.awt.Font("Chiller", 1, 48)); // NOI18N
+        jMainLabel2.setText("Contact Transmutator 1.0");
 
-            jMainLabel2.setFont(new java.awt.Font("Chiller", 1, 48)); // NOI18N
-            jMainLabel2.setText("Contact Transmutator 1.0");
+        jNextButton2.setText("Next >");
+        jNextButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jNextButton2MouseReleased(evt);
+            }
+        });
 
-            jNextButton2.setText("Next >");
-            jNextButton2.addMouseListener(new java.awt.event.MouseAdapter() {
-                public void mouseReleased(java.awt.event.MouseEvent evt) {
-                    jNextButton2MouseReleased(evt);
-                }
-            });
+        jCancelButton2.setText("Cancel");
+        jCancelButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jCancelButton2MouseReleased(evt);
+            }
+        });
 
-            jCancelButton2.setText("Cancel");
+        jBackButton2.setText("< Back");
+        jBackButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jBackButton2MouseReleased(evt);
+            }
+        });
 
-            jBackButton2.setText("< Back");
-            jBackButton2.addMouseListener(new java.awt.event.MouseAdapter() {
-                public void mouseReleased(java.awt.event.MouseEvent evt) {
-                    jBackButton2MouseReleased(evt);
-                }
-            });
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(80, 80, 80)
+                .addComponent(jMainLabel2)
+                .addContainerGap(70, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap(373, Short.MAX_VALUE)
+                .addComponent(jBackButton2)
+                .addGap(4, 4, 4)
+                .addComponent(jNextButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jCancelButton2)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jMainLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 257, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jBackButton2)
+                        .addComponent(jNextButton2))
+                    .addComponent(jCancelButton2))
+                .addContainerGap())
+        );
 
-            javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-            jPanel2.setLayout(jPanel2Layout);
-            jPanel2Layout.setHorizontalGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel2Layout.createSequentialGroup()
-                    .addGap(80, 80, 80)
-                    .addComponent(jMainLabel2)
-                    .addContainerGap(70, Short.MAX_VALUE))
-                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                    .addContainerGap(373, Short.MAX_VALUE)
-                    .addComponent(jBackButton2)
-                    .addGap(4, 4, 4)
-                    .addComponent(jNextButton2)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jCancelButton2)
-                    .addContainerGap())
-            );
-            jPanel2Layout.setVerticalGroup(
-                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel2Layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jMainLabel2)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 257, Short.MAX_VALUE)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jBackButton2)
-                            .addComponent(jNextButton2))
-                        .addComponent(jCancelButton2))
-                    .addContainerGap())
-            );
+        javax.swing.GroupLayout jFrame1Layout = new javax.swing.GroupLayout(jFrame1.getContentPane());
+        jFrame1.getContentPane().setLayout(jFrame1Layout);
+        jFrame1Layout.setHorizontalGroup(
+            jFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jFrame1Layout.createSequentialGroup()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jFrame1Layout.setVerticalGroup(
+            jFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
 
-            javax.swing.GroupLayout jFrame1Layout = new javax.swing.GroupLayout(jFrame1.getContentPane());
-            jFrame1.getContentPane().setLayout(jFrame1Layout);
-            jFrame1Layout.setHorizontalGroup(
-                jFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jFrame1Layout.createSequentialGroup()
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap())
-            );
-            jFrame1Layout.setVerticalGroup(
-                jFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            );
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Contact Transmutator 1.0");
+        setResizable(false);
 
-            setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-            setTitle("Contact Transmutator 1.0");
-            setResizable(false);
+        jMainLabel1.setFont(new java.awt.Font("Chiller", 1, 48)); // NOI18N
+        jMainLabel1.setText("Contact Transmutator 1.0");
 
-            jMainLabel1.setFont(new java.awt.Font("Chiller", 1, 48)); // NOI18N
-            jMainLabel1.setText("Contact Transmutator 1.0");
+        jBrowseButton1.setText("Browse...");
+        jBrowseButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jBrowseButton1MouseReleased(evt);
+            }
+        });
 
-            jBrowseButton1.setText("Browse...");
-            jBrowseButton1.addMouseListener(new java.awt.event.MouseAdapter() {
-                public void mouseReleased(java.awt.event.MouseEvent evt) {
-                    jBrowseButton1MouseReleased(evt);
-                }
-            });
+        jSelectInputLabel1.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
+        jSelectInputLabel1.setText("Please select the input file:");
 
-            jSelectInputLabel1.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
-            jSelectInputLabel1.setText("Please select the input file:");
+        jNextButton1.setText("Next >");
+        jNextButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jNextButton1MouseReleased(evt);
+            }
+        });
 
-            jNextButton1.setText("Next >");
-            jNextButton1.addMouseListener(new java.awt.event.MouseAdapter() {
-                public void mouseReleased(java.awt.event.MouseEvent evt) {
-                    jNextButton1MouseReleased(evt);
-                }
-            });
+        jCancelButton1.setText("Cancel");
+        jCancelButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jCancelButton1MouseReleased(evt);
+            }
+        });
 
-            jCancelButton1.setText("Cancel");
+        jBackButton1.setText("< Back");
+        jBackButton1.setEnabled(false);
 
-            jBackButton1.setText("< Back");
-            jBackButton1.setEnabled(false);
-
-            javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-            jPanel1.setLayout(jPanel1Layout);
-            jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addGap(168, 168, 168)
-                    .addComponent(jInputFileTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(168, 168, 168)
+                .addComponent(jInputFileTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jBrowseButton1)
+                .addContainerGap(87, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(80, 80, 80)
+                .addComponent(jMainLabel1)
+                .addContainerGap(70, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(100, 100, 100)
+                .addComponent(jSelectInputLabel1)
+                .addContainerGap(276, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(373, Short.MAX_VALUE)
+                .addComponent(jBackButton1)
+                .addGap(4, 4, 4)
+                .addComponent(jNextButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jCancelButton1)
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jMainLabel1)
+                .addGap(30, 30, 30)
+                .addComponent(jSelectInputLabel1)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jBrowseButton1)
-                    .addContainerGap(87, Short.MAX_VALUE))
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addGap(80, 80, 80)
-                    .addComponent(jMainLabel1)
-                    .addContainerGap(70, Short.MAX_VALUE))
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addGap(100, 100, 100)
-                    .addComponent(jSelectInputLabel1)
-                    .addContainerGap(276, Short.MAX_VALUE))
-                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                    .addContainerGap(373, Short.MAX_VALUE)
+                    .addComponent(jInputFileTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 141, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jBackButton1)
-                    .addGap(4, 4, 4)
-                    .addComponent(jNextButton1)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(jCancelButton1)
-                    .addContainerGap())
-            );
-            jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(jMainLabel1)
-                    .addGap(30, 30, 30)
-                    .addComponent(jSelectInputLabel1)
-                    .addGap(18, 18, 18)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jBrowseButton1)
-                        .addComponent(jInputFileTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 141, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jBackButton1)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jCancelButton1)
-                            .addComponent(jNextButton1)))
-                    .addContainerGap())
-            );
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jCancelButton1)
+                        .addComponent(jNextButton1)))
+                .addContainerGap())
+        );
 
-            javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-            getContentPane().setLayout(layout);
-            layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap())
-            );
-            layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            );
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
 
-            pack();
-        }// </editor-fold>//GEN-END:initComponents
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
 
     private void jNextButton1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jNextButton1MouseReleased
         jPanel2.setSize(jPanel1.getWidth(), jPanel1.getHeight());
@@ -214,7 +230,31 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     }//GEN-LAST:event_jNextButton1MouseReleased
 
     private void jBrowseButton1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jBrowseButton1MouseReleased
-        jFileChooser1.setVisible(true);
+        JFileChooser chooser = new JFileChooser();
+
+        FileFilter filter = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                if (f.isFile() && (f.toString().endsWith("csv")
+                        || f.toString().endsWith("ods")
+                        || f.toString().endsWith("vcf"))) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            @Override
+            public String getDescription() {
+                return "CSV, ODS, VCF files";
+            }
+        };
+              
+        chooser.setFileFilter(filter);
+        int returnVal = chooser.showOpenDialog(jPanel1);
+        if(returnVal == JFileChooser.APPROVE_OPTION){
+            inputFile = chooser.getSelectedFile();
+            jInputFileTextField1.setText(inputFile.toString());
+        }
         
     }//GEN-LAST:event_jBrowseButton1MouseReleased
 
@@ -226,6 +266,15 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jPanel1.setSize(jPanel2.getWidth(), jPanel2.getHeight());
         setContentPane(jPanel1);
     }//GEN-LAST:event_jBackButton2MouseReleased
+
+    private void jCancelButton1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jCancelButton1MouseReleased
+        System.exit(0);
+    }//GEN-LAST:event_jCancelButton1MouseReleased
+
+    private void jCancelButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jCancelButton2MouseReleased
+        System.exit(0);
+    }//GEN-LAST:event_jCancelButton2MouseReleased
+
 
     /**
     * @param args the command line arguments
