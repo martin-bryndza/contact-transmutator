@@ -514,7 +514,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                     nodes = currentContactElement.getElementsByTagName("Name");
                     if (nodes.getLength() == 0) {
                         nodes = currentContactElement.getElementsByTagName("Nickname");
-                                if (nodes.getLength() == 0) {
+                        if (nodes.getLength() == 0) {
                             nodes = currentContactElement.getElementsByTagName("Organization_Name_or_Organizational_unit");
                             if (nodes.getLength() == 0) {
                                 nodes = currentContactElement.getElementsByTagName("Organization_Name_or_Organizational_unit-work");
@@ -524,12 +524,12 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                             }
                         }
                     }
-                }
-                if (((nodes.getLength() != 0) && ((nodes.item(0)) instanceof Element)) && (((Element) nodes.item(0)).getTextContent().trim() == null ? "" != null : !((Element) nodes.item(0)).getTextContent().trim().equals(""))) {
-                    //create the FN, otherwise ignore it...
-                    Element fn = docCompiled.createElement("Formatted_Name");
-                    fn.setTextContent(((Element) nodes.item(0)).getTextContent().trim());
-                    currentContactElement.appendChild(fn);
+                    if (((nodes.getLength() != 0) && ((nodes.item(0)) instanceof Element)) && (((Element) nodes.item(0)).getTextContent().trim() == null ? "" != null : !((Element) nodes.item(0)).getTextContent().trim().equals(""))) {
+                        //create the FN, otherwise ignore it...
+                        Element fn = docCompiled.createElement("Formatted_Name");
+                        fn.setTextContent(((Element) nodes.item(0)).getTextContent().trim());
+                        currentContactElement.appendChild(fn);
+                    }
                 }
 
             }
