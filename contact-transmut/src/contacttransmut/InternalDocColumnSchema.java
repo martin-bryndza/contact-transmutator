@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package contacttransmut;
 
 import java.util.ArrayList;
@@ -10,6 +7,16 @@ import java.util.HashMap;
 /**
  *
  * @author ovečka
+ */
+
+/*
+ * This class describes data types (columns) in the raw InternalDoc
+ *  * what column is what data type
+ *  * what columns should be split and how
+ *  * what columns should be merged and how
+ *
+ * It uses some internal XML DOM data structure that is only private
+ * you should always use the methods to create, change and query the InternalDocColumnSchema
  */
 public interface InternalDocColumnSchema {
 

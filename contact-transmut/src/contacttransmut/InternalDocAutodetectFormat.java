@@ -1,13 +1,12 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package contacttransmut;
 
 /**
  *
  * @author ovečka
+ */
+
+/*
+ * This class should take "InternalDoc" Document and produce InternalDocColumnSchema with CandidateTypes autodetected
  */
 public interface InternalDocAutodetectFormat {
 
