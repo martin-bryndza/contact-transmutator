@@ -63,7 +63,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
         rootDocCompiled = docCompiled.createElement("contacts");
         root0.appendChild(rootDocCompiled);
 
-                Element rootERR0 = detectedErrors.createElement("root");
+        Element rootERR0 = detectedErrors.createElement("root");
         detectedErrors.appendChild(rootERR0);
         rootDetectedErrors = detectedErrors.createElement("contacts");
         rootERR0.appendChild(rootDetectedErrors);
@@ -95,6 +95,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
     }
 
     /*
+     * CompiledDoc format is as follows:
      * <root>
      * <contacts>
      * <contact number=0>
@@ -102,7 +103,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
      * <TYPE2>data</TYPE2> //e-mail, phone... whatever that can have multiple records of the same type
      * <TYPE2>data</TYPE2>
      * </contact>
-     * <contacts>
+     * </contacts>
      * </root>
      */
     private void writeField(Integer contactNumber, String dataType, String contents, boolean canHaveMultipleRecordsOfSameDataType) throws DOMException {
@@ -183,7 +184,6 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                     // ******* AGGREGATED, INTO SEPARATE, AUTO-DETECTION *******
                                     //TODO!
                                     //Not implemented!
-                                    
                                 } else { //no auto-detection!
                                     // ******* AGGREGATED, INTO SEPARATE, RIGID (without a-d) ******
                                     Scanner contentsScanner = new Scanner(contents);
@@ -507,6 +507,31 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                         }
                     }
                 }
+
+                //check if FN is present
+                NodeList nodes = currentContactElement.getElementsByTagName("Formatted_Name");
+                if (nodes.getLength() == 0) {
+                    nodes = currentContactElement.getElementsByTagName("Name");
+                    if (nodes.getLength() == 0) {
+                        nodes = currentContactElement.getElementsByTagName("Nickname");
+                                if (nodes.getLength() == 0) {
+                            nodes = currentContactElement.getElementsByTagName("Organization_Name_or_Organizational_unit");
+                            if (nodes.getLength() == 0) {
+                                nodes = currentContactElement.getElementsByTagName("Organization_Name_or_Organizational_unit-work");
+                                if (nodes.getLength() == 0) {
+                                    nodes = currentContactElement.getElementsByTagName("Organization_Name_or_Organizational_unit-home");
+                                }
+                            }
+                        }
+                    }
+                }
+                if (((nodes.getLength() != 0) && ((nodes.item(0)) instanceof Element)) && (((Element) nodes.item(0)).getTextContent().trim() == null ? "" != null : !((Element) nodes.item(0)).getTextContent().trim().equals(""))) {
+                    //create the FN, otherwise ignore it...
+                    Element fn = docCompiled.createElement("Formatted_Name");
+                    fn.setTextContent(((Element) nodes.item(0)).getTextContent().trim());
+                    currentContactElement.appendChild(fn);
+                }
+
             }
         }
 
@@ -517,7 +542,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
         //TODO!
         return null;
     }
-    
+
     public Document getCompiledInvalidContacts() {
         //TODO!
         return null;
@@ -527,5 +552,4 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
         //TODO!
         return true;
     }
-
 }
