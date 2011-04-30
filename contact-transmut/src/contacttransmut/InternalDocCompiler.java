@@ -233,7 +233,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                         //1) the original contact
                                         if (docColumnSchema.queryAggregateSettingOriginalsourcenote(counter)) {
                                             try {
-                                                String vcfNoteType = "Note"; //TODO: check this is correct
+                                                String vcfNoteType = VCFTypesEnum.Note.toString(); 
                                                 writeField(rawContCount, vcfNoteType, contents, false, true);
                                             } catch (DOMException e) {
                                                 //TODO: run shitstorm
@@ -259,7 +259,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                                 newContact.appendChild(field);
                                             }
                                             if (docColumnSchema.queryAggregateSettingOriginaltargetnote(counter)) {
-                                                String vcfNoteType = "Note"; //TODO: check this is correct
+                                                String vcfNoteType = VCFTypesEnum.Note.toString();
                                                 if (newContact.getElementsByTagName(vcfNoteType).getLength() != 0) {
                                                     newContact.getElementsByTagName(vcfNoteType).item(0).setTextContent(newContact.getElementsByTagName(vcfNoteType).item(0).getTextContent() + "; " + contents);
                                                 } else {
@@ -327,7 +327,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                         //1) the original contact
                                         if (docColumnSchema.queryAggregateSettingOriginalsourcenote(counter)) {
                                             try {
-                                                String vcfNoteType = "Note"; //TODO: check this is correct
+                                                String vcfNoteType = VCFTypesEnum.Note.toString();
                                                 writeField(rawContCount, vcfNoteType, contents, false, true);
                                             } catch (DOMException e) {
                                                 //TODO: run shitstorm
@@ -353,7 +353,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                                 newContact.appendChild(field);
                                             }
                                             if (docColumnSchema.queryAggregateSettingOriginaltargetnote(counter)) {
-                                                String vcfNoteType = "Note"; //TODO: check this is correct
+                                                String vcfNoteType = VCFTypesEnum.Note.toString();
                                                 if (newContact.getElementsByTagName(vcfNoteType).getLength() != 0) {
                                                     newContact.getElementsByTagName(vcfNoteType).item(0).setTextContent(newContact.getElementsByTagName(vcfNoteType).item(0).getTextContent() + "; " + contents);
                                                 } else {
@@ -509,24 +509,24 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                 }
 
                 //check if FN is present
-                NodeList nodes = currentContactElement.getElementsByTagName("Formatted_Name");
+                NodeList nodes = currentContactElement.getElementsByTagName(VCFTypesEnum.Formatted_Name.toString());
                 if (nodes.getLength() == 0) {
-                    nodes = currentContactElement.getElementsByTagName("Name");
+                    nodes = currentContactElement.getElementsByTagName(VCFTypesEnum.Name.toString());
                     if (nodes.getLength() == 0) {
-                        nodes = currentContactElement.getElementsByTagName("Nickname");
+                        nodes = currentContactElement.getElementsByTagName(VCFTypesEnum.Nickname.toString());
                         if (nodes.getLength() == 0) {
-                            nodes = currentContactElement.getElementsByTagName("Organization_Name_or_Organizational_unit");
+                            nodes = currentContactElement.getElementsByTagName(VCFTypesEnum.Organization_Name_or_Organizational_unit.toString());
                             if (nodes.getLength() == 0) {
-                                nodes = currentContactElement.getElementsByTagName("Organization_Name_or_Organizational_unit-work");
+                                nodes = currentContactElement.getElementsByTagName(VCFTypesEnum.Organization_Name_or_Organizational_unit_work.toString());
                                 if (nodes.getLength() == 0) {
-                                    nodes = currentContactElement.getElementsByTagName("Organization_Name_or_Organizational_unit-home");
+                                    nodes = currentContactElement.getElementsByTagName(VCFTypesEnum.Organization_Name_or_Organizational_unit_home.toString());
                                 }
                             }
                         }
                     }
                     if (((nodes.getLength() != 0) && ((nodes.item(0)) instanceof Element)) && (((Element) nodes.item(0)).getTextContent().trim() == null ? "" != null : !((Element) nodes.item(0)).getTextContent().trim().equals(""))) {
                         //create the FN, otherwise ignore it...
-                        Element fn = docCompiled.createElement("Formatted_Name");
+                        Element fn = docCompiled.createElement(VCFTypesEnum.Formatted_Name.toString());
                         fn.setTextContent(((Element) nodes.item(0)).getTextContent().trim());
                         currentContactElement.appendChild(fn);
                     }

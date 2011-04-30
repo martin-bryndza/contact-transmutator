@@ -56,7 +56,8 @@ public class VCFHelperImpl implements VCFHelper {
     }
 
     public boolean vcfCanHaveMultipleInstances(Integer columnNumber) {
-        boolean answer = false;
+
+        boolean answer = vcfCanHaveMultipleInstances(docColumnSchema.querySelectedtypeType(columnNumber));
 
         return false;
     }
