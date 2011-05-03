@@ -21,7 +21,7 @@ import org.w3c.dom.NodeList;
 
 /**
  *
- * @author ovečka
+ * @author jakub svoboda
  */
 
 /*

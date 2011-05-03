@@ -5,7 +5,7 @@ import org.w3c.dom.Document;
 
 /**
  *
- * @author ovečka
+ * @author jakub svoboda
  */
 
 /*

@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author ovečka
+ * @author jakub svoboda
  */
 
 /*

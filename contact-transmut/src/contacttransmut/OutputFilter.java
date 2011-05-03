@@ -2,7 +2,7 @@ package contacttransmut;
 
 /**
  *
- * @author ovečka
+ * @author jakub svoboda
  */
 
 /*

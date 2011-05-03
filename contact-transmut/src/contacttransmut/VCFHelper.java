@@ -6,7 +6,7 @@ package contacttransmut;
 
 /**
  *
- * @author ovečka
+ * @author jakub svoboda
  */
 
 /* PLEASE READ THIS!
@@ -20,7 +20,7 @@ package contacttransmut;
  * Task 2
  * ======
  * There is no method for this task, but pay attention:
- * There should be a list of VCF data types in VCFHelperImpl. (Kuba must finish the work!)
+ * There is be a list of VCF data types in VCFHelperImpl.
  * Others should take this list and use it in their classes. For instance in GUI.
  * The GUI should only allow user to choose columns that are from this list and disable
  * "next" button if there are some columns without "SelectedType" from this list!

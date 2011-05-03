@@ -6,10 +6,6 @@ package contacttransmut;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,7 +17,7 @@ import org.w3c.dom.Element;
 
 /**
  *
- * @author ovečka
+ * @author jakub svoboda
  */
 public class ReadCSV implements InputFilter {
 
@@ -29,7 +25,6 @@ public class ReadCSV implements InputFilter {
     private String fileFileName;
     private String delimiter;
     private String quote;
-    private final String FIXED_TEXT = "But soft! what code in yonder program breaks?";
     private DocumentBuilderFactory dbf;
     private DocumentBuilder db;
     private Document doc;
@@ -57,35 +52,10 @@ public class ReadCSV implements InputFilter {
 
     }
 
-    /** Write fixed content to the given file. */
-    void write_deletethis() throws IOException {
-        log_deletethislater("Writing to file named " + fileFileName + ". Encoding: " + fileEncoding);
-        Writer out = new OutputStreamWriter(new FileOutputStream(fileFileName), fileEncoding);
-        try {
-            out.write(FIXED_TEXT);
-        } finally {
-            out.close();
-        }
-    }
 
-    StringBuilder readEntireFile_deletethislater() throws IOException {
-        log_deletethislater("Reading from entire file.");
-        StringBuilder text = new StringBuilder();
-        String NL = System.getProperty("line.separator");
-        Scanner scanner = new Scanner(new FileInputStream(fileFileName), fileEncoding);
-        try {
-            while (scanner.hasNextLine()) {
-                text.append(scanner.nextLine()).append(NL);
-            }
-        } finally {
-            scanner.close();
-        }
-        //log_deletethislater("Text read in: " + text);
-        return text;
-    }
 
     //Todo: write javadoc
-    //this method’s implementation shall be final
+    //this method’s implementation is completed and will not be changed
     //this is CSV-to-XML parser
     public Document read() {
 
@@ -251,7 +221,6 @@ public class ReadCSV implements InputFilter {
             scanner.close();
         }
 
-//make this so that it returns doc and not text
         root.setAttribute("maxColumnNumber", maxI.toString());
 
         return doc;
@@ -261,38 +230,5 @@ public class ReadCSV implements InputFilter {
         return null;
     }
 
-    void read_deletethislater() throws IOException {
-        log_deletethislater("Reading from file.");
-        StringBuilder text = new StringBuilder();
-        String NL = System.getProperty("line.separator");
-        Scanner scanner = new Scanner(new FileInputStream(fileFileName), fileEncoding);
-
-
-
-
-        try {
-            while (scanner.hasNextLine()) {
-                text.append(scanner.nextLine()).append(NL);
-
-
-
-
-            }
-        } finally {
-            scanner.close();
-
-
-
-
-        }
-        log_deletethislater("Text read in: " + text);
-
-
-
-
-    }
-
-    private void log_deletethislater(String messageOut) {
-        System.out.println(messageOut);
-    }
+ 
 }
