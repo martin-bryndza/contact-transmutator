@@ -37,6 +37,9 @@ public class InternalDocAutodetectFormatImpl /*implements InternalDocAutodetectF
     }
 
     public InternalDocColumnSchema autodetect() {
+
+        Integer maxColumnNumber = Integer.parseInt(root.getAttribute("maxColumnNumber"));
+        
 //TODO
         return null;
     }
