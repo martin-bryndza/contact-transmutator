@@ -326,6 +326,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         // <editor-fold defaultstate="collapsed" desc="naplnenie InternalDoc a ColumnSchema">
         InputFilter inputFilter;
+        inputFile = new File(filePath);
         //TODO: detect encoding
         if (filePath.toLowerCase().endsWith(".csv")){
             inputFilter = new ReadCSV(inputFile.toString(),"UTF-8",",","\"");
@@ -347,7 +348,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         String line = null;
         BufferedReader buff = null;
         try{
-            inputFile = new File(filePath);
             buff = new BufferedReader(
                        new InputStreamReader(
                            new FileInputStream(
