@@ -11,14 +11,21 @@
 
 package gui;
 
-import java.awt.Component;
+import contacttransmut.InputFilter;
+import contacttransmut.InternalDocColumnSchema;
+import contacttransmut.ReadCSV;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -28,6 +35,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
             
     private File inputFile;
+    private Document internalDoc = null;
+    private InternalDocColumnSchema columnSchema = null;
 
     /** Creates new form ContactTransmutGUIMain */
     public ContactTransmutGUIMain() {
@@ -51,10 +60,14 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jCancelButton2 = new javax.swing.JButton();
         jBackButton2 = new javax.swing.JButton();
         jShowTextFileButton2 = new javax.swing.JButton();
+        jShowInternalDocButton2 = new javax.swing.JButton();
         jFileChooser1 = new javax.swing.JFileChooser();
         jOriginalFileTextFrame = new javax.swing.JFrame();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        jOriginalFileScrollPane = new javax.swing.JScrollPane();
+        jOriginalFileTextArea = new javax.swing.JTextArea();
+        jInternalDocTextFrame = new javax.swing.JFrame();
+        jInternalDocScrollPane = new javax.swing.JScrollPane();
+        jInternalDocTextArea = new javax.swing.JTextArea();
         jPanel1 = new javax.swing.JPanel();
         jMainLabel1 = new javax.swing.JLabel();
         jBrowseButton1 = new javax.swing.JButton();
@@ -99,6 +112,13 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             }
         });
 
+        jShowInternalDocButton2.setText("Show Internal Doc");
+        jShowInternalDocButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jShowInternalDocButton2MouseReleased(evt);
+            }
+        });
+
         javax.swing.GroupLayout jMainWindowPanel2Layout = new javax.swing.GroupLayout(jMainWindowPanel2);
         jMainWindowPanel2.setLayout(jMainWindowPanel2Layout);
         jMainWindowPanel2Layout.setHorizontalGroup(
@@ -108,7 +128,9 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 .addComponent(jMainLabel2)
                 .addContainerGap(148, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowPanel2Layout.createSequentialGroup()
-                .addContainerGap(428, Short.MAX_VALUE)
+                .addContainerGap(301, Short.MAX_VALUE)
+                .addComponent(jShowInternalDocButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jShowTextFileButton2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jBackButton2)
@@ -128,7 +150,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     .addGroup(jMainWindowPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jNextButton2)
                         .addComponent(jBackButton2)
-                        .addComponent(jShowTextFileButton2))
+                        .addComponent(jShowTextFileButton2)
+                        .addComponent(jShowInternalDocButton2))
                     .addComponent(jCancelButton2))
                 .addContainerGap())
         );
@@ -144,10 +167,10 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             .addComponent(jMainWindowPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        jOriginalFileTextArea.setColumns(20);
+        jOriginalFileTextArea.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jOriginalFileTextArea.setRows(5);
+        jOriginalFileScrollPane.setViewportView(jOriginalFileTextArea);
 
         javax.swing.GroupLayout jOriginalFileTextFrameLayout = new javax.swing.GroupLayout(jOriginalFileTextFrame.getContentPane());
         jOriginalFileTextFrame.getContentPane().setLayout(jOriginalFileTextFrameLayout);
@@ -157,7 +180,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             .addGroup(jOriginalFileTextFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jOriginalFileTextFrameLayout.createSequentialGroup()
                     .addGap(0, 0, 0)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 668, Short.MAX_VALUE)
+                    .addComponent(jOriginalFileScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 668, Short.MAX_VALUE)
                     .addGap(0, 0, 0)))
         );
         jOriginalFileTextFrameLayout.setVerticalGroup(
@@ -166,7 +189,35 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             .addGroup(jOriginalFileTextFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jOriginalFileTextFrameLayout.createSequentialGroup()
                     .addGap(0, 0, 0)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
+                    .addComponent(jOriginalFileScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
+                    .addGap(0, 0, 0)))
+        );
+
+        jInternalDocTextFrame.setTitle("InternalDoc");
+
+        jInternalDocTextArea.setColumns(20);
+        jInternalDocTextArea.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jInternalDocTextArea.setRows(5);
+        jInternalDocScrollPane.setViewportView(jInternalDocTextArea);
+
+        javax.swing.GroupLayout jInternalDocTextFrameLayout = new javax.swing.GroupLayout(jInternalDocTextFrame.getContentPane());
+        jInternalDocTextFrame.getContentPane().setLayout(jInternalDocTextFrameLayout);
+        jInternalDocTextFrameLayout.setHorizontalGroup(
+            jInternalDocTextFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 680, Short.MAX_VALUE)
+            .addGroup(jInternalDocTextFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jInternalDocTextFrameLayout.createSequentialGroup()
+                    .addGap(0, 0, 0)
+                    .addComponent(jInternalDocScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 668, Short.MAX_VALUE)
+                    .addGap(0, 0, 0)))
+        );
+        jInternalDocTextFrameLayout.setVerticalGroup(
+            jInternalDocTextFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 360, Short.MAX_VALUE)
+            .addGroup(jInternalDocTextFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jInternalDocTextFrameLayout.createSequentialGroup()
+                    .addGap(0, 0, 0)
+                    .addComponent(jInternalDocScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
                     .addGap(0, 0, 0)))
         );
 
@@ -268,31 +319,88 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jNextButton1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jNextButton1MouseReleased
-        setVisible(false);
 
-        //TODO: statusbar a nacitanie a detekovanie suboru
+        //TODO: statusbar
+
+        String filePath = jInputFileTextField1.getText();
+
+        // <editor-fold defaultstate="collapsed" desc="naplnenie InternalDoc a ColumnSchema">
+        InputFilter inputFilter;
+        //TODO: detect encoding
+        if (filePath.toLowerCase().endsWith(".csv")){
+            inputFilter = new ReadCSV(inputFile.toString(),"UTF-8",",","\"");
+            internalDoc = inputFilter.read();
+            columnSchema = inputFilter.getColumnSchema();
+        } else if (filePath.toLowerCase().endsWith(".csv")){
+            JOptionPane.showMessageDialog(this,"File type not supported yet.","Sorry!",JOptionPane.INFORMATION_MESSAGE);
+            return;
+        } else if (filePath.toLowerCase().endsWith(".csv")){
+            JOptionPane.showMessageDialog(this,"File type not supported yet.","Sorry!",JOptionPane.INFORMATION_MESSAGE);
+            return;
+        } else {
+            JOptionPane.showMessageDialog(this,"Choose a valid file. (*.csv, *.ods, *.vcf)","Invalid file path!",JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        //</editor-fold>
+       
+        // <editor-fold defaultstate="collapsed" desc="nacitanie do Show Original Text">
         String line = null;
         BufferedReader buff = null;
         try{
+            inputFile = new File(filePath);
             buff = new BufferedReader(
                        new InputStreamReader(
                            new FileInputStream(
-                               new File(jInputFileTextField1.getText()))));
+                               inputFile)));
 
-            jTextArea1.setText(null);
+            jOriginalFileTextArea.setText(null);
             while ((line = buff.readLine()) != null){
-                jTextArea1.append(line + "\n");
+                jOriginalFileTextArea.append(line + "\n");
             }
+        } catch(FileNotFoundException ex){
+            JOptionPane.showMessageDialog(this,"The file specified was not found. Check the file path!","File not found!",JOptionPane.ERROR_MESSAGE);
+            return;
         } catch(IOException ex){
-            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this,"An error occured. Please try again.","Error!",JOptionPane.ERROR_MESSAGE);
+            return;
         } finally {
             try {
                 if(buff != null) {buff.close();}
             } catch(IOException ex){
-                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this,"An error occured. Please try again.","Error!",JOptionPane.ERROR_MESSAGE);
+                return;
             }
         }
+        // </editor-fold>
 
+        // <editor-fold defaultstate="collapsed" desc="nacitanie do Show Internal Doc">
+        if (internalDoc == null){
+            jInternalDocTextArea.setText("Document is null!!!");
+        } else {
+            jInternalDocTextArea.append("<root>" + System.getProperty("line.separator"));
+            NodeList contactList = internalDoc.getElementsByTagName("contact");
+            for (int i=0; i<contactList.getLength(); i++){
+                jInternalDocTextArea.append("    <contact>" + System.getProperty("line.separator"));
+                Element contact = (Element) contactList.item(i);
+                NodeList uncategorizedList = contact.getElementsByTagName("uncategorized");
+                for (int j = 0; j<uncategorizedList.getLength(); j++){
+                    jInternalDocTextArea.append("        <uncategorized>" + System.getProperty("line.separator"));
+                    Element uncategorized = (Element) uncategorizedList.item(j);
+                    NodeList dataList = uncategorized.getElementsByTagName("data");
+                    for (int k = 0; k<dataList.getLength(); k++){
+                        jInternalDocTextArea.append("            <data>");
+                        jInternalDocTextArea.append(dataList.item(k).getTextContent());
+                        jInternalDocTextArea.append("</data>" + System.getProperty("line.separator"));
+                    }
+                    jInternalDocTextArea.append("        </uncategorized>" + System.getProperty("line.separator"));
+                }
+                jInternalDocTextArea.append("    </contact>" + System.getProperty("line.separator"));
+            }
+            jInternalDocTextArea.append("</root>" + System.getProperty("line.separator"));
+        }
+        // </editor-fold>
+
+        setVisible(false);
         jMainWindowFrame2.pack();
         jMainWindowFrame2.setVisible(true);
     }//GEN-LAST:event_jNextButton1MouseReleased
@@ -300,13 +408,16 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private void jBrowseButton1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jBrowseButton1MouseReleased
         JFileChooser chooser = new JFileChooser();
 
+        // <editor-fold defaultstate="collapsed" desc="filter typov suborov">
         FileFilter filter = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                if ((f.isFile() && (f.toString().endsWith("csv")
-                        || f.toString().endsWith("ods")
-                        || f.toString().endsWith("vcf")))
-                        || f.isDirectory()) {
+                if ((f.isFile() && (f.toString().toLowerCase().endsWith("csv")
+                                    || f.toString().toLowerCase().endsWith("ods")
+                                    || f.toString().toLowerCase().endsWith("vcf")
+                                    )
+                     )
+                     || f.isDirectory()) {
                     return true;
                 } else {
                     return false;
@@ -317,14 +428,13 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 return "CSV, ODS, VCF files";
             }
         };
+        // </editor-fold>
               
         chooser.setFileFilter(filter);
         int returnVal = chooser.showOpenDialog(jPanel1);
         if(returnVal == JFileChooser.APPROVE_OPTION){
-            inputFile = chooser.getSelectedFile();
-            jInputFileTextField1.setText(inputFile.toString());
-        }
-        
+            jInputFileTextField1.setText(chooser.getSelectedFile().toString());
+        }       
     }//GEN-LAST:event_jBrowseButton1MouseReleased
 
     private void jNextButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jNextButton2MouseReleased
@@ -346,18 +456,15 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     }//GEN-LAST:event_jCancelButton2MouseReleased
 
     private void jShowTextFileButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jShowTextFileButton2MouseReleased
-        int lastSlashIndex = 0;
-        String filePath = jInputFileTextField1.getText();
-        if (filePath.lastIndexOf("\\") != -1){
-            lastSlashIndex = filePath.lastIndexOf("\\");
-        }
-        else if (filePath.lastIndexOf("/") != -1) {
-            lastSlashIndex = filePath.lastIndexOf("/");
-        }
-        jOriginalFileTextFrame.setTitle(filePath.substring(lastSlashIndex+1));
+        jOriginalFileTextFrame.setTitle(inputFile.getName());
         jOriginalFileTextFrame.pack();
         jOriginalFileTextFrame.setVisible(true);
     }//GEN-LAST:event_jShowTextFileButton2MouseReleased
+
+    private void jShowInternalDocButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jShowInternalDocButton2MouseReleased
+        jInternalDocTextFrame.pack();
+        jInternalDocTextFrame.setVisible(true);
+    }//GEN-LAST:event_jShowInternalDocButton2MouseReleased
 
 
     /**
@@ -379,18 +486,22 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private javax.swing.JButton jCancelButton2;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JTextField jInputFileTextField1;
+    private javax.swing.JScrollPane jInternalDocScrollPane;
+    private javax.swing.JTextArea jInternalDocTextArea;
+    private javax.swing.JFrame jInternalDocTextFrame;
     private javax.swing.JLabel jMainLabel1;
     private javax.swing.JLabel jMainLabel2;
     private javax.swing.JFrame jMainWindowFrame2;
     private javax.swing.JPanel jMainWindowPanel2;
     private javax.swing.JButton jNextButton1;
     private javax.swing.JButton jNextButton2;
+    private javax.swing.JScrollPane jOriginalFileScrollPane;
+    private javax.swing.JTextArea jOriginalFileTextArea;
     private javax.swing.JFrame jOriginalFileTextFrame;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel jSelectInputLabel1;
+    private javax.swing.JButton jShowInternalDocButton2;
     private javax.swing.JButton jShowTextFileButton2;
-    private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
 
 }

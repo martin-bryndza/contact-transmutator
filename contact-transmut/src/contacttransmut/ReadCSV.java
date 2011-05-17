@@ -33,7 +33,7 @@ public class ReadCSV implements InputFilter {
      * other methods (eg. readVCF()) should return ColumnSchema to identify the columns
      */
 
-    ReadCSV(String aFileName, String aEncoding, String aDelimiter, String aQuote) {
+    public ReadCSV(String aFileName, String aEncoding, String aDelimiter, String aQuote) {
         fileEncoding = aEncoding;
         fileFileName = aFileName;
         delimiter = aDelimiter;
