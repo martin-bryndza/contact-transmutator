@@ -377,7 +377,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         if (internalDoc == null){
             jInternalDocTextArea.setText("Document is null!!!");
         } else {
-            jInternalDocTextArea.append("<root>" + System.getProperty("line.separator"));
+            jInternalDocTextArea.setText("<root>" + System.getProperty("line.separator"));
             NodeList contactList = internalDoc.getElementsByTagName("contact");
             for (int i=0; i<contactList.getLength(); i++){
                 jInternalDocTextArea.append("    <contact>" + System.getProperty("line.separator"));
