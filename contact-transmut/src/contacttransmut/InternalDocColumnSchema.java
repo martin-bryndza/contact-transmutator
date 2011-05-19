@@ -114,4 +114,12 @@ public interface InternalDocColumnSchema {
 
     //<order, columnNumber>
     public HashMap<Integer, Integer> getAllMergesetMembers(Integer mergeset);
+
+    //<editor-fold defaultstate="collapsed" desc="added by Martin B.">
+    public int getColumnCount();
+
+    @Override
+    public String toString();
+
+    //</editor-fold>
 }

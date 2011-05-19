@@ -4,6 +4,7 @@
  */
 package contacttransmut;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -11,6 +12,11 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -143,7 +149,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
     private DocumentBuilderFactory dbf;
     private DocumentBuilder db;
 
-    InternalDocColumnSchemaImpl(Integer columns) {
+    public InternalDocColumnSchemaImpl(Integer columns) {
         // create new internal XML DOM for processing the data
         dbf = DocumentBuilderFactory.newInstance();
         try {
@@ -962,6 +968,53 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
                    return sortKeyHashMap;
     }
 
+    //<editor-fold defaultstate="collapsed" desc="added by Martin B.">
+    public int getColumnCount(){
+        int columnCount = 0;
+
+        NodeList columnList = returnXPathNodeList("//columnschema/column");
+        for (int i = 0; i < columnList.getLength(); i++){
+            Element column = (Element)columnList.item(i);
+            if(column.getAttribute("mergeInOther").equals("yes")){
+                //do not increment
+            } else if(column.getAttribute("aggregated").equals("yes")){
+                NodeList aggColumnList = column.getElementsByTagName("column");
+                columnCount += aggColumnList.getLength();
+            } else {
+                columnCount++;
+            }
+        }
+        return columnCount;
+    }
+
+    @Override
+    public String toString(){
+        /*StringBuilder sb = new StringBuilder();
+        sb.delete(0, sb.length());
+        sb.append("<root>").append(System.getProperty("line.separator"));
+        sb.append("    <columnschema>").append(System.getProperty("line.separator"));
+        NodeList columnList = returnXPathNodeList("//columnschema/column");
+        for (int i = 0; i < columnList.getLength(); i++){
+            Element column = (Element) columnList.item(i);
+            sb.append("        <contact ").append(column.getAttribute("mergedinother"));
+        }
+        sb.append("    </columnschema>");
+        sb.append("</root>");*/
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer trans = null;
+        try {
+            trans = tf.newTransformer();
+            trans.transform(new DOMSource(doc), new StreamResult(stream));
+        } catch (TransformerException ex) {
+            Logger.getLogger(InternalDocColumnSchemaImpl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return stream.toString();
+    }
+
+    //</editor-fold>
 
 }
 
