@@ -4,6 +4,8 @@
  */
 package contacttransmut;
 
+import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
+import com.sun.org.apache.xerces.internal.dom.ElementImpl;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -178,6 +180,10 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
     }
 
     private Element returnFirstElement(NodeList dataNodeList) {
+        if (dataNodeList.getLength() <= 0){
+            return new ElementImpl(new DocumentImpl(), "null");
+        }
+
         Element retElement = null;
         for (int i = 0; i < dataNodeList.getLength(); i++) {
             if (dataNodeList.item(i) instanceof Element) {
@@ -707,7 +713,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
         NodeList dataNodeList = returnXPathNodeList("//columnschema/mergeset[@number=\"" + num.toString() + "\"]");
 
         Element mergeset = returnFirstElement(dataNodeList);
-        if (mergeset != null) {
+        if (!mergeset.getTagName().equals("null")) {
             Element mergesetParent = (Element) mergeset.getParentNode();
             mergesetParent.removeChild(mergeset);
             return true;
@@ -726,7 +732,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
         Element deleteElement = returnFirstElement(deleteNodeList);
 
-        if (deleteElement != null) {
+        if (!deleteElement.getTagName().equals("null")) {
             mergeset.removeChild(deleteElement);
         }
 
@@ -745,7 +751,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
         Element deleteElement = returnFirstElement(deleteNodeList);
 
-        if (deleteElement != null) {
+        if (!deleteElement.getTagName().equals("null")) {
             mergeset.removeChild(deleteElement);
         }
 
@@ -764,7 +770,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
         Element deleteElement = returnFirstElement(deleteNodeList);
 
-        if (deleteElement != null) {
+        if (!deleteElement.getTagName().equals("null")) {
             mergeset.removeChild(deleteElement);
         }
 
@@ -809,7 +815,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
         Element deleteElement = returnFirstElement(deleteNodeList);
 
-        if (deleteElement != null) {
+        if (!deleteElement.getTagName().equals("null")) {
             columnElement.removeChild(deleteElement);
         }
 
@@ -829,7 +835,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
         Element deleteElement = returnFirstElement(deleteNodeList);
 
-        if (deleteElement != null) {
+        if (!deleteElement.getTagName().equals("null")) {
             columnElement.removeChild(deleteElement);
         }
 
@@ -869,7 +875,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
         Element deleteElement = returnFirstElement(deleteNodeList);
 
-        if (deleteElement != null) {
+        if (!deleteElement.getTagName().equals("null")) {
             aggregatedColumnElement.removeChild(deleteElement);
         }
 
@@ -889,7 +895,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
         Element deleteElement = returnFirstElement(deleteNodeList);
 
-        if (deleteElement != null) {
+        if (!deleteElement.getTagName().equals("null")) {
             aggregatedColumnElement.removeChild(deleteElement);
         }
 
@@ -989,18 +995,6 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
     @Override
     public String toString(){
-        /*StringBuilder sb = new StringBuilder();
-        sb.delete(0, sb.length());
-        sb.append("<root>").append(System.getProperty("line.separator"));
-        sb.append("    <columnschema>").append(System.getProperty("line.separator"));
-        NodeList columnList = returnXPathNodeList("//columnschema/column");
-        for (int i = 0; i < columnList.getLength(); i++){
-            Element column = (Element) columnList.item(i);
-            sb.append("        <contact ").append(column.getAttribute("mergedinother"));
-        }
-        sb.append("    </columnschema>");
-        sb.append("</root>");*/
-
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer trans = null;

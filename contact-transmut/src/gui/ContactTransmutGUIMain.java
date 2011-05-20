@@ -14,17 +14,27 @@ package gui;
 import contacttransmut.InputFilter;
 import contacttransmut.InternalDocColumnSchema;
 import contacttransmut.ReadCSV;
+import contacttransmut.VCFTypesEnum;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.ListCellRenderer;
+import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -40,6 +50,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private Document internalDoc = null;
     private InternalDocColumnSchema columnSchema = null;
     private ContactsListTableModel tableModel = new ContactsListTableModel();
+    private ArrayList<javax.swing.JComboBox> comboBoxes = new ArrayList<JComboBox>();
+
 
     /** Creates new form ContactTransmutGUIMain */
     public ContactTransmutGUIMain() {
@@ -47,6 +59,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         jContactsListTable2.setModel(tableModel);
         jContactsListTable2.setAutoscrolls(true);
+        jMainWindowPanel2.setAutoscrolls(true);
     }
 
     /** This method is called from within the constructor to
@@ -58,18 +71,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jMainWindowFrame2 = new javax.swing.JFrame();
-        jMainWindowPanel2 = new javax.swing.JPanel();
-        jMainLabel2 = new javax.swing.JLabel();
-        jNextButton2 = new javax.swing.JButton();
-        jCancelButton2 = new javax.swing.JButton();
-        jBackButton2 = new javax.swing.JButton();
-        jShowTextFileButton2 = new javax.swing.JButton();
-        jShowInternalDocButton2 = new javax.swing.JButton();
-        jContactsListScrollPane2 = new javax.swing.JScrollPane();
-        jContactsListTable2 = new javax.swing.JTable();
-        jShowColumnSchemaButton2 = new javax.swing.JButton();
-        jTestTextField1 = new javax.swing.JTextField();
         jFileChooser1 = new javax.swing.JFileChooser();
         jOriginalFileTextFrame = new javax.swing.JFrame();
         jOriginalFileScrollPane = new javax.swing.JScrollPane();
@@ -80,6 +81,18 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jColumnSchemaTextFrame = new javax.swing.JFrame();
         jColumnSchemaScrollPane = new javax.swing.JScrollPane();
         jColumnSchemaTextArea = new javax.swing.JTextArea();
+        jMainWindowFrame2 = new javax.swing.JFrame();
+        jMainWindowPanel2 = new javax.swing.JPanel();
+        jBackButton2 = new javax.swing.JButton();
+        jCancelButton2 = new javax.swing.JButton();
+        jNextButton2 = new javax.swing.JButton();
+        jShowTextFileButton2 = new javax.swing.JButton();
+        jShowColumnSchemaButton2 = new javax.swing.JButton();
+        jShowInternalDocButton2 = new javax.swing.JButton();
+        jContactsListScrollPane2 = new javax.swing.JScrollPane();
+        jContactsListTable2 = new javax.swing.JTable();
+        jComboBoxesScrollPane2 = new javax.swing.JScrollPane();
+        jComboBoxesToolBar2 = new javax.swing.JToolBar();
         jPanel1 = new javax.swing.JPanel();
         jMainLabel1 = new javax.swing.JLabel();
         jBrowseButton1 = new javax.swing.JButton();
@@ -88,136 +101,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jNextButton1 = new javax.swing.JButton();
         jCancelButton1 = new javax.swing.JButton();
         jBackButton1 = new javax.swing.JButton();
-
-        jMainWindowFrame2.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        jMainWindowFrame2.setTitle("Contact Transmutator 1.0");
-        jMainWindowFrame2.setMinimumSize(new java.awt.Dimension(100, 100));
-
-        jMainLabel2.setFont(new java.awt.Font("Chiller", 1, 48));
-        jMainLabel2.setText("Contact Transmutator 1.0");
-
-        jNextButton2.setText("Next >");
-        jNextButton2.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jNextButton2MouseReleased(evt);
-            }
-        });
-
-        jCancelButton2.setText("Cancel");
-        jCancelButton2.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jCancelButton2MouseReleased(evt);
-            }
-        });
-
-        jBackButton2.setText("< Back");
-        jBackButton2.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jBackButton2MouseReleased(evt);
-            }
-        });
-
-        jShowTextFileButton2.setText("Show text");
-        jShowTextFileButton2.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jShowTextFileButton2MouseReleased(evt);
-            }
-        });
-
-        jShowInternalDocButton2.setText("Show Internal Doc");
-        jShowInternalDocButton2.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jShowInternalDocButton2MouseReleased(evt);
-            }
-        });
-
-        jContactsListTable2.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jContactsListTable2.setMaximumSize(new java.awt.Dimension(2147483647, 2147483647));
-        jContactsListTable2.setMinimumSize(new java.awt.Dimension(10, 10));
-        jContactsListScrollPane2.setViewportView(jContactsListTable2);
-
-        jShowColumnSchemaButton2.setText("Show Column Schema");
-        jShowColumnSchemaButton2.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jShowColumnSchemaButton2MouseReleased(evt);
-            }
-        });
-
-        jTestTextField1.setText("default");
-
-        javax.swing.GroupLayout jMainWindowPanel2Layout = new javax.swing.GroupLayout(jMainWindowPanel2);
-        jMainWindowPanel2.setLayout(jMainWindowPanel2Layout);
-        jMainWindowPanel2Layout.setHorizontalGroup(
-            jMainWindowPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowPanel2Layout.createSequentialGroup()
-                .addContainerGap(284, Short.MAX_VALUE)
-                .addComponent(jShowColumnSchemaButton2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jShowInternalDocButton2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jShowTextFileButton2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jBackButton2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jNextButton2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCancelButton2)
-                .addContainerGap())
-            .addGroup(jMainWindowPanel2Layout.createSequentialGroup()
-                .addContainerGap(215, Short.MAX_VALUE)
-                .addComponent(jMainLabel2)
-                .addContainerGap(205, Short.MAX_VALUE))
-            .addGroup(jMainWindowPanel2Layout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addGroup(jMainWindowPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jMainWindowPanel2Layout.createSequentialGroup()
-                        .addComponent(jTestTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())
-                    .addGroup(jMainWindowPanel2Layout.createSequentialGroup()
-                        .addComponent(jContactsListScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 820, Short.MAX_VALUE)
-                        .addGap(20, 20, 20))))
-        );
-        jMainWindowPanel2Layout.setVerticalGroup(
-            jMainWindowPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jMainLabel2)
-                .addGap(9, 9, 9)
-                .addComponent(jTestTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jContactsListScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 480, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addGroup(jMainWindowPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jMainWindowPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jNextButton2)
-                        .addComponent(jBackButton2)
-                        .addComponent(jShowTextFileButton2)
-                        .addComponent(jShowInternalDocButton2)
-                        .addComponent(jShowColumnSchemaButton2))
-                    .addComponent(jCancelButton2))
-                .addContainerGap())
-        );
-
-        javax.swing.GroupLayout jMainWindowFrame2Layout = new javax.swing.GroupLayout(jMainWindowFrame2.getContentPane());
-        jMainWindowFrame2.getContentPane().setLayout(jMainWindowFrame2Layout);
-        jMainWindowFrame2Layout.setHorizontalGroup(
-            jMainWindowFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jMainWindowPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        jMainWindowFrame2Layout.setVerticalGroup(
-            jMainWindowFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jMainWindowPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
 
         jOriginalFileTextArea.setColumns(20);
         jOriginalFileTextArea.setFont(new java.awt.Font("Arial", 0, 12));
@@ -274,7 +157,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         );
 
         jColumnSchemaTextArea.setColumns(20);
-        jColumnSchemaTextArea.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jColumnSchemaTextArea.setFont(new java.awt.Font("Arial", 0, 12));
         jColumnSchemaTextArea.setRows(5);
         jColumnSchemaScrollPane.setViewportView(jColumnSchemaTextArea);
 
@@ -299,6 +182,131 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     .addGap(0, 0, 0)))
         );
 
+        jMainWindowFrame2.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        jMainWindowFrame2.setTitle("Contact Transmutator 1.0");
+        jMainWindowFrame2.setMinimumSize(new java.awt.Dimension(100, 100));
+
+        jBackButton2.setText("< Back");
+        jBackButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jBackButton2MouseReleased(evt);
+            }
+        });
+
+        jCancelButton2.setText("Cancel");
+        jCancelButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jCancelButton2MouseReleased(evt);
+            }
+        });
+
+        jNextButton2.setText("Next >");
+        jNextButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jNextButton2MouseReleased(evt);
+            }
+        });
+
+        jShowTextFileButton2.setText("Show text");
+        jShowTextFileButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jShowTextFileButton2MouseReleased(evt);
+            }
+        });
+
+        jShowColumnSchemaButton2.setText("Show Column Schema");
+        jShowColumnSchemaButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jShowColumnSchemaButton2MouseReleased(evt);
+            }
+        });
+
+        jShowInternalDocButton2.setText("Show Internal Doc");
+        jShowInternalDocButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jShowInternalDocButton2MouseReleased(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jMainWindowPanel2Layout = new javax.swing.GroupLayout(jMainWindowPanel2);
+        jMainWindowPanel2.setLayout(jMainWindowPanel2Layout);
+        jMainWindowPanel2Layout.setHorizontalGroup(
+            jMainWindowPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowPanel2Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jShowColumnSchemaButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jShowInternalDocButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jShowTextFileButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jBackButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jNextButton2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jCancelButton2)
+                .addContainerGap())
+        );
+        jMainWindowPanel2Layout.setVerticalGroup(
+            jMainWindowPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowPanel2Layout.createSequentialGroup()
+                .addContainerGap(12, Short.MAX_VALUE)
+                .addGroup(jMainWindowPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jBackButton2)
+                    .addComponent(jCancelButton2)
+                    .addComponent(jNextButton2)
+                    .addComponent(jShowTextFileButton2)
+                    .addComponent(jShowColumnSchemaButton2)
+                    .addComponent(jShowInternalDocButton2))
+                .addContainerGap())
+        );
+
+        jContactsListScrollPane2.setMinimumSize(new java.awt.Dimension(1, 1));
+
+        jContactsListTable2.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jContactsListScrollPane2.setViewportView(jContactsListTable2);
+
+        jComboBoxesScrollPane2.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+
+        jComboBoxesToolBar2.setFloatable(false);
+        jComboBoxesToolBar2.setRollover(true);
+        jComboBoxesScrollPane2.setViewportView(jComboBoxesToolBar2);
+
+        javax.swing.GroupLayout jMainWindowFrame2Layout = new javax.swing.GroupLayout(jMainWindowFrame2.getContentPane());
+        jMainWindowFrame2.getContentPane().setLayout(jMainWindowFrame2Layout);
+        jMainWindowFrame2Layout.setHorizontalGroup(
+            jMainWindowFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jMainWindowFrame2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jMainWindowFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jMainWindowPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowFrame2Layout.createSequentialGroup()
+                        .addGroup(jMainWindowFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jComboBoxesScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 858, Short.MAX_VALUE)
+                            .addComponent(jContactsListScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 858, Short.MAX_VALUE))
+                        .addContainerGap())))
+        );
+        jMainWindowFrame2Layout.setVerticalGroup(
+            jMainWindowFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowFrame2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jComboBoxesScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jContactsListScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 535, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jMainWindowPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Contact Transmutator 1.0");
         setResizable(false);
@@ -312,6 +320,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 jBrowseButton1MouseReleased(evt);
             }
         });
+
+        jInputFileTextField1.setText("C:\\Users\\Martin\\Documents\\csv.csv");
 
         jSelectInputLabel1.setFont(new java.awt.Font("Arial", 0, 18));
         jSelectInputLabel1.setText("Please select the input file:");
@@ -371,7 +381,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jBrowseButton1)
                     .addComponent(jInputFileTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 141, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jBackButton1)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -408,8 +418,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         //TODO: detect encoding
         if (filePath.toLowerCase().endsWith(".csv")){
             inputFilter = new ReadCSV(inputFile.toString(),"UTF-8",",","\"");
-            internalDoc = inputFilter.read();
-            columnSchema = inputFilter.getColumnSchema();
         } else if (filePath.toLowerCase().endsWith(".vcf")){
             JOptionPane.showMessageDialog(this,"File type not supported yet.","Sorry!",JOptionPane.INFORMATION_MESSAGE);
             return;
@@ -420,16 +428,126 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this,"Choose a valid file. (*.csv, *.ods, *.vcf)","Invalid file path!",JOptionPane.ERROR_MESSAGE);
             return;
         }
+
+        internalDoc = inputFilter.read();
+        columnSchema = inputFilter.getColumnSchema();
         //</editor-fold>
        
         tableModel.initTable(internalDoc, columnSchema);
 
-        jTestTextField1.setText(String.valueOf(tableModel.getColumnCount()) + ", " + String.valueOf(jContactsListTable2.getColumnCount()));
+        // <editor-fold defaultstate="collapsed" desc="vytvorenie ComboBoxes">
+        boolean nameSelected = false;
+        boolean birthdaySelected = false;
+        boolean lastRevisionSelected = false;
+        boolean uniqueIdentifierSelected = false;
+        ArrayList<Object[]> itemsList = new ArrayList<Object[]>();
 
+        for (int i = 0; i<jContactsListTable2.getColumnCount(); i++){
+            // <editor-fold defaultstate="collapsed" desc="naplnenie hodnotami">
+            itemsList.add(new Object[]{
+                new ComboItem(VCFTypesEnum.Formatted_Name.toDisplayString()),       //0
+                new ComboItem(VCFTypesEnum.Name.toDisplayString()),                 //1
+                new ComboItem(VCFTypesEnum.Telephone.toDisplayString()),            //2
+                new ComboItem(VCFTypesEnum.Telephone_home.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Telephone_work.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Telephone_work_fax.toDisplayString()),   //5
+                new ComboItem(VCFTypesEnum.Telephone_work_video.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Email.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Email_work.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Note.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Photograph.toDisplayString()),           //10
+                new ComboItem(VCFTypesEnum.Sound.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Delivery_Address.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Delivery_Address_home.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Delivery_Address_work.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Label_Address.toDisplayString()),        //15
+                new ComboItem(VCFTypesEnum.Label_Address_home.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Label_Address_work.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Birthday.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Nickname.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Organization_Name_or_Organizational_unit
+                        .toDisplayString()),                                        //20
+                new ComboItem(VCFTypesEnum.Role_or_occupation.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Logo.toDisplayString()),
+                new ComboItem(VCFTypesEnum.URL.toDisplayString()),
+                new ComboItem(VCFTypesEnum.URL_home.toDisplayString()),
+                new ComboItem(VCFTypesEnum.URL_work.toDisplayString()),             //25
+                new ComboItem(VCFTypesEnum.Unique_Identifier.toDisplayString())     //26
+            });
+            //</editor-fold>
+            comboBoxes.add(new JComboBox(itemsList.get(i)));
+            comboBoxes.get(i).setRenderer(new ComboRenderer());
+            comboBoxes.get(i).addActionListener(new ComboListener(comboBoxes.get(i)));
+            
+            String candidateType = columnSchema.queryCandidateType(i);
+            comboBoxes.get(i).setSelectedIndex(9);
+            if (!candidateType.equals("")){
+                String type = VCFTypesEnum.valueOf(candidateType).toDisplayString();
+                comboBoxes.get(i).setSelectedItem(new ComboItem(type));
+                // <editor-fold defaultstate="collapsed" desc="cardinality check">
+                if (type.equals(VCFTypesEnum.Name.toDisplayString())){
+                    if(nameSelected == true){
+                        throw new IllegalArgumentException("Name type has allready been selected. Watch VCF types cardinality!");
+                    }
+                    nameSelected = true;
+                } else if (type.equals(VCFTypesEnum.Birthday.toDisplayString())){
+                    if(birthdaySelected == true){
+                        throw new IllegalArgumentException("Birthday type has allready been selected. Watch VCF types cardinality!");
+                    }
+                    birthdaySelected = true;
+                } else if (type.equals(VCFTypesEnum.Last_Revision.toDisplayString())){
+//                    if(nameSelected == true){
+//                        throw new IllegalArgumentException("Name has allready been selected. Watch VCF types cardinality!");
+//                    }
+//                    nameSelected = true;
+                } else if (type.equals(VCFTypesEnum.Unique_Identifier.toDisplayString())){
+                    if(uniqueIdentifierSelected == true){
+                        throw new IllegalArgumentException("Unique_Identifier type has allready been selected. Watch VCF types cardinality!");
+                    }
+                    uniqueIdentifierSelected = true;
+                }
+                // </editor-fold>
+            }
+            jComboBoxesToolBar2.add(comboBoxes.get(i));
+            comboBoxes.get(i).setVisible(true);
+        }
+
+        // <editor-fold defaultstate="collapsed" desc="disable after cardinality check">
+        if (nameSelected) {
+            for (int i = 0; i < comboBoxes.size(); i++) {
+                if (comboBoxes.get(i).getSelectedIndex() != (1)) {
+                    ((CanEnable) comboBoxes.get(i).getItemAt(1)).setEnabled(false);
+                }
+            }
+        }
+        if (birthdaySelected) {
+            for (int i = 0; i < comboBoxes.size(); i++) {
+                if (comboBoxes.get(i).getSelectedIndex() != (1)) {
+                    ((CanEnable) comboBoxes.get(i).getItemAt(18)).setEnabled(false);
+                }
+            }
+//        }if (lastRevisionSelected) {
+//            for (int i = 0; i < comboBoxes.size(); i++) {
+//                if (comboBoxes.get(i).getSelectedIndex() != (1)) {
+//                    ((CanEnable) comboBoxes.get(i).getItemAt(1)).setEnabled(false);
+//                }
+//            }
+        }if (uniqueIdentifierSelected) {
+            for (int i = 0; i < comboBoxes.size(); i++) {
+                if (comboBoxes.get(i).getSelectedIndex() != (1)) {
+                    ((CanEnable) comboBoxes.get(i).getItemAt(26)).setEnabled(false);
+                }
+            }
+        }
+        //</editor-fold>
+        //</editor-fold>
+
+        comboBoxes.get(0).setSelectedIndex(0);
+        //((CanEnable)comboBoxes.get(0).getItemAt(0)).setEnabled(false);
+    
         setVisible(false);
         jMainWindowFrame2.pack();
         jMainWindowFrame2.setVisible(true);
-        jMainWindowFrame2.repaint();
     }//GEN-LAST:event_jNextButton1MouseReleased
 
     private void jBrowseButton1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jBrowseButton1MouseReleased
@@ -464,9 +582,9 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         }       
     }//GEN-LAST:event_jBrowseButton1MouseReleased
 
-    private void jNextButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jNextButton2MouseReleased
-        // TODO add your handling code here:
-}//GEN-LAST:event_jNextButton2MouseReleased
+    private void jCancelButton1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jCancelButton1MouseReleased
+        System.exit(0);
+    }//GEN-LAST:event_jCancelButton1MouseReleased
 
     private void jBackButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jBackButton2MouseReleased
         jMainWindowFrame2.setVisible(false);
@@ -474,16 +592,15 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         setVisible(true);
     }//GEN-LAST:event_jBackButton2MouseReleased
 
-    private void jCancelButton1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jCancelButton1MouseReleased
-        System.exit(0);
-    }//GEN-LAST:event_jCancelButton1MouseReleased
-
     private void jCancelButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jCancelButton2MouseReleased
         System.exit(0);
     }//GEN-LAST:event_jCancelButton2MouseReleased
 
-    private void jShowTextFileButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jShowTextFileButton2MouseReleased
+    private void jNextButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jNextButton2MouseReleased
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jNextButton2MouseReleased
 
+    private void jShowTextFileButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jShowTextFileButton2MouseReleased
         if (jOriginalFileTextFrame.isVisible()) {
             jOriginalFileTextFrame.requestFocus();
         } else {
@@ -523,8 +640,21 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jShowTextFileButton2MouseReleased
 
-    private void jShowInternalDocButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jShowInternalDocButton2MouseReleased
+    private void jShowColumnSchemaButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jShowColumnSchemaButton2MouseReleased
+        if (jColumnSchemaTextFrame.isVisible()) {
+            jColumnSchemaTextFrame.requestFocus();
+        } else {
 
+            columnSchema = tableModel.getColumnSchema();
+
+            jColumnSchemaTextArea.setText(columnSchema.toString());
+
+            jColumnSchemaTextFrame.pack();
+            jColumnSchemaTextFrame.setVisible(true);
+        }
+    }//GEN-LAST:event_jShowColumnSchemaButton2MouseReleased
+
+    private void jShowInternalDocButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jShowInternalDocButton2MouseReleased
         if (jInternalDocTextFrame.isVisible()) {
             jInternalDocTextFrame.requestFocus();
         } else {
@@ -563,21 +693,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jShowInternalDocButton2MouseReleased
 
-    private void jShowColumnSchemaButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jShowColumnSchemaButton2MouseReleased
-
-        if (jColumnSchemaTextFrame.isVisible()) {
-            jColumnSchemaTextFrame.requestFocus();
-        } else {
-
-            columnSchema = tableModel.getColumnSchema();
-
-            jColumnSchemaTextArea.setText(columnSchema.toString());
-
-            jColumnSchemaTextFrame.pack();
-            jColumnSchemaTextFrame.setVisible(true);
-        }
-    }//GEN-LAST:event_jShowColumnSchemaButton2MouseReleased
-
 
     /**
     * @param args the command line arguments
@@ -590,6 +705,156 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         });
     }
 
+    // <editor-fold defaultstate="collapsed" desc="Combo Box">
+    class ComboRenderer extends JLabel implements ListCellRenderer {
+
+        public ComboRenderer() {
+            setOpaque(true);
+            setBorder(new EmptyBorder(1, 1, 1, 1));
+        }
+
+        public Component getListCellRendererComponent(JList list,
+                Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            if (isSelected) {
+                setBackground(list.getSelectionBackground());
+                setForeground(list.getSelectionForeground());
+            } else {
+                setBackground(list.getBackground());
+                setForeground(list.getForeground());
+            }
+            if (!((CanEnable) value).isEnabled()) {
+                setBackground(list.getBackground());
+                setForeground(UIManager.getColor("Label.disabledForeground"));
+            }
+            setFont(list.getFont());
+            setText((value == null) ? "" : value.toString());
+            return this;
+        }
+    }
+
+    class ComboListener implements ActionListener {
+
+        JComboBox combo;
+        Object currentItem;
+
+        ComboListener(JComboBox combo) {
+            this.combo = combo;
+            combo.setSelectedIndex(0);
+            currentItem = combo.getSelectedItem();
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            Object tempItem = combo.getSelectedItem();
+            if (!((CanEnable) tempItem).isEnabled()) {
+                combo.setSelectedItem(currentItem);
+            } else {
+                // <editor-fold defaultstate="collapsed" desc="osetrenie kardinality">
+                if (((ComboItem)tempItem).value.toString().equals(VCFTypesEnum.Name.toDisplayString())){
+                    for (int i=0; i<comboBoxes.size(); i++){
+                        if (!(((JComboBox)comboBoxes.get(i)).equals(combo))){
+                            ((CanEnable)comboBoxes.get(i).getItemAt(1)).setEnabled(false);
+                        }
+                    }
+                } else if (((ComboItem)tempItem).value.toString().equals(VCFTypesEnum.Birthday.toDisplayString())){
+                    for (int i=0; i<comboBoxes.size(); i++){
+                        if (!(((JComboBox)comboBoxes.get(i)).equals(combo))){
+                            ((CanEnable)comboBoxes.get(i).getItemAt(18)).setEnabled(false);
+                        }
+                    }
+                } else if (((ComboItem)tempItem).value.toString().equals(VCFTypesEnum.Last_Revision.toDisplayString())){
+//                    for (int i=0; i<comboBoxes.size(); i++){
+//                        if (!(((JComboBox)comboBoxes.get(i)).equals(combo))){
+//                            ((CanEnable)comboBoxes.get(i).getItemAt(1)).setEnabled(false);
+//                        }
+//                    }
+                } else if (((ComboItem)tempItem).value.toString().equals(VCFTypesEnum.Unique_Identifier.toDisplayString())){
+                    for (int i=0; i<comboBoxes.size(); i++){
+                        if (!(((JComboBox)comboBoxes.get(i)).equals(combo))){
+                            ((CanEnable)comboBoxes.get(i).getItemAt(26)).setEnabled(false);
+                        }
+                    }
+                }
+                if (((ComboItem)currentItem).value.toString().equals(VCFTypesEnum.Name.toDisplayString())){
+                    for (int i=0; i<comboBoxes.size(); i++){
+                        if (!(((JComboBox)comboBoxes.get(i)).equals(combo))){
+                            ((CanEnable)comboBoxes.get(i).getItemAt(1)).setEnabled(true);
+                        }
+                    }
+                } else if (((ComboItem)currentItem).value.toString().equals(VCFTypesEnum.Birthday.toDisplayString())){
+                    for (int i=0; i<comboBoxes.size(); i++){
+                        if (!(((JComboBox)comboBoxes.get(i)).equals(combo))){
+                            ((CanEnable)comboBoxes.get(i).getItemAt(18)).setEnabled(true);
+                        }
+                    }
+                } else if (((ComboItem)currentItem).value.toString().equals(VCFTypesEnum.Last_Revision.toDisplayString())){
+//                    for (int i=0; i<comboBoxes.size(); i++){
+//                        if (!(((JComboBox)comboBoxes.get(i)).equals(combo))){
+//                            ((CanEnable)comboBoxes.get(i).getItemAt(1)).setEnabled(true);
+//                        }
+//                    }
+                } else if (((ComboItem)currentItem).value.toString().equals(VCFTypesEnum.Unique_Identifier.toDisplayString())){
+                    for (int i=0; i<comboBoxes.size(); i++){
+                        if (!(((JComboBox)comboBoxes.get(i)).equals(combo))){
+                            ((CanEnable)comboBoxes.get(i).getItemAt(26)).setEnabled(true);
+                        }
+                    }
+                }
+                // </editor-fold>
+                currentItem = tempItem;
+            }
+        }
+    }
+
+    class ComboItem implements CanEnable {
+
+        Object value;
+        boolean isEnable;
+
+        ComboItem(Object value, boolean isEnable) {
+            this.value = value;
+            this.isEnable = isEnable;
+        }
+
+        ComboItem(Object value) {
+            this(value, true);
+        }
+
+        public boolean isEnabled() {
+            return isEnable;
+        }
+
+        public void setEnabled(boolean isEnable) {
+            this.isEnable = isEnable;
+        }
+
+        @Override
+        public String toString() {
+            return value.toString();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final ComboItem other = (ComboItem) obj;
+            if (this.value != other.value && (this.value == null || !this.value.equals(other.value))) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            return (this.value != null ? this.value.hashCode() : 0);
+        }
+
+    }
+    // </editor-fold>
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jBackButton1;
     private javax.swing.JButton jBackButton2;
@@ -599,6 +864,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private javax.swing.JScrollPane jColumnSchemaScrollPane;
     private javax.swing.JTextArea jColumnSchemaTextArea;
     private javax.swing.JFrame jColumnSchemaTextFrame;
+    private javax.swing.JScrollPane jComboBoxesScrollPane2;
+    private javax.swing.JToolBar jComboBoxesToolBar2;
     private javax.swing.JScrollPane jContactsListScrollPane2;
     private javax.swing.JTable jContactsListTable2;
     private javax.swing.JFileChooser jFileChooser1;
@@ -607,7 +874,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private javax.swing.JTextArea jInternalDocTextArea;
     private javax.swing.JFrame jInternalDocTextFrame;
     private javax.swing.JLabel jMainLabel1;
-    private javax.swing.JLabel jMainLabel2;
     private javax.swing.JFrame jMainWindowFrame2;
     private javax.swing.JPanel jMainWindowPanel2;
     private javax.swing.JButton jNextButton1;
@@ -620,7 +886,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private javax.swing.JButton jShowColumnSchemaButton2;
     private javax.swing.JButton jShowInternalDocButton2;
     private javax.swing.JButton jShowTextFileButton2;
-    private javax.swing.JTextField jTestTextField1;
     // End of variables declaration//GEN-END:variables
 
 }

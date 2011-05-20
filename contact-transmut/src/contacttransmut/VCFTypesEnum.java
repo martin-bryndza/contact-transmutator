@@ -105,4 +105,12 @@ Public_Key_home ("Public_Key_home");
     public boolean equals(VCFTypesEnum other) {
         return this.toString().equals(other.toString());
     }
+
+    public String toDisplayString(){
+        return this.name.replace("_", " ");
+    }
+
+    public VCFTypesEnum toEnumTypeFromDisplayString(String displayString){
+        return VCFTypesEnum.valueOf(displayString.replace(" ", "_"));
+    }
 }

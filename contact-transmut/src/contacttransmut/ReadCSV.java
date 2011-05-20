@@ -14,6 +14,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -227,7 +228,22 @@ public class ReadCSV implements InputFilter {
     }
 
     public InternalDocColumnSchema getColumnSchema() {
-        return null;
+        NodeList contactList = doc.getElementsByTagName("contact");
+        int maxNumberOfColumns = 0;
+        for (int i = 0; i < contactList.getLength(); i++) {
+            Element contact = (Element) contactList.item(i);
+            NodeList uncategorizedList = contact.getElementsByTagName("uncategorized");
+            for (int j = 0; j < uncategorizedList.getLength(); j++) {
+                Element uncategorized = (Element) uncategorizedList.item(j);
+                NodeList dataList = uncategorized.getElementsByTagName("data");
+                if (dataList.getLength() > maxNumberOfColumns) {
+                    maxNumberOfColumns = dataList.getLength();
+                }
+            }
+        }
+
+        InternalDocColumnSchema result = new InternalDocColumnSchemaImpl(maxNumberOfColumns);
+        return result;
     }
 
  
