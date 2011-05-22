@@ -13,8 +13,8 @@ package contacttransmut;
  */
 public interface OutputFilter {
     //CONSTRUCTOR: should allow to choose filename, encoding and filetype-specific parameters
-    //constructor should accept "CompiledDoc" Document (as produced by InternalDoc2CompiledDoc), nothing else
+    //constructor should accept "CompiledDoc" Document (as produced by InternalDoc2CompiledDoc) and filePath
 
-    //writes the CompiledDoc in appropriate format to the file
+    //writes the CompiledDoc in appropriate format to the file got in constructor
     public void write();
 }

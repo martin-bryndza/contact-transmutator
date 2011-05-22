@@ -25,6 +25,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -77,8 +78,8 @@ import org.w3c.dom.NodeList;
  *     type - present only when autodetectswaps="yes"
  *       number - corresponding //aggregatedcolumns/column@number
  *         regexp - redefine regular expression to detect this column type
- * candidatetype - type of column based on auto-detection
- * selectedtype - type of column selected by user
+ * candidatetype - type of column based on auto-detection (values from VCFHelperEnum.toString())
+ * selectedtype - type of column selected by user (values from VCFHelperEnum.toString())
  * mergein
  *   set - which set the column belongs to (starting from 1)
  *   order - order of the column in the set (starting from 1)
@@ -345,7 +346,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
             Element element = returnFirstElement(dataNodeList);
 
             String stringReturn = element.getAttribute("numberofcolumns");
-            Integer intReturn = Integer.getInteger(stringReturn);
+            Integer intReturn = Integer.parseInt(stringReturn);
             return intReturn;
         } else {
             return null;
@@ -660,12 +661,12 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
     public Integer queryMergeSet(Integer colNum) {
         if ((!isColumnAggregated(colNum)) && (isColumnMergedInOther(colNum))) {    //only meaningful when isColumnMergedInOther
 
-            NodeList dataNodeList = returnXPathNodeList("//columnschema/column[@number=\"" + colNum.toString() + "\"]/aggregatedcolumns/mergein");
+            NodeList dataNodeList = returnXPathNodeList("//columnschema/column[@number=\"" + colNum.toString() + "\"]/mergein");
 
             Element element = returnFirstElement(dataNodeList);
 
             String stringReturn = element.getAttribute("set");
-            Integer intReturn = Integer.getInteger(stringReturn);
+            Integer intReturn = Integer.parseInt(stringReturn);
             return intReturn;
         } else {
             return null;
@@ -675,12 +676,12 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
     public Integer queryMergeOrder(Integer colNum) {
         if ((!isColumnAggregated(colNum)) && (isColumnMergedInOther(colNum))) {    //only meaningful when isColumnMergedInOther
 
-            NodeList dataNodeList = returnXPathNodeList("//columnschema/column[@number=\"" + colNum.toString() + "\"]/aggregatedcolumns/mergein");
+            NodeList dataNodeList = returnXPathNodeList("//columnschema/column[@number=\"" + colNum.toString() + "\"]/mergein");
 
             Element element = returnFirstElement(dataNodeList);
 
             String stringReturn = element.getAttribute("order");
-            Integer intReturn = Integer.getInteger(stringReturn);
+            Integer intReturn = Integer.parseInt(stringReturn);
             return intReturn;
         } else {
             return null;
@@ -693,7 +694,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
         Element mergeset = returnFirstElement(dataNodeList);
 
-        if (mergeset == null) {
+        if (mergeset.getNodeName().equals("null")) {
             mergeset = doc.createElement("mergeset");
             mergeset.setAttribute("number", num.toString());
 
@@ -736,9 +737,9 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
             mergeset.removeChild(deleteElement);
         }
 
-        Element candidatetype = doc.createElement("candidatetype");
+        Element candidatetype = mergeset.getOwnerDocument().createElement("candidatetype");
         candidatetype.setAttribute("value", type);
-
+        
         mergeset.appendChild(candidatetype);
     }
 
@@ -755,9 +756,9 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
             mergeset.removeChild(deleteElement);
         }
 
-        Element selectedtype = doc.createElement("selectedtype");
+        Element selectedtype = mergeset.getOwnerDocument().createElement("selectedtype");
         selectedtype.setAttribute("value", type);
-
+        
         mergeset.appendChild(selectedtype);
     }
 
@@ -938,7 +939,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
                    for (Integer i = 0; i<dataNodeList.getLength(); i++) {
                        if (dataNodeList.item(i) instanceof Element) {
                            Element thisMergeSet = (Element) dataNodeList.item(i);
-                           allMergesetsList.add(Integer.getInteger(thisMergeSet.getAttribute("number")));
+                           allMergesetsList.add(Integer.parseInt(thisMergeSet.getAttribute("number")));
                        }
                    }
                    return allMergesetsList;
@@ -991,6 +992,18 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
             }
         }
         return columnCount;
+    }
+
+    public boolean isTypeInColumnSchema(VCFTypesEnum type){
+        NodeList candidateTypeList = doc.getElementsByTagName("candidatetype");
+        for (int i= 0; i<candidateTypeList.getLength(); i++){
+            Element candidateType = (Element) candidateTypeList.item(i);
+            String value = candidateType.getAttribute("value");
+            if (type.toString().equals(value)){
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

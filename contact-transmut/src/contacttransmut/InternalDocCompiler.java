@@ -43,7 +43,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
     private VCFHelper outFormValidtr;
     private boolean errorsDetected;
 
-    InternalDocCompiler(Document newDocRawReadTextDoc, InternalDocColumnSchema newDocColumnSchema) {
+    public InternalDocCompiler(Document newDocRawReadTextDoc, InternalDocColumnSchema newDocColumnSchema) {
         docRawReadTextDoc = newDocRawReadTextDoc;
         docColumnSchema = newDocColumnSchema;
         outFormValidtr = new VCFHelperImpl(docColumnSchema);

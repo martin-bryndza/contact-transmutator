@@ -118,6 +118,8 @@ public interface InternalDocColumnSchema {
     //<editor-fold defaultstate="collapsed" desc="added by Martin B.">
     public int getColumnCount();
 
+    public boolean isTypeInColumnSchema(VCFTypesEnum type);
+
     @Override
     public String toString();
 

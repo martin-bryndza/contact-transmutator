@@ -6,7 +6,6 @@
 package gui;
 
 import contacttransmut.InternalDocColumnSchema;
-import contacttransmut.InternalDocColumnSchemaImpl;
 import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 import org.w3c.dom.Document;

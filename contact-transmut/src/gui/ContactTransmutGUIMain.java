@@ -12,29 +12,44 @@
 package gui;
 
 import contacttransmut.InputFilter;
+import contacttransmut.InternalDoc2CompiledDoc;
 import contacttransmut.InternalDocColumnSchema;
+import contacttransmut.InternalDocCompiler;
+import contacttransmut.OutputFilter;
 import contacttransmut.ReadCSV;
+import contacttransmut.ReadCompiledDoc;
 import contacttransmut.VCFTypesEnum;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -50,16 +65,20 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private Document internalDoc = null;
     private InternalDocColumnSchema columnSchema = null;
     private ContactsListTableModel tableModel = new ContactsListTableModel();
-    private ArrayList<javax.swing.JComboBox> comboBoxes = new ArrayList<JComboBox>();
+    private ArrayList<javax.swing.JComboBox> comboBoxes = new ArrayList<JComboBox>(); // in main
+    private ArrayList<javax.swing.JLabel> addToLables = new ArrayList<JLabel>(); //in main next to comboBoxes
+    private List<JTextField> columnsToAdd = new LinkedList<JTextField>(); //in add to menu
+    private ArrayList<javax.swing.JComboBox> splitIntoColumnsTypes= new ArrayList<JComboBox>(); //in split into menu
 
+    private boolean oking = false;
 
     /** Creates new form ContactTransmutGUIMain */
     public ContactTransmutGUIMain() {
         initComponents();
 
-        jContactsListTable2.setModel(tableModel);
-        jContactsListTable2.setAutoscrolls(true);
-        jMainWindowPanel2.setAutoscrolls(true);
+        jContactsListTable.setModel(tableModel);
+        jContactsListTable.setAutoscrolls(true);
+        jMainWindowPanel.setAutoscrolls(true);
     }
 
     /** This method is called from within the constructor to
@@ -82,17 +101,84 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jColumnSchemaScrollPane = new javax.swing.JScrollPane();
         jColumnSchemaTextArea = new javax.swing.JTextArea();
         jMainWindowFrame2 = new javax.swing.JFrame();
-        jMainWindowPanel2 = new javax.swing.JPanel();
-        jBackButton2 = new javax.swing.JButton();
-        jCancelButton2 = new javax.swing.JButton();
-        jNextButton2 = new javax.swing.JButton();
-        jShowTextFileButton2 = new javax.swing.JButton();
-        jShowColumnSchemaButton2 = new javax.swing.JButton();
-        jShowInternalDocButton2 = new javax.swing.JButton();
-        jContactsListScrollPane2 = new javax.swing.JScrollPane();
-        jContactsListTable2 = new javax.swing.JTable();
-        jComboBoxesScrollPane2 = new javax.swing.JScrollPane();
-        jComboBoxesToolBar2 = new javax.swing.JToolBar();
+        jMainWindowPanel = new javax.swing.JPanel();
+        jMainWindowBackButton = new javax.swing.JButton();
+        jMainWindowCancelButton = new javax.swing.JButton();
+        jMainWindowNextButton = new javax.swing.JButton();
+        jMainWindowShowTextFileButton = new javax.swing.JButton();
+        jMainWindowShowColumnSchemaButton = new javax.swing.JButton();
+        jMainWindowShowInternalDocButton = new javax.swing.JButton();
+        jContactsListScrollPane = new javax.swing.JScrollPane();
+        jContactsListTable = new javax.swing.JTable();
+        jComboBoxesScrollPane = new javax.swing.JScrollPane();
+        jComboBoxesToolBar = new javax.swing.JToolBar();
+        jMainWindowRefreshButton = new javax.swing.JButton();
+        jAddToFrame = new javax.swing.JFrame();
+        jAddToOkButton = new javax.swing.JButton();
+        jAddToCancelButton = new javax.swing.JButton();
+        jAddToScrollPane = new javax.swing.JScrollPane();
+        jAddToToolBar = new javax.swing.JToolBar();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jAddToBaseColumnTextField = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jColumnToAddLabel = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jAddToDelimeterTextField = new javax.swing.JTextField();
+        jAddToSubmitButton = new javax.swing.JButton();
+        jAddToPlusButton = new javax.swing.JButton();
+        jSplitIntoFrame = new javax.swing.JFrame();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jColumnToSplitLabel = new javax.swing.JLabel();
+        jSplitIntoOkButton = new javax.swing.JButton();
+        jSplitIntoCancelButton = new javax.swing.JButton();
+        jSplitIntoNumberOfColumnsTextField = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jSplitIntoContactsSettingsButton = new javax.swing.JButton();
+        jLabel9 = new javax.swing.JLabel();
+        jSplitIntoDelimeterTextField = new javax.swing.JTextField();
+        jSplitIntoContactsCheckBox = new javax.swing.JCheckBox();
+        jSplitIntoNumberOfColumnsSettingsButton = new javax.swing.JButton();
+        jSplitIntoContactsFrame = new javax.swing.JFrame();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jColumnToSplitLabel1 = new javax.swing.JLabel();
+        jSplitIntoContactsOkButton = new javax.swing.JButton();
+        jSplitIntoContactsCancelButton = new javax.swing.JButton();
+        jSplitIntoContactsNumberOfColumnsTextField = new javax.swing.JTextField();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        jSplitIntoContactsSwapsSettingsButton = new javax.swing.JButton();
+        jLabel14 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        jSplitIntoContactsDelimeterOfContactsTextField = new javax.swing.JTextField();
+        jSplitIntoContactsDelimeterOfColumnsTextField = new javax.swing.JTextField();
+        jSplitIntoContactsSwapsCheckBox = new javax.swing.JCheckBox();
+        jLabel16 = new javax.swing.JLabel();
+        jSplitIntoContactsAreEmployeesCheckBox = new javax.swing.JCheckBox();
+        jSplitIntoContactsColumnTypesSettingsButton = new javax.swing.JButton();
+        jLabel18 = new javax.swing.JLabel();
+        jLabel19 = new javax.swing.JLabel();
+        jLabel20 = new javax.swing.JLabel();
+        jSplitIntoContactsOrigIntoContactsCheckBox = new javax.swing.JCheckBox();
+        jSplitIntoContactsOrigIntoSourceCheckBox = new javax.swing.JCheckBox();
+        jSplitIntoTypeSettingsFrame = new javax.swing.JFrame();
+        jLabel21 = new javax.swing.JLabel();
+        jLabel22 = new javax.swing.JLabel();
+        jColumnToSplitLabel2 = new javax.swing.JLabel();
+        jSplitIntoTypeSettingsOkButton = new javax.swing.JButton();
+        jSplitIntoTypeSettingsCancelButton = new javax.swing.JButton();
+        jLabel23 = new javax.swing.JLabel();
+        jSplitIntoTypeSettingsNumberOfColumnsLabel = new javax.swing.JLabel();
+        jSplitIntoTypeSettingsScrollPane = new javax.swing.JScrollPane();
+        jSplitIntoTypeSettingsToolBar = new javax.swing.JToolBar();
+        jCompiledDocTextFrame = new javax.swing.JFrame();
+        jCompiledDocScrollPane = new javax.swing.JScrollPane();
+        jCompiledDocTextArea = new javax.swing.JTextArea();
+        jFileChooserFrame = new javax.swing.JFrame();
+        jLabel17 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jMainLabel1 = new javax.swing.JLabel();
         jBrowseButton1 = new javax.swing.JButton();
@@ -186,84 +272,84 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jMainWindowFrame2.setTitle("Contact Transmutator 1.0");
         jMainWindowFrame2.setMinimumSize(new java.awt.Dimension(100, 100));
 
-        jBackButton2.setText("< Back");
-        jBackButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+        jMainWindowBackButton.setText("< Back");
+        jMainWindowBackButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jBackButton2MouseReleased(evt);
+                jMainWindowBackButtonMouseReleased(evt);
             }
         });
 
-        jCancelButton2.setText("Cancel");
-        jCancelButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+        jMainWindowCancelButton.setText("Cancel");
+        jMainWindowCancelButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jCancelButton2MouseReleased(evt);
+                jMainWindowCancelButtonMouseReleased(evt);
             }
         });
 
-        jNextButton2.setText("Next >");
-        jNextButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+        jMainWindowNextButton.setText("Next >");
+        jMainWindowNextButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jNextButton2MouseReleased(evt);
+                jMainWindowNextButtonMouseReleased(evt);
             }
         });
 
-        jShowTextFileButton2.setText("Show text");
-        jShowTextFileButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+        jMainWindowShowTextFileButton.setText("Show text");
+        jMainWindowShowTextFileButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jShowTextFileButton2MouseReleased(evt);
+                jMainWindowShowTextFileButtonMouseReleased(evt);
             }
         });
 
-        jShowColumnSchemaButton2.setText("Show Column Schema");
-        jShowColumnSchemaButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+        jMainWindowShowColumnSchemaButton.setText("Show Column Schema");
+        jMainWindowShowColumnSchemaButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jShowColumnSchemaButton2MouseReleased(evt);
+                jMainWindowShowColumnSchemaButtonMouseReleased(evt);
             }
         });
 
-        jShowInternalDocButton2.setText("Show Internal Doc");
-        jShowInternalDocButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+        jMainWindowShowInternalDocButton.setText("Show Internal Doc");
+        jMainWindowShowInternalDocButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jShowInternalDocButton2MouseReleased(evt);
+                jMainWindowShowInternalDocButtonMouseReleased(evt);
             }
         });
 
-        javax.swing.GroupLayout jMainWindowPanel2Layout = new javax.swing.GroupLayout(jMainWindowPanel2);
-        jMainWindowPanel2.setLayout(jMainWindowPanel2Layout);
-        jMainWindowPanel2Layout.setHorizontalGroup(
-            jMainWindowPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowPanel2Layout.createSequentialGroup()
+        javax.swing.GroupLayout jMainWindowPanelLayout = new javax.swing.GroupLayout(jMainWindowPanel);
+        jMainWindowPanel.setLayout(jMainWindowPanelLayout);
+        jMainWindowPanelLayout.setHorizontalGroup(
+            jMainWindowPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowPanelLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jShowColumnSchemaButton2)
+                .addComponent(jMainWindowShowColumnSchemaButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jShowInternalDocButton2)
+                .addComponent(jMainWindowShowInternalDocButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jShowTextFileButton2)
+                .addComponent(jMainWindowShowTextFileButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jBackButton2)
+                .addComponent(jMainWindowBackButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jNextButton2)
+                .addComponent(jMainWindowNextButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCancelButton2)
+                .addComponent(jMainWindowCancelButton)
                 .addContainerGap())
         );
-        jMainWindowPanel2Layout.setVerticalGroup(
-            jMainWindowPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowPanel2Layout.createSequentialGroup()
+        jMainWindowPanelLayout.setVerticalGroup(
+            jMainWindowPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowPanelLayout.createSequentialGroup()
                 .addContainerGap(12, Short.MAX_VALUE)
-                .addGroup(jMainWindowPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jBackButton2)
-                    .addComponent(jCancelButton2)
-                    .addComponent(jNextButton2)
-                    .addComponent(jShowTextFileButton2)
-                    .addComponent(jShowColumnSchemaButton2)
-                    .addComponent(jShowInternalDocButton2))
+                .addGroup(jMainWindowPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jMainWindowBackButton)
+                    .addComponent(jMainWindowCancelButton)
+                    .addComponent(jMainWindowNextButton)
+                    .addComponent(jMainWindowShowTextFileButton)
+                    .addComponent(jMainWindowShowColumnSchemaButton)
+                    .addComponent(jMainWindowShowInternalDocButton))
                 .addContainerGap())
         );
 
-        jContactsListScrollPane2.setMinimumSize(new java.awt.Dimension(1, 1));
+        jContactsListScrollPane.setMinimumSize(new java.awt.Dimension(1, 1));
 
-        jContactsListTable2.setModel(new javax.swing.table.DefaultTableModel(
+        jContactsListTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -274,13 +360,20 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jContactsListScrollPane2.setViewportView(jContactsListTable2);
+        jContactsListScrollPane.setViewportView(jContactsListTable);
 
-        jComboBoxesScrollPane2.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        jComboBoxesScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 
-        jComboBoxesToolBar2.setFloatable(false);
-        jComboBoxesToolBar2.setRollover(true);
-        jComboBoxesScrollPane2.setViewportView(jComboBoxesToolBar2);
+        jComboBoxesToolBar.setFloatable(false);
+        jComboBoxesToolBar.setRollover(true);
+        jComboBoxesScrollPane.setViewportView(jComboBoxesToolBar);
+
+        jMainWindowRefreshButton.setText("REFRESH TABLE (apply changes)");
+        jMainWindowRefreshButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jMainWindowRefreshButtonMouseReleased(evt);
+            }
+        });
 
         javax.swing.GroupLayout jMainWindowFrame2Layout = new javax.swing.GroupLayout(jMainWindowFrame2.getContentPane());
         jMainWindowFrame2.getContentPane().setLayout(jMainWindowFrame2Layout);
@@ -289,22 +382,605 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             .addGroup(jMainWindowFrame2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jMainWindowFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jMainWindowPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowFrame2Layout.createSequentialGroup()
+                        .addComponent(jMainWindowRefreshButton, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 225, Short.MAX_VALUE)
+                        .addComponent(jMainWindowPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowFrame2Layout.createSequentialGroup()
                         .addGroup(jMainWindowFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jComboBoxesScrollPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 858, Short.MAX_VALUE)
-                            .addComponent(jContactsListScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 858, Short.MAX_VALUE))
+                            .addComponent(jComboBoxesScrollPane, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 1014, Short.MAX_VALUE)
+                            .addComponent(jContactsListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1014, Short.MAX_VALUE))
                         .addContainerGap())))
         );
         jMainWindowFrame2Layout.setVerticalGroup(
             jMainWindowFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowFrame2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jComboBoxesScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jComboBoxesScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jContactsListScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 535, Short.MAX_VALUE)
+                .addComponent(jContactsListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 535, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jMainWindowPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jMainWindowFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jMainWindowPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowFrame2Layout.createSequentialGroup()
+                        .addComponent(jMainWindowRefreshButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(11, 11, 11))))
+        );
+
+        jAddToFrame.setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        jAddToFrame.setTitle("Add to..."); // NOI18N
+        jAddToFrame.setResizable(false);
+
+        jAddToOkButton.setText("OK");
+        jAddToOkButton.setEnabled(false);
+        jAddToOkButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jAddToOkButtonMouseReleased(evt);
+            }
+        });
+
+        jAddToCancelButton.setText("Cancel");
+        jAddToCancelButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jAddToCancelButtonMouseReleased(evt);
+            }
+        });
+
+        jAddToToolBar.setFloatable(false);
+        jAddToToolBar.setRollover(true);
+        jAddToScrollPane.setViewportView(jAddToToolBar);
+
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel1.setText("\"ADD TO COLUMN\" MENU:");
+
+        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel2.setText("Base column number:");
+
+        jAddToBaseColumnTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jAddToBaseColumnTextFieldKeyTyped(evt);
+            }
+        });
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel3.setText("Column to add:");
+
+        jColumnToAddLabel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jColumnToAddLabel.setText("0");
+
+        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel4.setText("Delimeter:");
+
+        jAddToDelimeterTextField.setText(",");
+
+        jAddToSubmitButton.setText("Submit");
+        jAddToSubmitButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jAddToSubmitButtonMouseReleased(evt);
+            }
+        });
+
+        jAddToPlusButton.setText("+");
+        jAddToPlusButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jAddToPlusButtonMouseReleased(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jAddToFrameLayout = new javax.swing.GroupLayout(jAddToFrame.getContentPane());
+        jAddToFrame.getContentPane().setLayout(jAddToFrameLayout);
+        jAddToFrameLayout.setHorizontalGroup(
+            jAddToFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jAddToFrameLayout.createSequentialGroup()
+                .addGroup(jAddToFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jAddToFrameLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jAddToFrameLayout.createSequentialGroup()
+                        .addGap(81, 81, 81)
+                        .addGroup(jAddToFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4)
+                            .addGroup(jAddToFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addGroup(jAddToFrameLayout.createSequentialGroup()
+                                    .addComponent(jLabel3)
+                                    .addGap(52, 52, 52))
+                                .addGroup(jAddToFrameLayout.createSequentialGroup()
+                                    .addComponent(jLabel2)
+                                    .addGap(18, 18, 18))))
+                        .addGap(18, 18, 18)
+                        .addGroup(jAddToFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jAddToFrameLayout.createSequentialGroup()
+                                .addComponent(jAddToBaseColumnTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jAddToSubmitButton))
+                            .addComponent(jColumnToAddLabel)
+                            .addComponent(jAddToDelimeterTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(10, 10, 10))
+                    .addGroup(jAddToFrameLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jAddToScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 542, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jAddToPlusButton)))
+                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jAddToFrameLayout.createSequentialGroup()
+                .addContainerGap(446, Short.MAX_VALUE)
+                .addComponent(jAddToOkButton, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jAddToCancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jAddToFrameLayout.setVerticalGroup(
+            jAddToFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jAddToFrameLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(13, 13, 13)
+                .addGroup(jAddToFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(jColumnToAddLabel))
+                .addGap(18, 18, 18)
+                .addGroup(jAddToFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jAddToDelimeterTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
+                .addGap(18, 18, 18)
+                .addGroup(jAddToFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jAddToBaseColumnTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2)
+                    .addComponent(jAddToSubmitButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jAddToFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jAddToPlusButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jAddToScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE))
+                .addGap(32, 32, 32)
+                .addGroup(jAddToFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jAddToCancelButton)
+                    .addComponent(jAddToOkButton))
+                .addContainerGap())
+        );
+
+        jSplitIntoFrame.setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        jSplitIntoFrame.setTitle("Split into...");
+        jSplitIntoFrame.setResizable(false);
+
+        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel5.setText("\"SPLIT INTO\" MULTIPLE COLUMNS MENU:");
+
+        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel6.setText("Column to split:");
+
+        jColumnToSplitLabel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jColumnToSplitLabel.setText("0");
+
+        jSplitIntoOkButton.setText("OK");
+        jSplitIntoOkButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jSplitIntoOkButtonMouseReleased(evt);
+            }
+        });
+
+        jSplitIntoCancelButton.setText("Cancel");
+        jSplitIntoCancelButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jSplitIntoCancelButtonMouseReleased(evt);
+            }
+        });
+
+        jSplitIntoNumberOfColumnsTextField.setText("0");
+
+        jLabel7.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel7.setText("Number of columns:");
+
+        jLabel8.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel8.setText("Into separate contacts:");
+
+        jSplitIntoContactsSettingsButton.setText("Settings");
+        jSplitIntoContactsSettingsButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jSplitIntoContactsSettingsButtonMouseReleased(evt);
+            }
+        });
+
+        jLabel9.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel9.setText("Delimeter:");
+
+        jSplitIntoDelimeterTextField.setText(",");
+
+        jSplitIntoContactsCheckBox.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jSplitIntoContactsCheckBoxMouseClicked(evt);
+            }
+        });
+
+        jSplitIntoNumberOfColumnsSettingsButton.setText("Settings");
+        jSplitIntoNumberOfColumnsSettingsButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jSplitIntoNumberOfColumnsSettingsButtonMouseReleased(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jSplitIntoFrameLayout = new javax.swing.GroupLayout(jSplitIntoFrame.getContentPane());
+        jSplitIntoFrame.getContentPane().setLayout(jSplitIntoFrameLayout);
+        jSplitIntoFrameLayout.setHorizontalGroup(
+            jSplitIntoFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jSplitIntoFrameLayout.createSequentialGroup()
+                .addGroup(jSplitIntoFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jSplitIntoFrameLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 395, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jSplitIntoFrameLayout.createSequentialGroup()
+                        .addGap(39, 39, 39)
+                        .addGroup(jSplitIntoFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jSplitIntoFrameLayout.createSequentialGroup()
+                                .addComponent(jLabel6)
+                                .addGap(59, 59, 59)
+                                .addComponent(jColumnToSplitLabel))
+                            .addGroup(jSplitIntoFrameLayout.createSequentialGroup()
+                                .addComponent(jLabel8)
+                                .addGap(18, 18, 18)
+                                .addComponent(jSplitIntoContactsCheckBox)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jSplitIntoContactsSettingsButton))
+                            .addGroup(jSplitIntoFrameLayout.createSequentialGroup()
+                                .addGroup(jSplitIntoFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel7)
+                                    .addComponent(jLabel9))
+                                .addGap(34, 34, 34)
+                                .addGroup(jSplitIntoFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jSplitIntoDelimeterTextField)
+                                    .addComponent(jSplitIntoNumberOfColumnsTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 67, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jSplitIntoNumberOfColumnsSettingsButton)))))
+                .addContainerGap(196, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jSplitIntoFrameLayout.createSequentialGroup()
+                .addContainerGap(450, Short.MAX_VALUE)
+                .addComponent(jSplitIntoOkButton, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSplitIntoCancelButton)
+                .addContainerGap())
+        );
+        jSplitIntoFrameLayout.setVerticalGroup(
+            jSplitIntoFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jSplitIntoFrameLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jSplitIntoFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(jColumnToSplitLabel))
+                .addGap(24, 24, 24)
+                .addGroup(jSplitIntoFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel8)
+                    .addGroup(jSplitIntoFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jSplitIntoContactsSettingsButton)
+                        .addComponent(jSplitIntoContactsCheckBox)))
+                .addGap(24, 24, 24)
+                .addGroup(jSplitIntoFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(jSplitIntoNumberOfColumnsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jSplitIntoNumberOfColumnsSettingsButton))
+                .addGap(23, 23, 23)
+                .addGroup(jSplitIntoFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(jSplitIntoDelimeterTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jSplitIntoFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jSplitIntoCancelButton)
+                    .addComponent(jSplitIntoOkButton))
+                .addContainerGap())
+        );
+
+        jSplitIntoContactsFrame.setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        jSplitIntoContactsFrame.setTitle("Split into contacts");
+        jSplitIntoContactsFrame.setResizable(false);
+
+        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel10.setText("SPLIT INTO CONTACTS MENU:");
+
+        jLabel11.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel11.setText("Column to split:");
+
+        jColumnToSplitLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jColumnToSplitLabel1.setText("0");
+
+        jSplitIntoContactsOkButton.setText("OK");
+        jSplitIntoContactsOkButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jSplitIntoContactsOkButtonMouseReleased(evt);
+            }
+        });
+
+        jSplitIntoContactsCancelButton.setText("Cancel");
+        jSplitIntoContactsCancelButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jSplitIntoContactsCancelButtonMouseReleased(evt);
+            }
+        });
+
+        jSplitIntoContactsNumberOfColumnsTextField.setText("0");
+
+        jLabel12.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel12.setText("Number of columns in each contact:");
+
+        jLabel13.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel13.setText("Detect swaps");
+        jLabel13.setEnabled(false);
+
+        jSplitIntoContactsSwapsSettingsButton.setText("Settings");
+        jSplitIntoContactsSwapsSettingsButton.setEnabled(false);
+
+        jLabel14.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel14.setText("Delimeter of contacts:");
+
+        jLabel15.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel15.setText("Delimeter of columns:");
+
+        jSplitIntoContactsDelimeterOfContactsTextField.setText(",");
+
+        jSplitIntoContactsDelimeterOfColumnsTextField.setText(",");
+
+        jSplitIntoContactsSwapsCheckBox.setEnabled(false);
+
+        jLabel16.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel16.setText("Contacts are employees:");
+
+        jSplitIntoContactsColumnTypesSettingsButton.setText("Settings");
+        jSplitIntoContactsColumnTypesSettingsButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jSplitIntoContactsColumnTypesSettingsButtonMouseReleased(evt);
+            }
+        });
+
+        jLabel18.setText("(company/displayname of original contact into Company field of new contact)");
+
+        jLabel19.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel19.setText("Original content into source as note:");
+
+        jLabel20.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel20.setText("Original content into contacts as note:");
+
+        javax.swing.GroupLayout jSplitIntoContactsFrameLayout = new javax.swing.GroupLayout(jSplitIntoContactsFrame.getContentPane());
+        jSplitIntoContactsFrame.getContentPane().setLayout(jSplitIntoContactsFrameLayout);
+        jSplitIntoContactsFrameLayout.setHorizontalGroup(
+            jSplitIntoContactsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jSplitIntoContactsFrameLayout.createSequentialGroup()
+                .addGroup(jSplitIntoContactsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jSplitIntoContactsFrameLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 395, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jSplitIntoContactsFrameLayout.createSequentialGroup()
+                        .addGap(39, 39, 39)
+                        .addGroup(jSplitIntoContactsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jSplitIntoContactsFrameLayout.createSequentialGroup()
+                                .addComponent(jLabel11)
+                                .addGap(59, 59, 59)
+                                .addComponent(jColumnToSplitLabel1))
+                            .addGroup(jSplitIntoContactsFrameLayout.createSequentialGroup()
+                                .addGroup(jSplitIntoContactsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel14)
+                                    .addComponent(jLabel15)
+                                    .addComponent(jLabel16)
+                                    .addComponent(jLabel13)
+                                    .addComponent(jLabel20)
+                                    .addComponent(jLabel19)
+                                    .addComponent(jLabel12))
+                                .addGap(34, 34, 34)
+                                .addGroup(jSplitIntoContactsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jSplitIntoContactsOrigIntoContactsCheckBox)
+                                    .addComponent(jSplitIntoContactsOrigIntoSourceCheckBox)
+                                    .addGroup(jSplitIntoContactsFrameLayout.createSequentialGroup()
+                                        .addComponent(jSplitIntoContactsNumberOfColumnsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(14, 14, 14)
+                                        .addComponent(jSplitIntoContactsColumnTypesSettingsButton))
+                                    .addGroup(jSplitIntoContactsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(jSplitIntoContactsDelimeterOfContactsTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(jSplitIntoContactsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(jSplitIntoContactsFrameLayout.createSequentialGroup()
+                                                .addComponent(jSplitIntoContactsAreEmployeesCheckBox)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(jLabel18))
+                                            .addComponent(jSplitIntoContactsDelimeterOfColumnsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGroup(jSplitIntoContactsFrameLayout.createSequentialGroup()
+                                                .addComponent(jSplitIntoContactsSwapsCheckBox)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jSplitIntoContactsSwapsSettingsButton)))))))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jSplitIntoContactsFrameLayout.createSequentialGroup()
+                .addContainerGap(553, Short.MAX_VALUE)
+                .addComponent(jSplitIntoContactsOkButton, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSplitIntoContactsCancelButton)
+                .addContainerGap())
+        );
+        jSplitIntoContactsFrameLayout.setVerticalGroup(
+            jSplitIntoContactsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jSplitIntoContactsFrameLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jSplitIntoContactsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel11)
+                    .addComponent(jColumnToSplitLabel1))
+                .addGap(18, 18, 18)
+                .addGroup(jSplitIntoContactsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jSplitIntoContactsNumberOfColumnsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jSplitIntoContactsColumnTypesSettingsButton)
+                    .addComponent(jLabel12))
+                .addGap(23, 23, 23)
+                .addGroup(jSplitIntoContactsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jSplitIntoContactsDelimeterOfContactsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel14))
+                .addGap(18, 18, 18)
+                .addGroup(jSplitIntoContactsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jSplitIntoContactsDelimeterOfColumnsTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel15))
+                .addGap(18, 18, 18)
+                .addGroup(jSplitIntoContactsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel16)
+                    .addGroup(jSplitIntoContactsFrameLayout.createSequentialGroup()
+                        .addGroup(jSplitIntoContactsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jSplitIntoContactsAreEmployeesCheckBox)
+                            .addComponent(jLabel18))
+                        .addGap(18, 18, 18)
+                        .addGroup(jSplitIntoContactsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jSplitIntoContactsSwapsSettingsButton)
+                            .addGroup(jSplitIntoContactsFrameLayout.createSequentialGroup()
+                                .addGroup(jSplitIntoContactsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jSplitIntoContactsFrameLayout.createSequentialGroup()
+                                        .addComponent(jLabel13)
+                                        .addGap(18, 18, 18))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jSplitIntoContactsFrameLayout.createSequentialGroup()
+                                        .addComponent(jSplitIntoContactsSwapsCheckBox)
+                                        .addGap(12, 12, 12)))
+                                .addGroup(jSplitIntoContactsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel19, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jSplitIntoContactsOrigIntoSourceCheckBox, javax.swing.GroupLayout.Alignment.LEADING))))))
+                .addGap(24, 24, 24)
+                .addGroup(jSplitIntoContactsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jSplitIntoContactsFrameLayout.createSequentialGroup()
+                        .addComponent(jLabel20)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 64, Short.MAX_VALUE)
+                        .addGroup(jSplitIntoContactsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jSplitIntoContactsCancelButton)
+                            .addComponent(jSplitIntoContactsOkButton)))
+                    .addComponent(jSplitIntoContactsOrigIntoContactsCheckBox))
+                .addContainerGap())
+        );
+
+        jSplitIntoTypeSettingsFrame.setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        jSplitIntoTypeSettingsFrame.setTitle("Split into...");
+        jSplitIntoTypeSettingsFrame.setResizable(false);
+
+        jLabel21.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel21.setText("\"SPLIT INTO\" MULTIPLE COLUMNS MENU:");
+
+        jLabel22.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel22.setText("Column to split:");
+
+        jColumnToSplitLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jColumnToSplitLabel2.setText("0");
+
+        jSplitIntoTypeSettingsOkButton.setText("OK");
+        jSplitIntoTypeSettingsOkButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jSplitIntoTypeSettingsOkButtonMouseReleased(evt);
+            }
+        });
+
+        jSplitIntoTypeSettingsCancelButton.setText("Cancel");
+        jSplitIntoTypeSettingsCancelButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jSplitIntoTypeSettingsCancelButtonMouseReleased(evt);
+            }
+        });
+
+        jLabel23.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel23.setText("Number of columns:");
+
+        jSplitIntoTypeSettingsNumberOfColumnsLabel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jSplitIntoTypeSettingsNumberOfColumnsLabel.setText("0");
+
+        jSplitIntoTypeSettingsToolBar.setFloatable(false);
+        jSplitIntoTypeSettingsToolBar.setRollover(true);
+        jSplitIntoTypeSettingsScrollPane.setViewportView(jSplitIntoTypeSettingsToolBar);
+
+        javax.swing.GroupLayout jSplitIntoTypeSettingsFrameLayout = new javax.swing.GroupLayout(jSplitIntoTypeSettingsFrame.getContentPane());
+        jSplitIntoTypeSettingsFrame.getContentPane().setLayout(jSplitIntoTypeSettingsFrameLayout);
+        jSplitIntoTypeSettingsFrameLayout.setHorizontalGroup(
+            jSplitIntoTypeSettingsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jSplitIntoTypeSettingsFrameLayout.createSequentialGroup()
+                .addGroup(jSplitIntoTypeSettingsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jSplitIntoTypeSettingsFrameLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 395, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jSplitIntoTypeSettingsFrameLayout.createSequentialGroup()
+                        .addGap(39, 39, 39)
+                        .addGroup(jSplitIntoTypeSettingsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jSplitIntoTypeSettingsScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 520, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jSplitIntoTypeSettingsFrameLayout.createSequentialGroup()
+                                .addGroup(jSplitIntoTypeSettingsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel22)
+                                    .addComponent(jLabel23))
+                                .addGap(34, 34, 34)
+                                .addGroup(jSplitIntoTypeSettingsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jSplitIntoTypeSettingsNumberOfColumnsLabel)
+                                    .addComponent(jColumnToSplitLabel2))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGap(0, 0, 0))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jSplitIntoTypeSettingsFrameLayout.createSequentialGroup()
+                .addContainerGap(448, Short.MAX_VALUE)
+                .addComponent(jSplitIntoTypeSettingsOkButton, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSplitIntoTypeSettingsCancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jSplitIntoTypeSettingsFrameLayout.setVerticalGroup(
+            jSplitIntoTypeSettingsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jSplitIntoTypeSettingsFrameLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel21, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jSplitIntoTypeSettingsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel22)
+                    .addComponent(jColumnToSplitLabel2))
+                .addGap(18, 18, 18)
+                .addGroup(jSplitIntoTypeSettingsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel23)
+                    .addComponent(jSplitIntoTypeSettingsNumberOfColumnsLabel))
+                .addGap(18, 18, 18)
+                .addComponent(jSplitIntoTypeSettingsScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 67, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addGroup(jSplitIntoTypeSettingsFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jSplitIntoTypeSettingsCancelButton)
+                    .addComponent(jSplitIntoTypeSettingsOkButton))
+                .addContainerGap())
+        );
+
+        jCompiledDocTextArea.setColumns(20);
+        jCompiledDocTextArea.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jCompiledDocTextArea.setRows(5);
+        jCompiledDocScrollPane.setViewportView(jCompiledDocTextArea);
+
+        javax.swing.GroupLayout jCompiledDocTextFrameLayout = new javax.swing.GroupLayout(jCompiledDocTextFrame.getContentPane());
+        jCompiledDocTextFrame.getContentPane().setLayout(jCompiledDocTextFrameLayout);
+        jCompiledDocTextFrameLayout.setHorizontalGroup(
+            jCompiledDocTextFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 680, Short.MAX_VALUE)
+            .addGroup(jCompiledDocTextFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jCompiledDocTextFrameLayout.createSequentialGroup()
+                    .addGap(0, 0, 0)
+                    .addComponent(jCompiledDocScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 668, Short.MAX_VALUE)
+                    .addGap(0, 0, 0)))
+        );
+        jCompiledDocTextFrameLayout.setVerticalGroup(
+            jCompiledDocTextFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 360, Short.MAX_VALUE)
+            .addGroup(jCompiledDocTextFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jCompiledDocTextFrameLayout.createSequentialGroup()
+                    .addGap(0, 0, 0)
+                    .addComponent(jCompiledDocScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
+                    .addGap(0, 0, 0)))
+        );
+
+        jFileChooserFrame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jLabel17.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        jLabel17.setText("SAVING...");
+
+        javax.swing.GroupLayout jFileChooserFrameLayout = new javax.swing.GroupLayout(jFileChooserFrame.getContentPane());
+        jFileChooserFrame.getContentPane().setLayout(jFileChooserFrameLayout);
+        jFileChooserFrameLayout.setHorizontalGroup(
+            jFileChooserFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jFileChooserFrameLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel17)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jFileChooserFrameLayout.setVerticalGroup(
+            jFileChooserFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jFileChooserFrameLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel17)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -438,11 +1114,10 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         // <editor-fold defaultstate="collapsed" desc="vytvorenie ComboBoxes">
         boolean nameSelected = false;
         boolean birthdaySelected = false;
-        boolean lastRevisionSelected = false;
         boolean uniqueIdentifierSelected = false;
         ArrayList<Object[]> itemsList = new ArrayList<Object[]>();
 
-        for (int i = 0; i<jContactsListTable2.getColumnCount(); i++){
+        for (int i = 0; i<jContactsListTable.getColumnCount(); i++){
             // <editor-fold defaultstate="collapsed" desc="naplnenie hodnotami">
             itemsList.add(new Object[]{
                 new ComboItem(VCFTypesEnum.Formatted_Name.toDisplayString()),       //0
@@ -472,16 +1147,32 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 new ComboItem(VCFTypesEnum.URL.toDisplayString()),
                 new ComboItem(VCFTypesEnum.URL_home.toDisplayString()),
                 new ComboItem(VCFTypesEnum.URL_work.toDisplayString()),             //25
-                new ComboItem(VCFTypesEnum.Unique_Identifier.toDisplayString())     //26
+                new ComboItem(VCFTypesEnum.Unique_Identifier.toDisplayString()),    //26
+                new ComboItem("ADD TO COLUMN #..."),
+                new ComboItem("SPLIT INTO...")
             });
             //</editor-fold>
             comboBoxes.add(new JComboBox(itemsList.get(i)));
             comboBoxes.get(i).setRenderer(new ComboRenderer());
             comboBoxes.get(i).addActionListener(new ComboListener(comboBoxes.get(i)));
+            addToLables.add(new JLabel(""));
             
             String candidateType = columnSchema.queryCandidateType(i);
             comboBoxes.get(i).setSelectedIndex(9);
-            if (!candidateType.equals("")){
+            if (columnSchema.isColumnAggregated(i)){
+                comboBoxes.get(i).setSelectedItem(new ComboItem("SPLIT INTO..."));
+                fillInSplitIntoTypesSettingsForm();
+            } else if (columnSchema.isColumnMergedInOther(i)){
+                int mergsetNumber = columnSchema.queryMergeSet(i);
+                if (columnSchema.queryMergeOrder(i) == 1){
+                    String candidType = columnSchema.queryMergesetCandidateType(i);
+                    comboBoxes.get(i).setSelectedItem(new ComboItem(VCFTypesEnum.valueOf(candidType).toDisplayString()));
+                } else {
+                    comboBoxes.get(i).setSelectedItem(new ComboItem("ADD TO COLUMN #..."));
+                    int mergeTo = columnSchema.getAllMergesetMembers(mergsetNumber).get(columnSchema.queryMergeOrder(i));
+                    addToLables.get(i).setText(String.valueOf(mergeTo));
+                }                
+            } else if (!candidateType.equals("")){
                 String type = VCFTypesEnum.valueOf(candidateType).toDisplayString();
                 comboBoxes.get(i).setSelectedItem(new ComboItem(type));
                 // <editor-fold defaultstate="collapsed" desc="cardinality check">
@@ -495,11 +1186,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                         throw new IllegalArgumentException("Birthday type has allready been selected. Watch VCF types cardinality!");
                     }
                     birthdaySelected = true;
-                } else if (type.equals(VCFTypesEnum.Last_Revision.toDisplayString())){
-//                    if(nameSelected == true){
-//                        throw new IllegalArgumentException("Name has allready been selected. Watch VCF types cardinality!");
-//                    }
-//                    nameSelected = true;
                 } else if (type.equals(VCFTypesEnum.Unique_Identifier.toDisplayString())){
                     if(uniqueIdentifierSelected == true){
                         throw new IllegalArgumentException("Unique_Identifier type has allready been selected. Watch VCF types cardinality!");
@@ -508,8 +1194,9 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 }
                 // </editor-fold>
             }
-            jComboBoxesToolBar2.add(comboBoxes.get(i));
+            jComboBoxesToolBar.add(comboBoxes.get(i));
             comboBoxes.get(i).setVisible(true);
+            jComboBoxesToolBar.add(addToLables.get(i));
         }
 
         // <editor-fold defaultstate="collapsed" desc="disable after cardinality check">
@@ -526,12 +1213,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     ((CanEnable) comboBoxes.get(i).getItemAt(18)).setEnabled(false);
                 }
             }
-//        }if (lastRevisionSelected) {
-//            for (int i = 0; i < comboBoxes.size(); i++) {
-//                if (comboBoxes.get(i).getSelectedIndex() != (1)) {
-//                    ((CanEnable) comboBoxes.get(i).getItemAt(1)).setEnabled(false);
-//                }
-//            }
         }if (uniqueIdentifierSelected) {
             for (int i = 0; i < comboBoxes.size(); i++) {
                 if (comboBoxes.get(i).getSelectedIndex() != (1)) {
@@ -543,7 +1224,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         //</editor-fold>
 
         comboBoxes.get(0).setSelectedIndex(0);
-        //((CanEnable)comboBoxes.get(0).getItemAt(0)).setEnabled(false);
     
         setVisible(false);
         jMainWindowFrame2.pack();
@@ -586,21 +1266,143 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_jCancelButton1MouseReleased
 
-    private void jBackButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jBackButton2MouseReleased
+    private void jMainWindowBackButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMainWindowBackButtonMouseReleased
         jMainWindowFrame2.setVisible(false);
         jOriginalFileTextFrame.setVisible(false);
         setVisible(true);
-    }//GEN-LAST:event_jBackButton2MouseReleased
+    }//GEN-LAST:event_jMainWindowBackButtonMouseReleased
 
-    private void jCancelButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jCancelButton2MouseReleased
+    private void jMainWindowCancelButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMainWindowCancelButtonMouseReleased
         System.exit(0);
-    }//GEN-LAST:event_jCancelButton2MouseReleased
+    }//GEN-LAST:event_jMainWindowCancelButtonMouseReleased
 
-    private void jNextButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jNextButton2MouseReleased
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jNextButton2MouseReleased
+    private void jMainWindowNextButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMainWindowNextButtonMouseReleased
+        boolean formatedNameSelected = false;
+        for (int i = 0; i<jContactsListTable.getColumnCount(); i++){
+            if (comboBoxes.get(i).getSelectedIndex() == 0){
+                formatedNameSelected = true;
+                break;
+            }
+        }
+        if (!formatedNameSelected)
+            formatedNameSelected = columnSchema.isTypeInColumnSchema(VCFTypesEnum.Formatted_Name);
+        if (!formatedNameSelected){
+            JOptionPane.showMessageDialog(this,"Formatted Name column type is mandatory. Please select one.","Error",JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-    private void jShowTextFileButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jShowTextFileButton2MouseReleased
+        jMainWindowFrame2.setVisible(false);
+
+        String savePath = "";
+        JFileChooser chooser = new JFileChooser();
+        // <editor-fold defaultstate="collapsed" desc="filter typov suborov">
+        FileFilter filterVCF = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                if ((f.isFile() && f.toString().toLowerCase().endsWith("vcf")) || f.isDirectory()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            @Override
+            public String getDescription() {
+                return "VCF files";
+            }
+        };
+        FileFilter filterODS = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                if ((f.isFile() && f.toString().toLowerCase().endsWith("ods")) || f.isDirectory()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            @Override
+            public String getDescription() {
+                return "ODS files";
+            }
+        };
+        FileFilter filterCSV = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                if ((f.isFile() && f.toString().toLowerCase().endsWith("csv")) || f.isDirectory()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            @Override
+            public String getDescription() {
+                return "CSV files";
+            }
+        };
+        FileFilter filterADR = new FileFilter() {
+            @Override
+            public boolean accept(File f) {
+                if ((f.isFile() && f.toString().toLowerCase().endsWith("adr")) || f.isDirectory()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            @Override
+            public String getDescription() {
+                return "ADR files";
+            }
+        };
+        // </editor-fold>
+        chooser.addChoosableFileFilter(filterCSV);
+        chooser.addChoosableFileFilter(filterADR);
+        chooser.addChoosableFileFilter(filterODS);
+        chooser.addChoosableFileFilter(filterVCF);
+        chooser.setDialogTitle("Save as...");
+        chooser.setApproveButtonText("Save");
+        jFileChooserFrame.setVisible(true);
+        int returnVal = chooser.showOpenDialog(jFileChooserFrame);
+        if(returnVal == JFileChooser.APPROVE_OPTION){
+            savePath = (chooser.getSelectedFile().toString());
+        } else {
+            jMainWindowFrame2.setVisible(true);
+            return;
+        }
+
+        for (int i = 0; i<jContactsListTable.getColumnCount(); i++){
+            String type = ((String)((ComboItem)comboBoxes.get(i).getSelectedItem()).value).replace(" ", "_");
+            if (type.equals("ADD_TO_COLUMN_#...") || type.equals("SPLIT_INTO...")){
+                continue;
+            }
+            columnSchema.setCandidateType(i, type);
+            columnSchema.setSelectedtypeType(i, type);
+        }
+
+        InternalDoc2CompiledDoc compiler = new InternalDocCompiler(internalDoc, columnSchema);
+        compiler.compile();
+        Document compiledDoc = compiler.getCompiledValidContacts();
+
+        OutputFilter outputFilter = null;
+        if (savePath.toLowerCase().endsWith(".csv")){
+            JOptionPane.showMessageDialog(this,"File type not supported yet.","Sorry!",JOptionPane.INFORMATION_MESSAGE);
+            return;
+        } else if (savePath.toLowerCase().endsWith(".vcf")){
+            JOptionPane.showMessageDialog(this,"File type not supported yet.","Sorry!",JOptionPane.INFORMATION_MESSAGE);
+            return;
+        } else if (savePath.toLowerCase().endsWith(".osd")){
+            JOptionPane.showMessageDialog(this,"File type not supported yet.","Sorry!",JOptionPane.INFORMATION_MESSAGE);
+            return;
+        } else if (savePath.toLowerCase().endsWith(".adr")){
+            JOptionPane.showMessageDialog(this,"File type not supported yet.","Sorry!",JOptionPane.INFORMATION_MESSAGE);
+            return;
+        } else {
+            JOptionPane.showMessageDialog(this,"Choose a valid file. (*.csv, *.ods, *.vcf, *.adr)","Invalid file path!",JOptionPane.ERROR_MESSAGE);
+            //return;
+        }
+        outputFilter.write();
+
+    }//GEN-LAST:event_jMainWindowNextButtonMouseReleased
+
+    private void jMainWindowShowTextFileButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMainWindowShowTextFileButtonMouseReleased
         if (jOriginalFileTextFrame.isVisible()) {
             jOriginalFileTextFrame.requestFocus();
         } else {
@@ -638,9 +1440,9 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             jOriginalFileTextFrame.pack();
             jOriginalFileTextFrame.setVisible(true);
         }
-    }//GEN-LAST:event_jShowTextFileButton2MouseReleased
+    }//GEN-LAST:event_jMainWindowShowTextFileButtonMouseReleased
 
-    private void jShowColumnSchemaButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jShowColumnSchemaButton2MouseReleased
+    private void jMainWindowShowColumnSchemaButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMainWindowShowColumnSchemaButtonMouseReleased
         if (jColumnSchemaTextFrame.isVisible()) {
             jColumnSchemaTextFrame.requestFocus();
         } else {
@@ -652,9 +1454,9 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             jColumnSchemaTextFrame.pack();
             jColumnSchemaTextFrame.setVisible(true);
         }
-    }//GEN-LAST:event_jShowColumnSchemaButton2MouseReleased
+    }//GEN-LAST:event_jMainWindowShowColumnSchemaButtonMouseReleased
 
-    private void jShowInternalDocButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jShowInternalDocButton2MouseReleased
+    private void jMainWindowShowInternalDocButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMainWindowShowInternalDocButtonMouseReleased
         if (jInternalDocTextFrame.isVisible()) {
             jInternalDocTextFrame.requestFocus();
         } else {
@@ -691,7 +1493,404 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             jInternalDocTextFrame.pack();
             jInternalDocTextFrame.setVisible(true);
         }
-    }//GEN-LAST:event_jShowInternalDocButton2MouseReleased
+    }//GEN-LAST:event_jMainWindowShowInternalDocButtonMouseReleased
+
+    private void jAddToCancelButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jAddToCancelButtonMouseReleased
+        int myColumn = Integer.parseInt(jColumnToAddLabel.getText());
+        if (!columnSchema.isColumnMergedInOther(myColumn)){
+            comboBoxes.get(myColumn).setSelectedIndex(9);
+        }
+        jAddToFrame.setVisible(false);
+    }//GEN-LAST:event_jAddToCancelButtonMouseReleased
+
+    private void jAddToSubmitButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jAddToSubmitButtonMouseReleased
+        jAddToSubmitButtonMouseReleasedAction();
+    }//GEN-LAST:event_jAddToSubmitButtonMouseReleased
+
+    private void jAddToPlusButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jAddToPlusButtonMouseReleased
+        jAddToToolBar.add(new JLabel(jAddToDelimeterTextField.getText()));
+        columnsToAdd.add(new JTextField(2));
+        jAddToToolBar.add(columnsToAdd.get(columnsToAdd.size()-1));
+        jAddToToolBar.setVisible(false);
+        jAddToToolBar.setVisible(true);
+    }//GEN-LAST:event_jAddToPlusButtonMouseReleased
+
+    private void jAddToOkButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jAddToOkButtonMouseReleased
+        //check inputs
+        String myColumn = jColumnToAddLabel.getText();
+        String baseColumnStr = jAddToBaseColumnTextField.getText();
+        int baseColumn  = Integer.parseInt(baseColumnStr);
+        int newMergesetNumber = 0;
+        boolean myColumnAdded = false;
+        ArrayList<Integer> columnsToAddNumbers = new ArrayList<Integer>();
+        for (int i = 0; i<columnsToAdd.size(); i++){
+            String component1 = columnsToAdd.get(i).getText();
+            if (component1.equals(""))
+                continue;
+            if (component1.equals(myColumn))
+                myColumnAdded = true;
+            if (component1.equals(baseColumnStr)){
+                JOptionPane.showMessageDialog(this,"Cannot add column to itself.","Error",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            for (int j = i+1; j<columnsToAdd.size(); j++){
+                String component2 = columnsToAdd.get(j).getText();
+                if (component2.equals(""))
+                    continue;
+                if (component1.equals(component2)){
+                    JOptionPane.showMessageDialog(this,"Cannot add column to itself.","Error",JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+        }
+        if (!myColumnAdded){
+            JOptionPane.showMessageDialog(this,"You didn't add the \"Column to add\".","Info",JOptionPane.INFORMATION_MESSAGE);
+        }
+
+        try{
+            for (int i=0; i<columnsToAdd.size(); i++){
+                if (columnsToAdd.get(i).getText().equals(""))
+                    continue;
+                int columnNumber = Integer.parseInt(columnsToAdd.get(i).getText());
+                if (columnNumber >= jContactsListTable.getColumnCount() ){
+                    JOptionPane.showMessageDialog(this,"Too high column number","Error",JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                columnsToAddNumbers.add(columnNumber);
+            }
+        }catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this,"Invalid column number","Error",JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        if (columnSchema.isColumnMergedInOther(baseColumn)){
+            if (columnSchema.queryMergeOrder(baseColumn) != 1){
+                Object[] options = {"Yes", "No, I will change the settings"};
+                int n = JOptionPane.showOptionDialog(this, "The base column is added to another. Cancel the other addition?", "Problem!", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,null, options, options[1]);
+                if (n == 0){
+                    //deleted mergeset number will become new mergeset number
+                    newMergesetNumber = columnSchema.queryMergeSet(baseColumn);
+                    deleteMergeset(newMergesetNumber);
+                } else {
+                    return;
+                }
+            }
+        }
+
+        // change columnSchema !! pozor na allready is in another mergeset
+
+        //get mains mergeset or create new mergeset
+        if (columnSchema.isColumnMergedInOther(baseColumn)){
+            //column is base in that mergeset, checked above
+            newMergesetNumber = columnSchema.queryMergeSet(baseColumn);
+            deleteMergeset(newMergesetNumber);
+        } else if (newMergesetNumber == 0){
+            ArrayList<Integer> allMergesets = columnSchema.getAllMergesets();
+            for (int i = 0; i<allMergesets.size(); i++){
+                if (allMergesets.get(i) > newMergesetNumber)
+                    newMergesetNumber = allMergesets.get(i);
+            }
+            newMergesetNumber++;
+        }
+        columnSchema.createMergeset(newMergesetNumber, jAddToDelimeterTextField.getText());
+        //set to all aggregate off
+        //set to all merge on
+        //set to all the mergeset number -> if is main in other, cancel that mergeset/do not include
+        columnSchema.columnAggregateOff(baseColumn);
+        columnSchema.columnMergeOn(baseColumn, newMergesetNumber, 1);
+        for (int i = 0; i<columnsToAddNumbers.size(); i++){
+            columnSchema.columnAggregateOff(columnsToAddNumbers.get(i));
+            if (columnSchema.isColumnMergedInOther(columnsToAddNumbers.get(i))) {
+                if (columnSchema.queryMergeOrder(columnsToAddNumbers.get(i)) == 1) {
+                    Object[] options = {"Yes", "No"};
+                    int n = JOptionPane.showOptionDialog(this, "The column number " + columnsToAddNumbers.get(i) + " is base in another addition. Cancel the other addition? If No, the column will not be added.", "Problem!", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+                    if (n == 0) {
+                        deleteMergeset(columnSchema.queryMergeSet(columnsToAddNumbers.get(i)));
+                    } else {
+                        continue;
+                    }
+                }
+            }
+            columnSchema.columnMergeOn(columnsToAddNumbers.get(i), newMergesetNumber, i+2);
+        }
+        //set mergesets type
+        columnSchema.setMergesetCandidateType(newMergesetNumber, ((String)((ComboItem)comboBoxes.get(baseColumn).getSelectedItem()).value).replace(" ", "_"));
+        columnSchema.setMergesetSelectedType(newMergesetNumber, ((String)((ComboItem)comboBoxes.get(baseColumn).getSelectedItem()).value).replace(" ", "_"));
+
+        // change comboBoxes and addToLables
+        for (int i = 0; i<columnsToAdd.size(); i++){
+            String columnNumStr = columnsToAdd.get(i).getText();
+            if (columnNumStr.equals(""))
+                continue;
+            int columnNum = Integer.parseInt(columnNumStr);
+            addToLables.get(columnNum).setText("# = " + String.valueOf(baseColumn));
+            oking = true;
+            setComboBoxTo((JComboBox) comboBoxes.get(columnNum), 27);
+        }
+
+        jAddToFrame.setVisible(false);
+    }//GEN-LAST:event_jAddToOkButtonMouseReleased
+
+    private void jAddToBaseColumnTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jAddToBaseColumnTextFieldKeyTyped
+        jAddToOkButton.setEnabled(false);
+    }//GEN-LAST:event_jAddToBaseColumnTextFieldKeyTyped
+
+    private void jSplitIntoCancelButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoCancelButtonMouseReleased
+        int myColumn = Integer.parseInt(jColumnToSplitLabel.getText());
+        if (!columnSchema.isColumnAggregated(myColumn)){
+            comboBoxes.get(myColumn).setSelectedIndex(9);
+        }
+        jSplitIntoFrame.setVisible(false);
+        jSplitIntoContactsFrame.setVisible(false);
+        jSplitIntoTypeSettingsFrame.setVisible(false);
+    }//GEN-LAST:event_jSplitIntoCancelButtonMouseReleased
+
+    private void jSplitIntoNumberOfColumnsSettingsButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoNumberOfColumnsSettingsButtonMouseReleased
+        try{
+            fillInSplitIntoTypesSettingsForm();
+        } catch (NumberFormatException ex){
+            JOptionPane.showMessageDialog(this,"Invalid number of columns","Error",JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        jSplitIntoTypeSettingsFrame.pack();
+        jSplitIntoTypeSettingsFrame.setVisible(true);
+    }//GEN-LAST:event_jSplitIntoNumberOfColumnsSettingsButtonMouseReleased
+
+    private void jSplitIntoTypeSettingsCancelButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoTypeSettingsCancelButtonMouseReleased
+        for (int i = 0; i < splitIntoColumnsTypes.size(); i++){
+            setComboBoxTo(splitIntoColumnsTypes.get(i), 9);
+        }
+        fillInSplitIntoTypesSettingsForm();
+        jSplitIntoTypeSettingsFrame.setVisible(false);
+    }//GEN-LAST:event_jSplitIntoTypeSettingsCancelButtonMouseReleased
+
+    private void jSplitIntoTypeSettingsOkButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoTypeSettingsOkButtonMouseReleased
+        jSplitIntoTypeSettingsFrame.setVisible(false);
+    }//GEN-LAST:event_jSplitIntoTypeSettingsOkButtonMouseReleased
+
+    private void jSplitIntoOkButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoOkButtonMouseReleased
+        int numberOfColumns = 0;
+        int columnToSplit = Integer.parseInt(jColumnToSplitLabel.getText());
+        try{
+            numberOfColumns = Integer.parseInt(jSplitIntoNumberOfColumnsTextField.getText());
+        } catch (NumberFormatException ex){
+            JOptionPane.showMessageDialog(this,"Invalid number of columns","Error",JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // changeColumnSchema
+        columnSchema.columnMergeOff(columnToSplit);
+        columnSchema.columnAggregateOn(columnToSplit, jSplitIntoDelimeterTextField.getText(), numberOfColumns, jSplitIntoContactsCheckBox.isSelected(), jSplitIntoContactsAreEmployeesCheckBox.isSelected(), jSplitIntoContactsOrigIntoSourceCheckBox.isSelected(), jSplitIntoContactsOrigIntoContactsCheckBox.isSelected(), jSplitIntoContactsDelimeterOfContactsTextField.getText(), jSplitIntoContactsSwapsCheckBox.isSelected());
+        for (int i = 0; i<splitIntoColumnsTypes.size(); i++){
+            String type = ((String)((ComboItem)splitIntoColumnsTypes.get(i).getSelectedItem()).value).replace(" ", "_");
+            columnSchema.setAggregatedCandidateType(columnToSplit, i, type);
+            columnSchema.setAggregatedSelectedtypeType(columnToSplit, i, type);
+        }
+        for (int i = splitIntoColumnsTypes.size(); i<numberOfColumns; i++){
+            String type = "Note";
+            columnSchema.setAggregatedCandidateType(columnToSplit, i, type);
+            columnSchema.setAggregatedSelectedtypeType(columnToSplit, i, type);
+        }
+
+        jSplitIntoFrame.setVisible(false);
+        jSplitIntoContactsFrame.setVisible(false);
+        jSplitIntoTypeSettingsFrame.setVisible(false);
+    }//GEN-LAST:event_jSplitIntoOkButtonMouseReleased
+
+    private void jSplitIntoContactsCheckBoxMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoContactsCheckBoxMouseClicked
+        if (!jSplitIntoContactsCheckBox.isSelected()){
+            jSplitIntoContactsSettingsButton.setEnabled(false);
+            jSplitIntoNumberOfColumnsTextField.setEnabled(true);
+            jSplitIntoNumberOfColumnsSettingsButton.setEnabled(true);
+            jSplitIntoDelimeterTextField.setEnabled(true);
+            return;
+        }
+        jSplitIntoContactsSettingsButton.setEnabled(true);
+        jSplitIntoNumberOfColumnsTextField.setEnabled(false);
+        jSplitIntoNumberOfColumnsSettingsButton.setEnabled(false);
+        jSplitIntoDelimeterTextField.setEnabled(false);
+        jSplitIntoContactsFrame.pack();
+        jSplitIntoContactsFrame.setVisible(true);
+    }//GEN-LAST:event_jSplitIntoContactsCheckBoxMouseClicked
+
+    private void jSplitIntoContactsColumnTypesSettingsButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoContactsColumnTypesSettingsButtonMouseReleased
+        jSplitIntoNumberOfColumnsTextField.setText(jSplitIntoContactsNumberOfColumnsTextField.getText());
+        try{
+            fillInSplitIntoTypesSettingsForm();
+        } catch (NumberFormatException ex){
+            JOptionPane.showMessageDialog(this,"Invalid number of columns","Error",JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        jSplitIntoTypeSettingsFrame.pack();
+        jSplitIntoTypeSettingsFrame.setVisible(true);
+    }//GEN-LAST:event_jSplitIntoContactsColumnTypesSettingsButtonMouseReleased
+
+    private void jSplitIntoContactsCancelButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoContactsCancelButtonMouseReleased
+        jSplitIntoContactsFrame.setVisible(false);
+    }//GEN-LAST:event_jSplitIntoContactsCancelButtonMouseReleased
+
+    private void jSplitIntoContactsOkButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoContactsOkButtonMouseReleased
+        jSplitIntoContactsFrame.setVisible(false);
+        jSplitIntoNumberOfColumnsTextField.setText(jSplitIntoContactsNumberOfColumnsTextField.getText());
+        jSplitIntoDelimeterTextField.setText(jSplitIntoContactsDelimeterOfColumnsTextField.getText());
+    }//GEN-LAST:event_jSplitIntoContactsOkButtonMouseReleased
+
+    private void jSplitIntoContactsSettingsButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoContactsSettingsButtonMouseReleased
+        jSplitIntoContactsFrame.setVisible(true);
+    }//GEN-LAST:event_jSplitIntoContactsSettingsButtonMouseReleased
+
+    private void jMainWindowRefreshButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMainWindowRefreshButtonMouseReleased
+        boolean formatedNameSelected = false;
+        for (int i = 0; i<jContactsListTable.getColumnCount(); i++){
+            if (comboBoxes.get(i).getSelectedIndex() == 0){
+                formatedNameSelected = true;
+                break;
+            }
+        }
+        if (!formatedNameSelected)
+            formatedNameSelected = columnSchema.isTypeInColumnSchema(VCFTypesEnum.Formatted_Name);
+        if (!formatedNameSelected){
+            JOptionPane.showMessageDialog(this,"Formatted Name column type is mandatory. Please select one.","Error",JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        for (int i = 0; i<jContactsListTable.getColumnCount(); i++){
+            String type = ((String)((ComboItem)comboBoxes.get(i).getSelectedItem()).value).replace(" ", "_");
+            if (type.equals("ADD_TO_COLUMN_#...") || type.equals("SPLIT_INTO...")){
+                continue;
+            }
+            columnSchema.setCandidateType(i, type);
+            columnSchema.setSelectedtypeType(i, type);
+        }
+
+        InternalDoc2CompiledDoc compiler = new InternalDocCompiler(internalDoc, columnSchema);
+        compiler.compile();
+        Document compiledDoc = compiler.getCompiledValidContacts();
+
+        //show CompiledDoc
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer trans = null;
+        try {
+            trans = tf.newTransformer();
+            trans.transform(new DOMSource(compiledDoc), new StreamResult(stream));
+        } catch (TransformerException ex) {
+            Logger.getLogger(Document.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        jCompiledDocTextArea.setText(stream.toString());
+        jCompiledDocTextFrame.pack();
+        jCompiledDocTextFrame.setVisible(true);
+        
+
+        InputFilter readCompiledDoc = new ReadCompiledDoc(compiledDoc);
+        internalDoc = readCompiledDoc.read();
+        columnSchema = readCompiledDoc.getColumnSchema();
+
+        comboBoxes.clear();
+        addToLables.clear();
+        columnsToAdd.clear();
+        splitIntoColumnsTypes.clear();
+
+        tableModel.initTable(internalDoc, columnSchema);
+
+        // <editor-fold defaultstate="collapsed" desc="vytvorenie ComboBoxes">
+        boolean nameSelected = false;
+        boolean birthdaySelected = false;
+        boolean uniqueIdentifierSelected = false;
+        ArrayList<Object[]> itemsList = new ArrayList<Object[]>();
+
+        for (int i = 0; i<jContactsListTable.getColumnCount(); i++){
+            // <editor-fold defaultstate="collapsed" desc="naplnenie hodnotami">
+            itemsList.add(new Object[]{
+                new ComboItem(VCFTypesEnum.Formatted_Name.toDisplayString()),       //0
+                new ComboItem(VCFTypesEnum.Name.toDisplayString()),                 //1
+                new ComboItem(VCFTypesEnum.Telephone.toDisplayString()),            //2
+                new ComboItem(VCFTypesEnum.Telephone_home.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Telephone_work.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Telephone_work_fax.toDisplayString()),   //5
+                new ComboItem(VCFTypesEnum.Telephone_work_video.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Email.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Email_work.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Note.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Photograph.toDisplayString()),           //10
+                new ComboItem(VCFTypesEnum.Sound.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Delivery_Address.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Delivery_Address_home.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Delivery_Address_work.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Label_Address.toDisplayString()),        //15
+                new ComboItem(VCFTypesEnum.Label_Address_home.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Label_Address_work.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Birthday.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Nickname.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Organization_Name_or_Organizational_unit
+                        .toDisplayString()),                                        //20
+                new ComboItem(VCFTypesEnum.Role_or_occupation.toDisplayString()),
+                new ComboItem(VCFTypesEnum.Logo.toDisplayString()),
+                new ComboItem(VCFTypesEnum.URL.toDisplayString()),
+                new ComboItem(VCFTypesEnum.URL_home.toDisplayString()),
+                new ComboItem(VCFTypesEnum.URL_work.toDisplayString()),             //25
+                new ComboItem(VCFTypesEnum.Unique_Identifier.toDisplayString()),    //26
+                new ComboItem("ADD TO COLUMN #..."),
+                new ComboItem("SPLIT INTO...")
+            });
+            //</editor-fold>
+            comboBoxes.add(new JComboBox(itemsList.get(i)));
+            comboBoxes.get(i).setRenderer(new ComboRenderer());
+            comboBoxes.get(i).addActionListener(new ComboListener(comboBoxes.get(i)));
+            addToLables.add(new JLabel(""));
+            //every column must have candidate type
+            String candidateType = columnSchema.queryCandidateType(i);
+            String type = VCFTypesEnum.valueOf(candidateType).toDisplayString();
+            comboBoxes.get(i).setSelectedItem(new ComboItem(type));
+            // <editor-fold defaultstate="collapsed" desc="cardinality check">
+            if (type.equals(VCFTypesEnum.Name.toDisplayString())) {
+                if (nameSelected == true) {
+                    throw new IllegalArgumentException("Name type has allready been selected. Watch VCF types cardinality!");
+                }
+                nameSelected = true;
+            } else if (type.equals(VCFTypesEnum.Birthday.toDisplayString())) {
+                if (birthdaySelected == true) {
+                    throw new IllegalArgumentException("Birthday type has allready been selected. Watch VCF types cardinality!");
+                }
+                birthdaySelected = true;
+            } else if (type.equals(VCFTypesEnum.Unique_Identifier.toDisplayString())) {
+                if (uniqueIdentifierSelected == true) {
+                    throw new IllegalArgumentException("Unique_Identifier type has allready been selected. Watch VCF types cardinality!");
+                }
+                uniqueIdentifierSelected = true;
+            }
+            // </editor-fold>
+            jComboBoxesToolBar.add(comboBoxes.get(i));
+            comboBoxes.get(i).setVisible(true);
+            jComboBoxesToolBar.add(addToLables.get(i));
+        }
+
+        // <editor-fold defaultstate="collapsed" desc="disable after cardinality check">
+        if (nameSelected) {
+            for (int i = 0; i < comboBoxes.size(); i++) {
+                if (comboBoxes.get(i).getSelectedIndex() != (1)) {
+                    ((CanEnable) comboBoxes.get(i).getItemAt(1)).setEnabled(false);
+                }
+            }
+        }
+        if (birthdaySelected) {
+            for (int i = 0; i < comboBoxes.size(); i++) {
+                if (comboBoxes.get(i).getSelectedIndex() != (1)) {
+                    ((CanEnable) comboBoxes.get(i).getItemAt(18)).setEnabled(false);
+                }
+            }
+        }if (uniqueIdentifierSelected) {
+            for (int i = 0; i < comboBoxes.size(); i++) {
+                if (comboBoxes.get(i).getSelectedIndex() != (1)) {
+                    ((CanEnable) comboBoxes.get(i).getItemAt(26)).setEnabled(false);
+                }
+            }
+        }
+        //</editor-fold>
+        //</editor-fold>
+
+
+    }//GEN-LAST:event_jMainWindowRefreshButtonMouseReleased
 
 
     /**
@@ -703,6 +1902,280 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 new ContactTransmutGUIMain().setVisible(true);
             }
         });
+    }
+
+    private void deleteMergeset(int mergesetNum) {
+        int thatOldMergesetBaseColumn = columnSchema.getAllMergesetMembers(mergesetNum).get(1);
+        for (int i = 0; i < comboBoxes.size(); i++) {
+            if (!addToLables.get(i).getText().equals("")) {
+                if (Integer.parseInt(addToLables.get(i).getText().substring(4)) == thatOldMergesetBaseColumn) {
+                    comboBoxes.get(i).setSelectedIndex(9);
+                    addToLables.get(i).setText("");
+                    columnSchema.columnMergeOff(i);
+                }
+            }
+        }
+        columnSchema.columnMergeOff(thatOldMergesetBaseColumn);
+        columnSchema.deleteMergeset(mergesetNum);
+    }
+
+    private void setComboBoxTo(JComboBox combo, int index){
+        // <editor-fold defaultstate="collapsed" desc="osetrenie kardinality">
+        Object currentItem = combo.getSelectedItem();
+        int changeToIndex = index;
+        if (((ComboItem) currentItem).value.toString().equals(VCFTypesEnum.Name.toDisplayString())) {
+            for (int i = 0; i < comboBoxes.size(); i++) {
+                if (!(((JComboBox) comboBoxes.get(i)).equals(combo))) {
+                    ((CanEnable) comboBoxes.get(i).getItemAt(1)).setEnabled(true);
+                }
+            }
+            for (int i = 0; i < splitIntoColumnsTypes.size(); i++) {
+                if (!(((JComboBox) splitIntoColumnsTypes.get(i)).equals(combo))) {
+                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(1)).setEnabled(true);
+                }
+            }
+        } else if (((ComboItem) currentItem).value.toString().equals(VCFTypesEnum.Birthday.toDisplayString())) {
+            for (int i = 0; i < comboBoxes.size(); i++) {
+                if (!(((JComboBox) comboBoxes.get(i)).equals(combo))) {
+                    ((CanEnable) comboBoxes.get(i).getItemAt(18)).setEnabled(true);
+                }
+            }
+            for (int i = 0; i < splitIntoColumnsTypes.size(); i++) {
+                if (!(((JComboBox) splitIntoColumnsTypes.get(i)).equals(combo))) {
+                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(18)).setEnabled(true);
+                }
+            }
+        } else if (((ComboItem) currentItem).value.toString().equals(VCFTypesEnum.Unique_Identifier.toDisplayString())) {
+            for (int i = 0; i < comboBoxes.size(); i++) {
+                if (!(((JComboBox) comboBoxes.get(i)).equals(combo))) {
+                    ((CanEnable) comboBoxes.get(i).getItemAt(26)).setEnabled(true);
+                }
+            }
+            for (int i = 0; i < splitIntoColumnsTypes.size(); i++) {
+                if (!(((JComboBox) splitIntoColumnsTypes.get(i)).equals(combo))) {
+                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(26)).setEnabled(true);
+                }
+            }
+        }
+        if (changeToIndex == 1) {
+            for (int i = 0; i < comboBoxes.size(); i++) {
+                if (!(((JComboBox) comboBoxes.get(i)).equals(combo))) {
+                    ((CanEnable) comboBoxes.get(i).getItemAt(1)).setEnabled(false);
+                }
+            }
+            for (int i = 0; i < splitIntoColumnsTypes.size(); i++) {
+                if (!(((JComboBox) splitIntoColumnsTypes.get(i)).equals(combo))) {
+                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(1)).setEnabled(false);
+                }
+            }
+        } else if (changeToIndex == 18) {
+            for (int i = 0; i < comboBoxes.size(); i++) {
+                if (!(((JComboBox) comboBoxes.get(i)).equals(combo))) {
+                    ((CanEnable) comboBoxes.get(i).getItemAt(18)).setEnabled(false);
+                }
+            }
+            for (int i = 0; i < splitIntoColumnsTypes.size(); i++) {
+                if (!(((JComboBox) splitIntoColumnsTypes.get(i)).equals(combo))) {
+                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(18)).setEnabled(false);
+                }
+            }
+        } else if (changeToIndex == 26) {
+            for (int i = 0; i < comboBoxes.size(); i++) {
+                if (!(((JComboBox) comboBoxes.get(i)).equals(combo))) {
+                    ((CanEnable) comboBoxes.get(i).getItemAt(26)).setEnabled(false);
+                }
+            }
+            for (int i = 0; i < splitIntoColumnsTypes.size(); i++) {
+                if (!(((JComboBox) splitIntoColumnsTypes.get(i)).equals(combo))) {
+                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(26)).setEnabled(false);
+                }
+            }
+        }
+        // </editor-fold>
+        combo.setSelectedIndex(index);
+    }
+
+    private void jAddToSubmitButtonMouseReleasedAction(){
+        int myColumn = Integer.parseInt(jColumnToAddLabel.getText());
+        int baseColumn = 0;
+        try{
+            baseColumn = Integer.parseInt(jAddToBaseColumnTextField.getText());
+        } catch (NumberFormatException ex){
+            JOptionPane.showMessageDialog(this,"Type valid base column number","Error",JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (columnSchema.isColumnMergedInOther(baseColumn) && columnSchema.queryMergeOrder(baseColumn) != 1){
+            JOptionPane.showMessageDialog(this,"The base column has allready been added to another column.","Error",JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        if (myColumn == baseColumn){
+            JOptionPane.showMessageDialog(this,"Cannot add column to itself.","Error",JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        jAddToOkButton.setEnabled(true);
+        columnsToAdd.clear();
+        jAddToToolBar.removeAll();
+        jAddToToolBar.add(new JLabel(String.valueOf(baseColumn)));
+        if (columnSchema.queryMergeSet(baseColumn) == null){
+            jAddToToolBar.add(new JLabel(jAddToDelimeterTextField.getText()));
+            columnsToAdd.add(new JTextField(String.valueOf(myColumn),2));
+            jAddToToolBar.add(columnsToAdd.get(0));
+            for (int i=0; i<10; i++){
+                jAddToToolBar.add(new JLabel(jAddToDelimeterTextField.getText()));
+                columnsToAdd.add(new JTextField(2));
+                jAddToToolBar.add(columnsToAdd.get(i+1));
+            }
+            jAddToToolBar.setVisible(false);
+            jAddToToolBar.setVisible(true);
+            return;
+        }
+        HashMap<Integer, Integer> allMergesetMembers = columnSchema.getAllMergesetMembers(columnSchema.queryMergeSet(baseColumn));
+        for (int i = 1; i< allMergesetMembers.size(); i++){
+            jAddToToolBar.add(new JLabel(jAddToDelimeterTextField.getText()));
+            columnsToAdd.add(new JTextField(String.valueOf(allMergesetMembers.get(i+1)),2));
+            jAddToToolBar.add(columnsToAdd.get(i-1));
+        }
+        for (int i = allMergesetMembers.size(); i < 13; i++) {
+            jAddToToolBar.add(new JLabel(jAddToDelimeterTextField.getText()));
+            columnsToAdd.add(new JTextField(2));
+            jAddToToolBar.add(columnsToAdd.get(i-1));
+        }
+        jAddToToolBar.setVisible(false);
+        jAddToToolBar.setVisible(true);
+        jAddToPlusButton.setEnabled(true);
+        return;
+    }
+
+    private void fillInSplitIntoTypesSettingsForm() throws NumberFormatException{
+        int columnNumber = Integer.parseInt(jColumnToSplitLabel.getText());
+        int numberOfColumns = Integer.parseInt(jSplitIntoNumberOfColumnsTextField.getText());
+        boolean nameSelected = false;
+        boolean birthdaySelected = false;
+        boolean lastRevisionSelected = false;
+        boolean uniqueIdentifierSelected = false;
+        jSplitIntoTypeSettingsToolBar.removeAll();
+        jSplitIntoTypeSettingsNumberOfColumnsLabel.setText(String.valueOf(numberOfColumns));
+        ArrayList<Object[]> itemsList = new ArrayList<Object[]>();
+        for (int i = 0; i < numberOfColumns; i++) {
+            // <editor-fold defaultstate="collapsed" desc="naplnenie hodnotami">
+            itemsList.add(new Object[]{
+                        new ComboItem(VCFTypesEnum.Formatted_Name.toDisplayString()), //0
+                        new ComboItem(VCFTypesEnum.Name.toDisplayString()), //1
+                        new ComboItem(VCFTypesEnum.Telephone.toDisplayString()), //2
+                        new ComboItem(VCFTypesEnum.Telephone_home.toDisplayString()),
+                        new ComboItem(VCFTypesEnum.Telephone_work.toDisplayString()),
+                        new ComboItem(VCFTypesEnum.Telephone_work_fax.toDisplayString()), //5
+                        new ComboItem(VCFTypesEnum.Telephone_work_video.toDisplayString()),
+                        new ComboItem(VCFTypesEnum.Email.toDisplayString()),
+                        new ComboItem(VCFTypesEnum.Email_work.toDisplayString()),
+                        new ComboItem(VCFTypesEnum.Note.toDisplayString()),
+                        new ComboItem(VCFTypesEnum.Photograph.toDisplayString()), //10
+                        new ComboItem(VCFTypesEnum.Sound.toDisplayString()),
+                        new ComboItem(VCFTypesEnum.Delivery_Address.toDisplayString()),
+                        new ComboItem(VCFTypesEnum.Delivery_Address_home.toDisplayString()),
+                        new ComboItem(VCFTypesEnum.Delivery_Address_work.toDisplayString()),
+                        new ComboItem(VCFTypesEnum.Label_Address.toDisplayString()), //15
+                        new ComboItem(VCFTypesEnum.Label_Address_home.toDisplayString()),
+                        new ComboItem(VCFTypesEnum.Label_Address_work.toDisplayString()),
+                        new ComboItem(VCFTypesEnum.Birthday.toDisplayString()),
+                        new ComboItem(VCFTypesEnum.Nickname.toDisplayString()),
+                        new ComboItem(VCFTypesEnum.Organization_Name_or_Organizational_unit.toDisplayString()), //20
+                        new ComboItem(VCFTypesEnum.Role_or_occupation.toDisplayString()),
+                        new ComboItem(VCFTypesEnum.Logo.toDisplayString()),
+                        new ComboItem(VCFTypesEnum.URL.toDisplayString()),
+                        new ComboItem(VCFTypesEnum.URL_home.toDisplayString()),
+                        new ComboItem(VCFTypesEnum.URL_work.toDisplayString()), //25
+                        new ComboItem(VCFTypesEnum.Unique_Identifier.toDisplayString()) //26
+                    });
+            //</editor-fold>
+            splitIntoColumnsTypes.add(new JComboBox(itemsList.get(i)));
+            splitIntoColumnsTypes.get(i).setRenderer(new ComboRenderer());
+            splitIntoColumnsTypes.get(i).addActionListener(new ComboListener(splitIntoColumnsTypes.get(i)));
+            splitIntoColumnsTypes.get(i).setSelectedIndex(9);
+            if (!columnSchema.queryAggregatedCandidateType(columnNumber, i).equals("")) {
+                String type = VCFTypesEnum.valueOf(columnSchema.queryAggregatedCandidateType(columnNumber, i)).toDisplayString();
+                splitIntoColumnsTypes.get(i).setSelectedItem(new ComboItem(type));
+                // <editor-fold defaultstate="collapsed" desc="cardinality check">
+                if (type.equals(VCFTypesEnum.Name.toDisplayString())) {
+                    if (nameSelected == true || !(((CanEnable) comboBoxes.get(columnNumber).getItemAt(1)).isEnabled())) {
+                        throw new IllegalArgumentException("Name type has allready been selected. Watch VCF types cardinality!");
+                    }
+                    nameSelected = true;
+                } else if (type.equals(VCFTypesEnum.Birthday.toDisplayString())) {
+                    if (birthdaySelected == true || !(((CanEnable) comboBoxes.get(columnNumber).getItemAt(18)).isEnabled())) {
+                        throw new IllegalArgumentException("Birthday type has allready been selected. Watch VCF types cardinality!");
+                    }
+                    birthdaySelected = true;
+//                } else if (type.equals(VCFTypesEnum.Last_Revision.toDisplayString())) {
+//                    if(nameSelected == true){
+//                        throw new IllegalArgumentException("Name has allready been selected. Watch VCF types cardinality!");
+//                    }
+//                    nameSelected = true;
+                } else if (type.equals(VCFTypesEnum.Unique_Identifier.toDisplayString())) {
+                    if (uniqueIdentifierSelected == true || !(((CanEnable) comboBoxes.get(columnNumber).getItemAt(26)).isEnabled())) {
+                        throw new IllegalArgumentException("Unique_Identifier type has allready been selected. Watch VCF types cardinality!");
+                    }
+                    uniqueIdentifierSelected = true;
+                }
+                // </editor-fold>
+            }
+        }
+        for (int i = 0; i < numberOfColumns; i++) {
+            for (int j = 0; j < splitIntoColumnsTypes.get(i).getItemCount(); j++) {
+                if (!(((CanEnable) comboBoxes.get(columnNumber).getItemAt(j)).isEnabled())) {
+                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(j)).setEnabled(false);
+                }
+            }
+            jSplitIntoTypeSettingsToolBar.add(splitIntoColumnsTypes.get(i));
+        }
+        // <editor-fold defaultstate="collapsed" desc="disable after cardinality check">
+        if (nameSelected) {
+            for (int i = 0; i < comboBoxes.size(); i++) {
+                if (comboBoxes.get(i).getSelectedIndex() != (1)) {
+                    ((CanEnable) comboBoxes.get(i).getItemAt(1)).setEnabled(false);
+                }
+            }
+            for (int i = 0; i < splitIntoColumnsTypes.size(); i++) {
+                if (splitIntoColumnsTypes.get(i).getSelectedIndex() != (1)) {
+                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(1)).setEnabled(false);
+                }
+            }
+            nameSelected = false;
+        }
+        if (birthdaySelected) {
+            for (int i = 0; i < comboBoxes.size(); i++) {
+                if (comboBoxes.get(i).getSelectedIndex() != (18)) {
+                    ((CanEnable) comboBoxes.get(i).getItemAt(18)).setEnabled(false);
+                }
+            }
+            for (int i = 0; i < splitIntoColumnsTypes.size(); i++) {
+                if (splitIntoColumnsTypes.get(i).getSelectedIndex() != (18)) {
+                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(18)).setEnabled(false);
+                }
+            }
+            birthdaySelected = false;
+//        }if (lastRevisionSelected) {
+//            for (int i = 0; i < comboBoxes.size(); i++) {
+//                if (comboBoxes.get(i).getSelectedIndex() != (1)) {
+//                    ((CanEnable) comboBoxes.get(i).getItemAt(1)).setEnabled(false);
+//                }
+//            }
+        }
+        if (uniqueIdentifierSelected) {
+            for (int i = 0; i < comboBoxes.size(); i++) {
+                if (comboBoxes.get(i).getSelectedIndex() != (26)) {
+                    ((CanEnable) comboBoxes.get(i).getItemAt(26)).setEnabled(false);
+                }
+            }
+            for (int i = 0; i < splitIntoColumnsTypes.size(); i++) {
+                if (splitIntoColumnsTypes.get(i).getSelectedIndex() != (26)) {
+                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(26)).setEnabled(false);
+                }
+            }
+            uniqueIdentifierSelected = false;
+        }
+        //</editor-fold>
     }
 
     // <editor-fold defaultstate="collapsed" desc="Combo Box">
@@ -748,59 +2221,160 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             if (!((CanEnable) tempItem).isEnabled()) {
                 combo.setSelectedItem(currentItem);
             } else {
-                // <editor-fold defaultstate="collapsed" desc="osetrenie kardinality">
-                if (((ComboItem)tempItem).value.toString().equals(VCFTypesEnum.Name.toDisplayString())){
-                    for (int i=0; i<comboBoxes.size(); i++){
-                        if (!(((JComboBox)comboBoxes.get(i)).equals(combo))){
-                            ((CanEnable)comboBoxes.get(i).getItemAt(1)).setEnabled(false);
-                        }
-                    }
-                } else if (((ComboItem)tempItem).value.toString().equals(VCFTypesEnum.Birthday.toDisplayString())){
-                    for (int i=0; i<comboBoxes.size(); i++){
-                        if (!(((JComboBox)comboBoxes.get(i)).equals(combo))){
-                            ((CanEnable)comboBoxes.get(i).getItemAt(18)).setEnabled(false);
-                        }
-                    }
-                } else if (((ComboItem)tempItem).value.toString().equals(VCFTypesEnum.Last_Revision.toDisplayString())){
-//                    for (int i=0; i<comboBoxes.size(); i++){
-//                        if (!(((JComboBox)comboBoxes.get(i)).equals(combo))){
-//                            ((CanEnable)comboBoxes.get(i).getItemAt(1)).setEnabled(false);
-//                        }
-//                    }
-                } else if (((ComboItem)tempItem).value.toString().equals(VCFTypesEnum.Unique_Identifier.toDisplayString())){
-                    for (int i=0; i<comboBoxes.size(); i++){
-                        if (!(((JComboBox)comboBoxes.get(i)).equals(combo))){
-                            ((CanEnable)comboBoxes.get(i).getItemAt(26)).setEnabled(false);
-                        }
+                // <editor-fold defaultstate="collapsed" desc="merge and aggregate setting popup">
+                int columnNumber = 0;
+                for (int i = 0; i < comboBoxes.size(); i++) {
+                    if (combo.equals(comboBoxes.get(i))) {
+                        columnNumber = i;
+                        break;
                     }
                 }
-                if (((ComboItem)currentItem).value.toString().equals(VCFTypesEnum.Name.toDisplayString())){
-                    for (int i=0; i<comboBoxes.size(); i++){
-                        if (!(((JComboBox)comboBoxes.get(i)).equals(combo))){
-                            ((CanEnable)comboBoxes.get(i).getItemAt(1)).setEnabled(true);
+                if(((ComboItem)tempItem).value.toString().equals("ADD TO COLUMN #...") && !oking){
+                    columnSchema.columnAggregateOff(columnNumber);
+                    if (columnSchema.isColumnMergedInOther(columnNumber)){
+                        int mergesetNumber = columnSchema.queryMergeSet(columnNumber);
+                        if (columnSchema.getAllMergesetMembers(mergesetNumber).get(1) == columnNumber) {
+                            Object[] options1 = {"Yes","No"};
+                            int m = JOptionPane.showOptionDialog(jMainWindowFrame2, "This column is base in an addition. Delete whole addition?", "Problem!", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options1, options1[1]);
+                            if (m == 0) {
+                                deleteMergeset(mergesetNumber);
+                            } else {
+                                combo.setSelectedItem(currentItem);
+                                return;
+                            }
                         }
                     }
-                } else if (((ComboItem)currentItem).value.toString().equals(VCFTypesEnum.Birthday.toDisplayString())){
-                    for (int i=0; i<comboBoxes.size(); i++){
-                        if (!(((JComboBox)comboBoxes.get(i)).equals(combo))){
-                            ((CanEnable)comboBoxes.get(i).getItemAt(18)).setEnabled(true);
+                    jAddToPlusButton.setEnabled(false);
+                    jColumnToAddLabel.setText(String.valueOf(columnNumber));
+                    jAddToToolBar.removeAll();
+                    jAddToBaseColumnTextField.setText("");
+                    if (columnSchema.isColumnMergedInOther(columnNumber)){
+                        int mergsetNumber = columnSchema.queryMergeSet(columnNumber);
+                        int firstInMergset = columnSchema.getAllMergesetMembers(mergsetNumber).get(1);
+                        jAddToBaseColumnTextField.setText(String.valueOf(firstInMergset));
+                        jAddToDelimeterTextField.setText(columnSchema.queryMergesetDelimiter(mergsetNumber));
+                        jAddToSubmitButtonMouseReleasedAction();
+                    }
+                    jAddToFrame.pack();
+                    jAddToFrame.setVisible(true);
+                } else if (((ComboItem)tempItem).value.toString().equals("SPLIT INTO...") && !oking){
+                    if (columnSchema.isColumnMergedInOther(columnNumber)) {
+                        Object[] options = {"Yes", "No"};
+                        int n = JOptionPane.showOptionDialog(jMainWindowFrame2, "This column is added to another. Split this column instead?", "Problem!", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+                        if (n == 0) {
+                            //deleted mergeset number will become new mergeset number
+                            int mergesetNumber = columnSchema.queryMergeSet(columnNumber);
+                            if (columnSchema.getAllMergesetMembers(mergesetNumber).get(1) == columnNumber) {
+                                Object[] options1 = {"Yes", "No"};
+                                int m = JOptionPane.showOptionDialog(jMainWindowFrame2, "This column is base in an addition. Delete whole addition?", "Problem!", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options1, options1[1]);
+                                if (m == 0) {
+                                    deleteMergeset(mergesetNumber);                             
+                                } else {
+                                    combo.setSelectedItem(currentItem);
+                                    return;
+                                }
+                            }
+                        } else {
+                            combo.setSelectedItem(currentItem);
+                            return;
                         }
                     }
-                } else if (((ComboItem)currentItem).value.toString().equals(VCFTypesEnum.Last_Revision.toDisplayString())){
-//                    for (int i=0; i<comboBoxes.size(); i++){
-//                        if (!(((JComboBox)comboBoxes.get(i)).equals(combo))){
-//                            ((CanEnable)comboBoxes.get(i).getItemAt(1)).setEnabled(true);
-//                        }
-//                    }
-                } else if (((ComboItem)currentItem).value.toString().equals(VCFTypesEnum.Unique_Identifier.toDisplayString())){
-                    for (int i=0; i<comboBoxes.size(); i++){
-                        if (!(((JComboBox)comboBoxes.get(i)).equals(combo))){
-                            ((CanEnable)comboBoxes.get(i).getItemAt(26)).setEnabled(true);
+                    jColumnToSplitLabel.setText(String.valueOf(columnNumber));
+                    jColumnToSplitLabel1.setText(String.valueOf(columnNumber));
+                    jColumnToSplitLabel2.setText(String.valueOf(columnNumber));
+                    if (columnSchema.isColumnAggregated(columnNumber)){
+                        jSplitIntoNumberOfColumnsTextField.setText(String.valueOf(columnSchema.queryAggregateSettingNumberofcolumns(columnNumber)));
+                        jSplitIntoDelimeterTextField.setText(columnSchema.queryAggregateSettingDelimiter(columnNumber));
+                        if (columnSchema.queryAggregateSettingIntoseparatecontacts(columnNumber)){
+                            jSplitIntoContactsCheckBox.setSelected(true);
+                            jSplitIntoContactsSettingsButton.setEnabled(true);
+                            jSplitIntoNumberOfColumnsTextField.setEnabled(false);
+                            jSplitIntoNumberOfColumnsSettingsButton.setEnabled(false);
+                            jSplitIntoDelimeterTextField.setEnabled(false);
+                            //fill in the settings form
+                            jSplitIntoContactsNumberOfColumnsTextField.setText(String.valueOf(columnSchema.queryAggregateSettingNumberofcolumns(columnNumber)));
+                            jSplitIntoContactsDelimeterOfContactsTextField.setText(columnSchema.queryAggregateSettingSeparatecontactsdelimiter(columnNumber));
+                            jSplitIntoContactsDelimeterOfColumnsTextField.setText(columnSchema.queryAggregateSettingDelimiter(columnNumber));
+                            jSplitIntoContactsAreEmployeesCheckBox.setSelected(columnSchema.queryAggregateSettingEmployees(columnNumber));
+                            jSplitIntoContactsOrigIntoSourceCheckBox.setSelected(columnSchema.queryAggregateSettingOriginalsourcenote(columnNumber));
+                            jSplitIntoContactsOrigIntoContactsCheckBox.setSelected(columnSchema.queryAggregateSettingOriginaltargetnote(columnNumber));
                         }
+                    } else {
+                        jSplitIntoNumberOfColumnsTextField.setText("0");
+                        jSplitIntoDelimeterTextField.setText(",");
+                        jSplitIntoContactsCheckBox.setSelected(false);
+                        jSplitIntoContactsSettingsButton.setEnabled(false);
+                        jSplitIntoNumberOfColumnsTextField.setEnabled(true);
+                        jSplitIntoNumberOfColumnsSettingsButton.setEnabled(true);
+                        jSplitIntoDelimeterTextField.setEnabled(true);
+
+                        //fill in column type settings form -> when displayed
                     }
+                    //fill in the settings form
+                    try{
+                        fillInSplitIntoTypesSettingsForm();
+                    } catch (NumberFormatException ex){
+                        JOptionPane.showMessageDialog(jMainWindowFrame2, "An error occured while parsing number of columns.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    jSplitIntoFrame.pack();
+                    jSplitIntoFrame.setVisible(true);
                 }
                 // </editor-fold>
-                currentItem = tempItem;
+                else {
+                    int index = 0;
+                    for (int i = 0; i<combo.getItemCount(); i++){
+                        if(combo.getItemAt(i).equals(tempItem)){
+                            index=i;
+                            break;
+                        }
+                    }
+                    if (((String)((ComboItem)currentItem).value).equals("ADD TO COLUMN #...")){
+                        addToLables.get(columnNumber).setText("");
+                    }
+                    if (((String)((ComboItem)currentItem).value).equals("SPLIT INTO...")){
+                        for (int i = 0; i<columnSchema.queryAggregateSettingNumberofcolumns(columnNumber); i++){
+                            if (columnSchema.queryAggregatedCandidateType(columnNumber, i).equals(VCFTypesEnum.Name.toString())){
+                                for (int j = 0; i < comboBoxes.size(); i++) {
+                                    if (!(((JComboBox) comboBoxes.get(i)).equals(combo))) {
+                                        ((CanEnable) comboBoxes.get(i).getItemAt(1)).setEnabled(true);
+                                    }
+                                }
+                                for (int j = 0; i < splitIntoColumnsTypes.size(); i++) {
+                                    if (!(((JComboBox) splitIntoColumnsTypes.get(i)).equals(combo))) {
+                                        ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(1)).setEnabled(true);
+                                    }
+                                }
+                            } else if (columnSchema.queryAggregatedCandidateType(columnNumber, i).equals(VCFTypesEnum.Birthday.toString())){
+                                for (int j = 0; i < comboBoxes.size(); i++) {
+                                    if (!(((JComboBox) comboBoxes.get(i)).equals(combo))) {
+                                        ((CanEnable) comboBoxes.get(i).getItemAt(18)).setEnabled(true);
+                                    }
+                                }
+                                for (int j = 0; i < splitIntoColumnsTypes.size(); i++) {
+                                    if (!(((JComboBox) splitIntoColumnsTypes.get(i)).equals(combo))) {
+                                        ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(18)).setEnabled(true);
+                                    }
+                                }
+                            } else if (columnSchema.queryAggregatedCandidateType(columnNumber, i).equals(VCFTypesEnum.Unique_Identifier.toString())){
+                                for (int j = 0; i < comboBoxes.size(); i++) {
+                                    if (!(((JComboBox) comboBoxes.get(i)).equals(combo))) {
+                                        ((CanEnable) comboBoxes.get(i).getItemAt(26)).setEnabled(true);
+                                    }
+                                }
+                                for (int j = 0; i < splitIntoColumnsTypes.size(); i++) {
+                                    if (!(((JComboBox) splitIntoColumnsTypes.get(i)).equals(combo))) {
+                                        ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(26)).setEnabled(true);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    setComboBoxTo(combo, index);
+                    currentItem = tempItem;
+                    oking = false;
+                }
             }
         }
     }
@@ -856,36 +2430,103 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     // </editor-fold>
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField jAddToBaseColumnTextField;
+    private javax.swing.JButton jAddToCancelButton;
+    private javax.swing.JTextField jAddToDelimeterTextField;
+    private javax.swing.JFrame jAddToFrame;
+    private javax.swing.JButton jAddToOkButton;
+    private javax.swing.JButton jAddToPlusButton;
+    private javax.swing.JScrollPane jAddToScrollPane;
+    private javax.swing.JButton jAddToSubmitButton;
+    private javax.swing.JToolBar jAddToToolBar;
     private javax.swing.JButton jBackButton1;
-    private javax.swing.JButton jBackButton2;
     private javax.swing.JButton jBrowseButton1;
     private javax.swing.JButton jCancelButton1;
-    private javax.swing.JButton jCancelButton2;
     private javax.swing.JScrollPane jColumnSchemaScrollPane;
     private javax.swing.JTextArea jColumnSchemaTextArea;
     private javax.swing.JFrame jColumnSchemaTextFrame;
-    private javax.swing.JScrollPane jComboBoxesScrollPane2;
-    private javax.swing.JToolBar jComboBoxesToolBar2;
-    private javax.swing.JScrollPane jContactsListScrollPane2;
-    private javax.swing.JTable jContactsListTable2;
+    private javax.swing.JLabel jColumnToAddLabel;
+    private javax.swing.JLabel jColumnToSplitLabel;
+    private javax.swing.JLabel jColumnToSplitLabel1;
+    private javax.swing.JLabel jColumnToSplitLabel2;
+    private javax.swing.JScrollPane jComboBoxesScrollPane;
+    private javax.swing.JToolBar jComboBoxesToolBar;
+    private javax.swing.JScrollPane jCompiledDocScrollPane;
+    private javax.swing.JTextArea jCompiledDocTextArea;
+    private javax.swing.JFrame jCompiledDocTextFrame;
+    private javax.swing.JScrollPane jContactsListScrollPane;
+    private javax.swing.JTable jContactsListTable;
     private javax.swing.JFileChooser jFileChooser1;
+    private javax.swing.JFrame jFileChooserFrame;
     private javax.swing.JTextField jInputFileTextField1;
     private javax.swing.JScrollPane jInternalDocScrollPane;
     private javax.swing.JTextArea jInternalDocTextArea;
     private javax.swing.JFrame jInternalDocTextFrame;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel jMainLabel1;
+    private javax.swing.JButton jMainWindowBackButton;
+    private javax.swing.JButton jMainWindowCancelButton;
     private javax.swing.JFrame jMainWindowFrame2;
-    private javax.swing.JPanel jMainWindowPanel2;
+    private javax.swing.JButton jMainWindowNextButton;
+    private javax.swing.JPanel jMainWindowPanel;
+    private javax.swing.JButton jMainWindowRefreshButton;
+    private javax.swing.JButton jMainWindowShowColumnSchemaButton;
+    private javax.swing.JButton jMainWindowShowInternalDocButton;
+    private javax.swing.JButton jMainWindowShowTextFileButton;
     private javax.swing.JButton jNextButton1;
-    private javax.swing.JButton jNextButton2;
     private javax.swing.JScrollPane jOriginalFileScrollPane;
     private javax.swing.JTextArea jOriginalFileTextArea;
     private javax.swing.JFrame jOriginalFileTextFrame;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel jSelectInputLabel1;
-    private javax.swing.JButton jShowColumnSchemaButton2;
-    private javax.swing.JButton jShowInternalDocButton2;
-    private javax.swing.JButton jShowTextFileButton2;
+    private javax.swing.JButton jSplitIntoCancelButton;
+    private javax.swing.JCheckBox jSplitIntoContactsAreEmployeesCheckBox;
+    private javax.swing.JButton jSplitIntoContactsCancelButton;
+    private javax.swing.JCheckBox jSplitIntoContactsCheckBox;
+    private javax.swing.JButton jSplitIntoContactsColumnTypesSettingsButton;
+    private javax.swing.JTextField jSplitIntoContactsDelimeterOfColumnsTextField;
+    private javax.swing.JTextField jSplitIntoContactsDelimeterOfContactsTextField;
+    private javax.swing.JFrame jSplitIntoContactsFrame;
+    private javax.swing.JTextField jSplitIntoContactsNumberOfColumnsTextField;
+    private javax.swing.JButton jSplitIntoContactsOkButton;
+    private javax.swing.JCheckBox jSplitIntoContactsOrigIntoContactsCheckBox;
+    private javax.swing.JCheckBox jSplitIntoContactsOrigIntoSourceCheckBox;
+    private javax.swing.JButton jSplitIntoContactsSettingsButton;
+    private javax.swing.JCheckBox jSplitIntoContactsSwapsCheckBox;
+    private javax.swing.JButton jSplitIntoContactsSwapsSettingsButton;
+    private javax.swing.JTextField jSplitIntoDelimeterTextField;
+    private javax.swing.JFrame jSplitIntoFrame;
+    private javax.swing.JButton jSplitIntoNumberOfColumnsSettingsButton;
+    private javax.swing.JTextField jSplitIntoNumberOfColumnsTextField;
+    private javax.swing.JButton jSplitIntoOkButton;
+    private javax.swing.JButton jSplitIntoTypeSettingsCancelButton;
+    private javax.swing.JFrame jSplitIntoTypeSettingsFrame;
+    private javax.swing.JLabel jSplitIntoTypeSettingsNumberOfColumnsLabel;
+    private javax.swing.JButton jSplitIntoTypeSettingsOkButton;
+    private javax.swing.JScrollPane jSplitIntoTypeSettingsScrollPane;
+    private javax.swing.JToolBar jSplitIntoTypeSettingsToolBar;
     // End of variables declaration//GEN-END:variables
 
 }
