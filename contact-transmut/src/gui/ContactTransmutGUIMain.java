@@ -430,10 +430,10 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jAddToToolBar.setRollover(true);
         jAddToScrollPane.setViewportView(jAddToToolBar);
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 18));
         jLabel1.setText("\"ADD TO COLUMN\" MENU:");
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel2.setText("Base column number:");
 
         jAddToBaseColumnTextField.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -442,13 +442,13 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             }
         });
 
-        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel3.setText("Column to add:");
 
-        jColumnToAddLabel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jColumnToAddLabel.setFont(new java.awt.Font("Tahoma", 1, 14));
         jColumnToAddLabel.setText("0");
 
-        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel4.setText("Delimeter:");
 
         jAddToDelimeterTextField.setText(",");
@@ -542,13 +542,13 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jSplitIntoFrame.setTitle("Split into...");
         jSplitIntoFrame.setResizable(false);
 
-        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 18));
         jLabel5.setText("\"SPLIT INTO\" MULTIPLE COLUMNS MENU:");
 
-        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel6.setText("Column to split:");
 
-        jColumnToSplitLabel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jColumnToSplitLabel.setFont(new java.awt.Font("Tahoma", 1, 14));
         jColumnToSplitLabel.setText("0");
 
         jSplitIntoOkButton.setText("OK");
@@ -567,10 +567,10 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         jSplitIntoNumberOfColumnsTextField.setText("0");
 
-        jLabel7.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel7.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel7.setText("Number of columns:");
 
-        jLabel8.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel8.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel8.setText("Into separate contacts:");
 
         jSplitIntoContactsSettingsButton.setText("Settings");
@@ -580,7 +580,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             }
         });
 
-        jLabel9.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel9.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel9.setText("Delimeter:");
 
         jSplitIntoDelimeterTextField.setText(",");
@@ -673,13 +673,13 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jSplitIntoContactsFrame.setTitle("Split into contacts");
         jSplitIntoContactsFrame.setResizable(false);
 
-        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel10.setFont(new java.awt.Font("Tahoma", 1, 18));
         jLabel10.setText("SPLIT INTO CONTACTS MENU:");
 
-        jLabel11.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel11.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel11.setText("Column to split:");
 
-        jColumnToSplitLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jColumnToSplitLabel1.setFont(new java.awt.Font("Tahoma", 1, 14));
         jColumnToSplitLabel1.setText("0");
 
         jSplitIntoContactsOkButton.setText("OK");
@@ -698,20 +698,20 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         jSplitIntoContactsNumberOfColumnsTextField.setText("0");
 
-        jLabel12.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel12.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel12.setText("Number of columns in each contact:");
 
-        jLabel13.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel13.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel13.setText("Detect swaps");
         jLabel13.setEnabled(false);
 
         jSplitIntoContactsSwapsSettingsButton.setText("Settings");
         jSplitIntoContactsSwapsSettingsButton.setEnabled(false);
 
-        jLabel14.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel14.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel14.setText("Delimeter of contacts:");
 
-        jLabel15.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel15.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel15.setText("Delimeter of columns:");
 
         jSplitIntoContactsDelimeterOfContactsTextField.setText(",");
@@ -720,7 +720,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         jSplitIntoContactsSwapsCheckBox.setEnabled(false);
 
-        jLabel16.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel16.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel16.setText("Contacts are employees:");
 
         jSplitIntoContactsColumnTypesSettingsButton.setText("Settings");
@@ -732,10 +732,10 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         jLabel18.setText("(company/displayname of original contact into Company field of new contact)");
 
-        jLabel19.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel19.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel19.setText("Original content into source as note:");
 
-        jLabel20.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel20.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel20.setText("Original content into contacts as note:");
 
         javax.swing.GroupLayout jSplitIntoContactsFrameLayout = new javax.swing.GroupLayout(jSplitIntoContactsFrame.getContentPane());
@@ -850,13 +850,13 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jSplitIntoTypeSettingsFrame.setTitle("Split into...");
         jSplitIntoTypeSettingsFrame.setResizable(false);
 
-        jLabel21.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        jLabel21.setFont(new java.awt.Font("Tahoma", 1, 18));
         jLabel21.setText("\"SPLIT INTO\" MULTIPLE COLUMNS MENU:");
 
-        jLabel22.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel22.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel22.setText("Column to split:");
 
-        jColumnToSplitLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jColumnToSplitLabel2.setFont(new java.awt.Font("Tahoma", 1, 14));
         jColumnToSplitLabel2.setText("0");
 
         jSplitIntoTypeSettingsOkButton.setText("OK");
@@ -873,10 +873,10 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             }
         });
 
-        jLabel23.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel23.setFont(new java.awt.Font("Tahoma", 0, 12));
         jLabel23.setText("Number of columns:");
 
-        jSplitIntoTypeSettingsNumberOfColumnsLabel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jSplitIntoTypeSettingsNumberOfColumnsLabel.setFont(new java.awt.Font("Tahoma", 1, 14));
         jSplitIntoTypeSettingsNumberOfColumnsLabel.setText("0");
 
         jSplitIntoTypeSettingsToolBar.setFloatable(false);
@@ -936,7 +936,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         );
 
         jCompiledDocTextArea.setColumns(20);
-        jCompiledDocTextArea.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jCompiledDocTextArea.setFont(new java.awt.Font("Arial", 0, 12));
         jCompiledDocTextArea.setRows(5);
         jCompiledDocScrollPane.setViewportView(jCompiledDocTextArea);
 
@@ -963,7 +963,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         jFileChooserFrame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel17.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        jLabel17.setFont(new java.awt.Font("Tahoma", 1, 24));
         jLabel17.setText("SAVING...");
 
         javax.swing.GroupLayout jFileChooserFrameLayout = new javax.swing.GroupLayout(jFileChooserFrame.getContentPane());
@@ -996,8 +996,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 jBrowseButton1MouseReleased(evt);
             }
         });
-
-        jInputFileTextField1.setText("C:\\Users\\Martin\\Documents\\csv.csv");
 
         jSelectInputLabel1.setFont(new java.awt.Font("Arial", 0, 18));
         jSelectInputLabel1.setText("Please select the input file:");
@@ -2255,6 +2253,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                         jAddToDelimeterTextField.setText(columnSchema.queryMergesetDelimiter(mergsetNumber));
                         jAddToSubmitButtonMouseReleasedAction();
                     }
+                    currentItem = tempItem;
                     jAddToFrame.pack();
                     jAddToFrame.setVisible(true);
                 } else if (((ComboItem)tempItem).value.toString().equals("SPLIT INTO...") && !oking){
@@ -2317,6 +2316,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                         JOptionPane.showMessageDialog(jMainWindowFrame2, "An error occured while parsing number of columns.", "Error", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
+                    currentItem = tempItem;
                     jSplitIntoFrame.pack();
                     jSplitIntoFrame.setVisible(true);
                 }

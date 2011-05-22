@@ -1374,9 +1374,6 @@
           </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="jInputFileTextField1">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="C:\Users\Martin\Documents\csv.csv"/>
-          </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jSelectInputLabel1">
           <Properties>
