@@ -44,6 +44,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
     private boolean errorsDetected;
 
     public InternalDocCompiler(Document newDocRawReadTextDoc, InternalDocColumnSchema newDocColumnSchema) {
+        System.err.println("blabla5: called");
         docRawReadTextDoc = newDocRawReadTextDoc;
         docColumnSchema = newDocColumnSchema;
         outFormValidtr = new VCFHelperImpl(docColumnSchema);
@@ -153,11 +154,23 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
         //rootDocRawReadTextDoc.getChildNodes();
         NodeList rawContacts = returnXPathNodeList(docRawReadTextDoc, "//contact/uncategorized");
 
+     System.err.println("blabla4: " + docColumnSchema.toString());
+     System.err.println("blabla6: " + docRawReadTextDoc.toString());
+     // vystup: blabla6: [#document: null]
+     //pro Martin Bryndza: poslal jsi do kompilatoru prazdny dokument
+
+
+
+                 System.err.println("blabla2: " + rawContacts.toString());
+                 System.err.println("blabla3: " + (rawContacts.getLength()));
+
         for (int rawContCount = 0; rawContCount < rawContacts.getLength(); rawContCount++) {
             Element currentContactElement;
             if (rawContacts.item(rawContCount) instanceof Element) {
+                 System.err.println("blabla0: " + rawContacts.item(rawContCount).toString());
                 Element thisRawContact0 = (Element) rawContacts.item(rawContCount);
-                Element thisRawContact = returnFirstElement(thisRawContact0.getElementsByTagName("uncategorized"));
+                 System.err.println("blabla1: " + thisRawContact0.toString());
+               Element thisRawContact = returnFirstElement(thisRawContact0.getElementsByTagName("uncategorized"));
                 currentContactElement = thisRawContact;
                 NodeList thisRawContactContents = thisRawContact.getChildNodes();
                 boolean processMergeSets = false;
