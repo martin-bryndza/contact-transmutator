@@ -118,10 +118,10 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
         if (nodes.getLength() == 0) { //create
             Element newContact = docCompiled.createElement("contact");
             newContact.setAttribute("number", contactNumber.toString());
-
+            field = docCompiled.createElement(dataType);
             newContact.appendChild(field);
             docCompiled.appendChild(newContact);
-            field = docCompiled.createElement(dataType);
+            
         } else { //update
             Element contact = returnFirstElement(nodes);
             NodeList checkNodes = contact.getElementsByTagName(dataType);
@@ -170,8 +170,9 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                  System.err.println("blabla0: " + rawContacts.item(rawContCount).toString());
                 Element thisRawContact0 = (Element) rawContacts.item(rawContCount);
                  System.err.println("blabla1: " + thisRawContact0.toString());
-               Element thisRawContact = returnFirstElement(thisRawContact0.getElementsByTagName("uncategorized"));
-                currentContactElement = thisRawContact;
+               //Element thisRawContact = returnFirstElement(thisRawContact0.getElementsByTagName("uncategorized"));
+                Element thisRawContact = thisRawContact0; //todo jakub svoboda: check and tidy up
+                 currentContactElement = thisRawContact;
                 NodeList thisRawContactContents = thisRawContact.getChildNodes();
                 boolean processMergeSets = false;
                 ArrayList<Integer> columnsInMergeset = new ArrayList<Integer>();
