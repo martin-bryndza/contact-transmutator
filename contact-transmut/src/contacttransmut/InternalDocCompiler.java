@@ -115,21 +115,25 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
      * </root>
      */
     private void writeField(Integer contactNumber, String dataType, String contents, boolean canHaveMultipleRecordsOfSameDataType) throws DOMException {
+        System.err.println("short writeField called: Integer contactNumber="+contactNumber+", String dataType="+dataType+", String contents="+contents+", boolean canHaveMultipleRecordsOfSameDataType="+(canHaveMultipleRecordsOfSameDataType?"true":"false"));
         writeField(contactNumber, dataType, contents, canHaveMultipleRecordsOfSameDataType, false);
     }
 
     private void writeField(Integer contactNumber, String dataType, String contents, boolean canHaveMultipleRecordsOfSameDataType, boolean thisIsOriginalNoteEmbedding) throws DOMException {
-        Element field = null;
+       System.err.println("long writeField called: Integer contactNumber="+contactNumber+", String dataType="+dataType+", String contents="+contents+", boolean canHaveMultipleRecordsOfSameDataType="+(canHaveMultipleRecordsOfSameDataType?"true":"false")+", boolean thisIsOriginalNoteEmbedding="+(thisIsOriginalNoteEmbedding?"true":"false"));
+         Element field = null;
         NodeList nodes = returnXPathNodeList(docCompiled, "//contact[@number=\"" + contactNumber + "\"]");
         String writeContents = contents;
         if (nodes.getLength() == 0) { //create
+            System.err.println("create hive");
             Element newContact = docCompiled.createElement("contact");
             newContact.setAttribute("number", contactNumber.toString());
             field = docCompiled.createElement(dataType);
             newContact.appendChild(field);
-            docCompiled.appendChild(newContact);
+            rootDocCompiled.appendChild(newContact);
             
         } else { //update
+            System.err.println("update hive");
             Element contact = returnFirstElement(nodes);
             NodeList checkNodes = contact.getElementsByTagName(dataType);
             if (thisIsOriginalNoteEmbedding) {
@@ -163,8 +167,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
 
      System.err.println("blabla4: " + docColumnSchema.toString());
      System.err.println("blabla6: " + docRawReadTextDoc.toString());
-     // vystup: blabla6: [#document: null]
-     //pro Martin Bryndza: poslal jsi do kompilatoru prazdny dokument
+//TODO jakub svoboda tidy up
 
 
 
@@ -484,7 +487,12 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                     writeField(rawContCount, type, contents, outFormValidtr.vcfCanHaveMultipleInstances(counter));
                                 } catch (DOMException e) {
                                       System.err.println("InternalDocCompiler-err019: MERGESET: writeField(rawContCount, type, contents, outFormValidtr.vcfCanHaveMultipleInstances(counter)) failed");
-                                //log event
+                                       System.err.println("exception=" + e);
+                                      System.err.println("rawContCount=" + rawContCount);
+                                       System.err.println("type="+ type);
+                                       System.err.println("contents="+contents);
+                                       System.err.println("outFormValidtr.vcfCanHaveMultipleInstances(counter)="+outFormValidtr.vcfCanHaveMultipleInstances(counter));
+                                               //log event
                                  }
                             }
                         }
