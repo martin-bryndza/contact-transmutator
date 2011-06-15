@@ -467,11 +467,15 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                        System.err.println("InternalDocCompiler-err017: MERGESET: (!(docColumnSchema.getAllMergesets().contains(belongsInMergeset)))");
                                 //log event
                                 }
+                                System.err.println("compiler info: mergeset added");
+                                processMergeSets = true;
                                 columnsInMergeset.add(counter); //note the column in a mergeset
-
+                                if (!(usedMergesets.contains(belongsInMergeset))) { //if not already noted...
+                                    usedMergesets.add(belongsInMergeset); //note the parent mergeset
+                                }
                                 //OKAY, we have tested the column that it belongs in an existing mergeset
                                 //will go through all mergesets later, let the column be at this moment
-                                //TODO: go through all mergesets
+                                //TODO: jakub svoboda check corectness and tidy up
                             } else { //normal column...                                //normal column...
                                 // =========== NORMAL COLUMN ===========
                                 String type = docColumnSchema.querySelectedtypeType(counter);
@@ -502,45 +506,64 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
 
                 }
                 // ********** PROCESS MERGESETS HERE ***********
+                System.err.println("InternalDocCompiler-info031: process mergesets here");
                 if (processMergeSets) { //there are mergesets to process
+                    processMergeSets = false;
+               System.err.println("InternalDocCompiler-info032: there are mergesets to process");
+
                     ArrayList<Integer> allMergesets = docColumnSchema.getAllMergesets();
                     Iterator<Integer> usedMergesetsIter = usedMergesets.iterator();
                     while (usedMergesetsIter.hasNext()) {
+            System.err.println("InternalDocCompiler-info034: while (usedMergesetsIter.hasNext())");
+
                         Integer thisMergeset = usedMergesetsIter.next();
                         HashMap<Integer, Integer> allMergesetMembers = docColumnSchema.getAllMergesetMembers(thisMergeset);
                         SortedSet<Integer> sortedMembersSet = new TreeSet<Integer>(allMergesetMembers.keySet());
-                        Iterator membersIter = sortedMembersSet.iterator();
+                        Iterator<Integer> membersIter = sortedMembersSet.iterator();
                         String mergesetValue = "";
                         boolean firstEntry = true;
                         while (membersIter.hasNext()) {
-                            Map.Entry attribPair = (Map.Entry) membersIter.next();
-                            attribPair.getKey();
-                            attribPair.getValue();
-                            if (columnsInMergeset.contains((Integer) attribPair.getValue())) {
+                   System.err.println("InternalDocCompiler-info035: while (membersIter.hasNext())");
+
+                            Integer attribPairKey = membersIter.next(); //order of column in mergeset
+                            Integer attribPairValue = allMergesetMembers.get(attribPairKey); //number of the column
+                            //Map.Entry attribPair = (Map.Entry) membersIter.next();
+                     System.err.println("attribPairKey="+ attribPairKey + " attribPairValue="+attribPairValue);
+
+                            //attribPair.getKey();
+                            //attribPair.getValue();
+                            if (columnsInMergeset.contains((Integer) attribPairValue)) {
+                   System.err.println("if (columnsInMergeset.contains((Integer) attribPairValue="+attribPairValue);
+
                                 String contentsOfField = null;
                                 NodeList childsOfContact = currentContactElement.getChildNodes();
                                 for (Integer i = 0; i < childsOfContact.getLength(); i++) {
                                     if (childsOfContact.item(i) instanceof Element) {
                                         Element thisField = (Element) childsOfContact.item(i);
-                                        if (Integer.parseInt(thisField.getAttribute("counter")) == attribPair.getValue()) {
+                                        if (Integer.parseInt(thisField.getAttribute("counter")) == attribPairValue) {
                                             contentsOfField = thisField.getTextContent();
                                             break;
                                         }
                                     }
                                 }
+                  System.err.println("contentsOfField="+contentsOfField+", firstentry:"+(firstEntry?"true":"false"));
 
                                 if (contentsOfField != null) {
+
                                     if (firstEntry) {
                                         mergesetValue = contentsOfField;
                                         firstEntry = false;
                                     } else {
-                                        mergesetValue = mergesetValue + docColumnSchema.queryMergesetDelimiter(thisMergeset) + " ";
+                                        mergesetValue = mergesetValue + docColumnSchema.queryMergesetDelimiter(thisMergeset) + " " + contentsOfField;
                                     }
                                 }
+                  System.err.println("mergesetValue="+mergesetValue);
+
                             }
                         }
 
                         //write mergeset into contact
+                   System.err.println("InternalDocCompiler-info036: write mergeset into contact, thisMergeset="+thisMergeset);
                         String type = docColumnSchema.queryMergesetSelectedType(thisMergeset);
                         if (type == null) {
                             type = docColumnSchema.queryMergesetCandidateType(thisMergeset);
@@ -560,7 +583,8 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                 }
 
                 //check if FN is present
-                NodeList nodes = currentContactElement.getElementsByTagName(VCFTypesEnum.Formatted_Name.toString());
+                   System.err.println("InternalDocCompiler-info041: check if FN is present");
+               NodeList nodes = currentContactElement.getElementsByTagName(VCFTypesEnum.Formatted_Name.toString());
                 if (nodes.getLength() == 0) {
                     nodes = currentContactElement.getElementsByTagName(VCFTypesEnum.Name.toString());
                     if (nodes.getLength() == 0) {
@@ -576,6 +600,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                         }
                     }
                     if (((nodes.getLength() != 0) && ((nodes.item(0)) instanceof Element)) && (((Element) nodes.item(0)).getTextContent().trim() == null ? "" != null : !((Element) nodes.item(0)).getTextContent().trim().equals(""))) {
+                   System.err.println("InternalDocCompiler-info042: create the FN, otherwise ignore it...");
                         //create the FN, otherwise ignore it...
                         Element fn = docCompiled.createElement(VCFTypesEnum.Formatted_Name.toString());
                         fn.setTextContent(((Element) nodes.item(0)).getTextContent().trim());
