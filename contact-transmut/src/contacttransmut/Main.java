@@ -39,6 +39,9 @@ public class Main {
             //String fileName = "content.xml";
             //InputFilter test = new ODSInput(fileName);
             
+				// Test nacitani VCF
+				// String fileName = "test.vcf";
+				// InputFilter test = new ReadVCF(fileName, "UTF-8");
             
             Document loadedContacts = test.read();
 
