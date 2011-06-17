@@ -995,7 +995,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
     }
 
     public boolean isTypeInColumnSchema(VCFTypesEnum type){
-        NodeList candidateTypeList = doc.getElementsByTagName("candidatetype");
+        NodeList candidateTypeList = returnXPathNodeList("//candidatetype");
         for (int i= 0; i<candidateTypeList.getLength(); i++){
             Element candidateType = (Element) candidateTypeList.item(i);
             String value = candidateType.getAttribute("value");
@@ -1003,6 +1003,15 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
                 return true;
             }
         }
+         NodeList selectedTypeList = returnXPathNodeList("//selectedtype");
+        for (int i= 0; i<selectedTypeList.getLength(); i++){
+            Element selectedType = (Element) selectedTypeList.item(i);
+            String value = selectedType.getAttribute("value");
+            if (type.toString().equals(value)){
+                return true;
+            }
+        }
+
         return false;
     }
 
