@@ -821,7 +821,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
         }
 
         Element candidatetypeElement = doc.createElement("candidatetype");
-        candidatetypeElement.setAttribute("candidatetype", type);
+        candidatetypeElement.setAttribute("value", type);
 
         columnElement.appendChild(candidatetypeElement);
     }
@@ -841,7 +841,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
         }
 
         Element selectedtypeElement = doc.createElement("selectedtype");
-        selectedtypeElement.setAttribute("selectedtype", type);
+        selectedtypeElement.setAttribute("value", type);
 
         columnElement.appendChild(selectedtypeElement);
     }
@@ -852,7 +852,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
         Element columnElement = returnFirstElement(dataNodeList);
 
-        return columnElement.getAttribute("candidatetype");
+        return columnElement.getAttribute("value");
     }
 
     public String querySelectedtypeType(Integer colNum) {
@@ -861,7 +861,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
         Element columnElement = returnFirstElement(dataNodeList);
 
-        return columnElement.getAttribute("selectedtype");
+        return columnElement.getAttribute("value");
     }
 
     //colNum - number of column with attribute "aggregated"
@@ -881,7 +881,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
         }
 
         Element candidatetypeElement = doc.createElement("candidatetype");
-        candidatetypeElement.setAttribute("candidatetype", type);
+        candidatetypeElement.setAttribute("value", type);
 
         aggregatedColumnElement.appendChild(candidatetypeElement);
     }
@@ -901,7 +901,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
         }
 
         Element selectedtypeElement = doc.createElement("selectedtype");
-        selectedtypeElement.setAttribute("selectedtype", type);
+        selectedtypeElement.setAttribute("value", type);
 
         aggregatedColumnElement.appendChild(selectedtypeElement);
     }
@@ -911,7 +911,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
         Element element = returnFirstElement(dataNodeList);
 
-        return element.getAttribute("candidatetype");
+        return element.getAttribute("value");
     }
 
     public String queryAggregatedSelectedtypeType(Integer colNum, Integer colNum2) {
@@ -919,7 +919,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
         Element element = returnFirstElement(dataNodeList);
 
-        return element.getAttribute("selectedtype");
+        return element.getAttribute("value");
     }
 //String queryCandidateType
 //String querySelectedType
