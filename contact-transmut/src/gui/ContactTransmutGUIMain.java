@@ -1397,9 +1397,19 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
     private void jAddToCancelButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jAddToCancelButtonMouseReleased
         int myColumn = Integer.parseInt(jColumnToAddLabel.getText());
-        if (!columnSchema.isColumnMergedInOther(myColumn)){
+        int indexSetBefore = 0;
+        if (columnSchema.isColumnMergedInOther(myColumn)){
+            indexSetBefore = comboMgr.getIndexOfValue("ADD_TO_COLUMN_#...");
+        }
+        else if(columnSchema.isColumnAggregated(myColumn))
+        {
+            indexSetBefore = comboMgr.getIndexOfValue("SPIT_INTO...");
+        }
+        else{
+            indexSetBefore = comboMgr.getIndexOfValue(columnSchema.queryCandidateType(myColumn));
             comboBoxes.get(myColumn).setSelectedIndex(9);
         }
+        comboBoxes.get(myColumn).setSelectedIndex(indexSetBefore);
         jAddToFrame.setVisible(false);
     }//GEN-LAST:event_jAddToCancelButtonMouseReleased
 
@@ -1420,7 +1430,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         String myColumn = jColumnToAddLabel.getText();
         String baseColumnStr = jAddToBaseColumnTextField.getText();
         int baseColumn  = Integer.parseInt(baseColumnStr);
-        int newMergesetNumber = 0;
         boolean myColumnAdded = false;
         ArrayList<Integer> columnsToAddNumbers = new ArrayList<Integer>();
         for (int i = 0; i<columnsToAdd.size(); i++){
@@ -1468,64 +1477,37 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 Object[] options = {"Yes", "No, I will change the settings"};
                 int n = JOptionPane.showOptionDialog(this, "The base column is added to another. Cancel the other addition?", "Problem!", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,null, options, options[1]);
                 if (n == 0){
-                    //deleted mergeset number will become new mergeset number
-                    newMergesetNumber = columnSchema.queryMergeSet(baseColumn);
-                    deleteMergeset(newMergesetNumber);
+                    int mergeset = columnSchema.queryMergeSet(baseColumn);
+                    HashMap<Integer, Integer> allMergesetMembers = columnSchema.getAllMergesetMembers(mergeset);
+                    for (Integer i : allMergesetMembers.values()){
+                        comboBoxes.get(i).setSelectedIndex(9);
+                    }
+                    columnSchema.deleteMergeset(mergeset);
+                    columnSchMgr.update();
                 } else {
                     return;
                 }
             }
-        }
 
-        // change columnSchema !! pozor na allready is in another mergeset
-
-        //get mains mergeset or create new mergeset
-        if (columnSchema.isColumnMergedInOther(baseColumn)){
-            //column is base in that mergeset, checked above
-            newMergesetNumber = columnSchema.queryMergeSet(baseColumn);
-            deleteMergeset(newMergesetNumber);
-        } else if (newMergesetNumber == 0){
-            ArrayList<Integer> allMergesets = columnSchema.getAllMergesets();
-            for (int i = 0; i<allMergesets.size(); i++){
-                if (allMergesets.get(i) > newMergesetNumber)
-                    newMergesetNumber = allMergesets.get(i);
-            }
-            newMergesetNumber++;
-        }
-        columnSchema.createMergeset(newMergesetNumber, jAddToDelimeterTextField.getText());
-        //set to all aggregate off
-        //set to all merge on
-        //set to all the mergeset number -> if is main in other, cancel that mergeset/do not include
-        columnSchema.columnAggregateOff(baseColumn);
-        columnSchema.columnMergeOn(baseColumn, newMergesetNumber, 1);
-        for (int i = 0; i<columnsToAddNumbers.size(); i++){
-            columnSchema.columnAggregateOff(columnsToAddNumbers.get(i));
-            if (columnSchema.isColumnMergedInOther(columnsToAddNumbers.get(i))) {
-                if (columnSchema.queryMergeOrder(columnsToAddNumbers.get(i)) == 1) {
-                    Object[] options = {"Yes", "No"};
-                    int n = JOptionPane.showOptionDialog(this, "The column number " + columnsToAddNumbers.get(i) + " is base in another addition. Cancel the other addition? If No, the column will not be added.", "Problem!", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-                    if (n == 0) {
-                        deleteMergeset(columnSchema.queryMergeSet(columnsToAddNumbers.get(i)));
-                    } else {
-                        continue;
-                    }
+            //if this mergeset existed before, it could loose some components -> set all to Note
+            if (columnSchema.queryMergeOrder(baseColumn) == 1){
+                int mergeset = columnSchema.queryMergeSet(baseColumn);
+                HashMap<Integer, Integer> allMergesetMembers = columnSchema.getAllMergesetMembers(mergeset);
+                for (Integer i : allMergesetMembers.values()){
+                    comboBoxes.get(i).setSelectedIndex(9);
                 }
             }
-            columnSchema.columnMergeOn(columnsToAddNumbers.get(i), newMergesetNumber, i+2);
         }
-        //set mergesets type
-        columnSchema.setMergesetCandidateType(newMergesetNumber, ((String)((ComboItem)comboBoxes.get(baseColumn).getSelectedItem()).value).replace(" ", "_"));
-        columnSchema.setMergesetSelectedType(newMergesetNumber, ((String)((ComboItem)comboBoxes.get(baseColumn).getSelectedItem()).value).replace(" ", "_"));
 
-        // change comboBoxes and addToLables
-        for (int i = 0; i<columnsToAdd.size(); i++){
-            String columnNumStr = columnsToAdd.get(i).getText();
-            if (columnNumStr.equals(""))
-                continue;
-            int columnNum = Integer.parseInt(columnNumStr);
-            addToLables.get(columnNum).setText("# = " + String.valueOf(baseColumn));
-            setComboBoxTo((JComboBox) comboBoxes.get(columnNum), 27);
+
+
+        //set all merge components to add to
+        for (Integer i : columnsToAddNumbers){
+            comboBoxes.get(i).setSelectedIndex(comboMgr.getIndexOfValue("ADD_TO_COLUMN_#..."));
         }
+        columnSchMgr.update();
+        comboMgr.updateComboBoxesEnabledValues();
+        comboMgr.updateAddToLables();
 
         jAddToFrame.setVisible(false);
     }//GEN-LAST:event_jAddToOkButtonMouseReleased
@@ -2138,11 +2120,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         }
     }
 
-    public void setAddToWindowVisible(boolean value) {
-        jAddToFrame.pack();
-        jAddToFrame.setVisible(value);
-    }
-
     // <editor-fold defaultstate="collapsed" desc="Combo Box">
     class ComboRenderer extends JLabel implements ListCellRenderer {
 
@@ -2191,19 +2168,26 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 int columnNumber = comboMgr.getIndexOfComboBox(combo);
                 
                 //if a type was selected
-                if (comboMgr.getIndexOfValue(((ComboItem)tempItem).toString()) <= 26){
+                String tempItemVCFFormat = comboMgr.getSelectedValueStr(combo);
+                if (comboMgr.getIndexOfValue(tempItemVCFFormat) <= (comboMgr.getIndexOfValue("ADD_TO_COLUMN_#...")-1)){
                     columnSchMgr.update();
                     comboMgr.updateComboBoxesEnabledValues();
                 }
 
                 //if the add to was selected
-                else if(comboMgr.getIndexOfValue(((ComboItem)tempItem).toString()) == 27){
-                    
+                else if (comboMgr.getIndexOfValue(tempItemVCFFormat) == comboMgr.getIndexOfValue("ADD_TO_COLUMN_#...")) {
+                    if (!jAddToFrame.isVisible()){
+                        prepareAddToWindow(columnNumber);
+                        jAddToFrame.pack();
+                        jAddToFrame.setVisible(true);
+                    }
                 }
                     
                 //if the split into was selected
-                else if (comboMgr.getIndexOfValue(((ComboItem)tempItem).toString()) == 28){
-                    
+                else if (comboMgr.getIndexOfValue(tempItemVCFFormat) == comboMgr.getIndexOfValue("SPLIT_INTO...")){
+                    if (!jSplitIntoFrame.isVisible()){
+                        
+                    }
                 }
                 
                 else {
@@ -2319,7 +2303,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                         cs.setMergesetSelectedType(oldMergesetNum, type);
                     }
                     //if 1st in newly created mergeset -> values in addto window
-                    else if (columnsToAdd.size() > 0 && Integer.parseInt(columnsToAdd.get(0).getText()) == column){
+                    else if (!jAddToBaseColumnTextField.getText().equals("") && Integer.parseInt(jAddToBaseColumnTextField.getText()) == column){
                         cs.createMergeset(newMergesetNum,jAddToDelimeterTextField.getText());
                         cs.columnMergeOn(column, newMergesetNum, 1);
                         cs.setMergesetCandidateType(newMergesetNum, type);
@@ -2344,7 +2328,11 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     }
                     //if is in newly created mergeset
                     if (newToMergeList.contains(column)){
-                        cs.columnMergeOn(column, newMergesetNum, newToMergeList.indexOf(column));
+                        int baseColumn = Integer.parseInt(jAddToBaseColumnTextField.getText());
+                        if (oldCs.isColumnMergedInOther(baseColumn)){
+                            cs.columnMergeOn(column, oldCs.queryMergeSet(baseColumn), newToMergeList.indexOf(column)+2);
+                        }
+                        cs.columnMergeOn(column, newMergesetNum, newToMergeList.indexOf(column)+2);
                     }
                     //if merged in old CS
                     else if(oldCs.isColumnMergedInOther(column)){
@@ -2500,6 +2488,19 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 }
             }
 
+            public void updateAddToLables(){
+                for (JComboBox combo : comboBoxes){
+                    int column = comboMgr.getIndexOfComboBox(combo);
+                    if (combo.getSelectedIndex() == getIndexOfValue("ADD_TO_COLUMN_#...")){
+                        int mergeset = columnSchema.queryMergeSet(column);
+                        int baseColumn = columnSchema.getAllMergesetMembers(mergeset).get(1);
+                        addToLables.get(column).setText(String.valueOf(baseColumn));
+                    } else {
+                        addToLables.get(column).setText("");
+                    }
+                }
+            }
+
 //            public void setSelectedValue(int comboBoxIndex, int indexOfValue) {
 //                JComboBox temp = getComboBoxAtIndex(comboBoxIndex);
 //                setSelectedValue(temp, indexOfValue);
@@ -2516,7 +2517,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             }
 
             public String getSelectedValueStr(JComboBox comboBox) {
-                return getSelectedValueVCF(comboBox).toString();
+                return ((ComboItem)comboBox.getSelectedItem()).toString().replace(" ", "_");
             }
 
             public VCFTypesEnum getSelectedValueVCF(int comboBoxIndex) {
@@ -2626,6 +2627,12 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 }
                 if (value.equals(VCFTypesEnum.Unique_Identifier.toString())) {
                     answer = 26;
+                }
+                if (value.equals("ADD_TO_COLUMN_#...")) {
+                    answer = 27;
+                }
+                if (value.equals("SPLIT_INTO...")) {
+                    answer = 28;
                 }
                 return answer;
             }
