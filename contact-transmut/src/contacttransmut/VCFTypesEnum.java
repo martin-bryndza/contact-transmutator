@@ -103,6 +103,7 @@ Public_Key_home ("Public_Key_home");
     }
 
     public boolean equals(VCFTypesEnum other) {
+        if (other==null) return false;
         return this.toString().equals(other.toString());
     }
 
