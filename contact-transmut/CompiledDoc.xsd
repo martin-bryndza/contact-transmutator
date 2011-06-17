@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    This schema isn't completely correct. It doesn't allow more elements of the same type to appear in contact.
+    It's caused by poor support of XSD Schema for unordered structures, xsd:all doesn't support maxOccurs > 1,
+    xsd:sequence is ordered etc.
+-->
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+<xsd:element name="root" type="rootType" />
+
+<xsd:complexType name="rootType">
+    <xsd:sequence>
+        <xsd:element name="contacts" type="contactsType" minOccurs="1" maxOccurs="1" />
+    </xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="contactsType">
+    <xsd:sequence>
+        <xsd:element name="contact" type="contactType" minOccurs="1" maxOccurs="unbounded" />
+    </xsd:sequence>
+</xsd:complexType>
+
+<xsd:complexType name="contactType">
+    <xsd:all>
+        <xsd:element name="Name" type="xsd:string" minOccurs="0" />
+        <xsd:element name="Formatted_Name" minOccurs="0" />
+        <xsd:element name="Birthday" minOccurs="0" />
+        <xsd:element name="Telephone" minOccurs="0" />
+    </xsd:all>
+    <xsd:attribute name="number" type="xsd:int" />
+</xsd:complexType>
+
+</xsd:schema>

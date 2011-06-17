@@ -14,7 +14,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 /**
- *
+ * Input filter implementation for VCF format.
+ * 
  * @author Martin Molnar
  */
 public class ReadVCF implements InputFilter {
@@ -51,7 +52,6 @@ public class ReadVCF implements InputFilter {
         Element thisContact = null;
         Element thisContactUncat = null;
         Element thisProperty = null;
-        VCFConverter converter = new VCFConverter();
         VCFHelper helper = new VCFHelperImpl(new InternalDocColumnSchemaImpl(1));
         int maxCounter = 0;
         int indexLastModified = -1;
@@ -89,7 +89,7 @@ public class ReadVCF implements InputFilter {
                         // New property detected
                         if (contactLine.length > 1) {
                             if (!contactLine[0].equals("VERSION")) {
-                                String naturalName = converter.VCFNameToNaturalName(contactLine[0]);
+                                String naturalName = VCFConverter.VCFNameToNaturalName(contactLine[0]);
                                 boolean mpInstAllowed = helper.vcfCanHaveMultipleInstances(naturalName);
                                 boolean newType = true;
 

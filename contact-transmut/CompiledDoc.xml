@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root   xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+        xsi:noNamespaceSchemaLocation="CompiledDoc.xsd">
+    <contacts>
+        <contact number="0">
+            <Name>John Doe</Name>
+            <Formatted_Name>John;Doe</Formatted_Name>
+            <Birthday>1950-01-01</Birthday>
+        </contact>
+        <contact number="1">
+            <Formatted_Name>Bobby;Kottick</Formatted_Name>
+            <Name>Bobby Kottick</Name>
+            <Telephone>+100200300</Telephone>
+        </contact>
+    </contacts>
+</root>

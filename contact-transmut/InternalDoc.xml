@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root   xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+        xsi:noNamespaceSchemaLocation="InternalDoc.xsd"
+        maxColumnNumber="3">
+    <person>
+        <uncategorized>
+            <data counter="0">Name</data>
+            <data counter="1">Formatted_Name</data>
+            <data counter="2">1990-05-14</data>
+        </uncategorized>
+    </person>
+    <person>
+        <uncategorized>
+            <data counter="0"/>
+            <data counter="1">Formatted_Name</data>
+            <data counter="2"/>
+        </uncategorized>
+    </person>
+</root>
