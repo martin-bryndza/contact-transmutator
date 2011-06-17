@@ -196,7 +196,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                     //current contents is $contents
                     //current element is $contentsElement
 
-                    if (!(contents.trim().equals(""))) {
+                    if ((!(contents.trim().equals("")))&&(!(/*if column is planned for deletion, ignore*/ docColumnSchema.querySelectedtypeType(counter).equals("DELETE_THIS")))) {
                         if (docColumnSchema.isColumnAggregated(counter)) { //aggregated column...
                             // ============== AGGREGATED COLUMN =============
                             Integer numOfColumns = docColumnSchema.queryAggregateSettingNumberofcolumns(counter);
