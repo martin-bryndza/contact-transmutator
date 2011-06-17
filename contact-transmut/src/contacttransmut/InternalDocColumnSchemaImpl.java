@@ -163,7 +163,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
         doc = db.newDocument(); //this is internal XML DOM we use to process the data
         Element root0 = doc.createElement("root");
         doc.appendChild(root0);
-        root = doc.createElement("columnschema");
+        root = root0.getOwnerDocument().createElement("columnschema");
         root0.appendChild(root);
 
         addColumns(columns);
@@ -210,7 +210,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
         findRoot();
 
         for (Integer i = 0; i < numOfColumns; i++) {
-            Element column = doc.createElement("column");
+            Element column = root.getOwnerDocument().createElement("column");
             column.setAttribute("number", i.toString());
             column.setAttribute("mergedinother", "no");
             column.setAttribute("aggregated", "no");
@@ -270,7 +270,12 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
             boolean originaltargetnote, String separatecontactsdelimiter, boolean autodetectswaps) {
         findRoot();
         if ((!isColumnAggregated(colNum)) && (!isColumnMergedInOther(colNum))) {    //only meaningful when !isColumnAggregated
-            Element aggregatedcolumns = doc.createElement("aggregatedcolumns");
+
+            NodeList dataNodeList = returnXPathNodeList("//columnschema/column[@number=\"" + colNum.toString() + "\"]");
+
+            Element theColumnElement = returnFirstElement(dataNodeList);
+            
+            Element aggregatedcolumns = theColumnElement.getOwnerDocument().createElement("aggregatedcolumns");
             aggregatedcolumns.setAttribute("delimiter", delimiter);
             aggregatedcolumns.setAttribute("numberofcolumns", numberofcolumns.toString());
             aggregatedcolumns.setAttribute("intoseparatecontacts", (intoseparatecontacts ? "yes" : "no"));
@@ -279,21 +284,17 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
             aggregatedcolumns.setAttribute("originaltargetnote", (originaltargetnote ? "yes" : "no"));
 
             if (intoseparatecontacts) {
-                Element separatecontacts = doc.createElement("separatecontacts");
+                Element separatecontacts = aggregatedcolumns.getOwnerDocument().createElement("separatecontacts");
                 separatecontacts.setAttribute("delimiter", delimiter);
                 separatecontacts.setAttribute("autodetectswaps", (autodetectswaps ? "yes" : "no"));
                 aggregatedcolumns.appendChild(separatecontacts);
             }
 
             for (Integer i = 0; i < numberofcolumns; i++) {
-                Element column = doc.createElement("column");
+                Element column = aggregatedcolumns.getOwnerDocument().createElement("column");
                 column.setAttribute("number", i.toString());
                 aggregatedcolumns.appendChild(column);
             }
-
-            NodeList dataNodeList = returnXPathNodeList("//columnschema/column[@number=\"" + colNum.toString() + "\"]");
-
-            Element theColumnElement = returnFirstElement(dataNodeList);
 
             theColumnElement.appendChild(aggregatedcolumns);
 
@@ -516,7 +517,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
             element.setAttribute("intoseparatecontacts", (intoseparatecontacts ? "yes" : "no"));
 
-            Element separatecontacts = doc.createElement("separatecontacts");
+            Element separatecontacts = element.getOwnerDocument().createElement("separatecontacts");
             separatecontacts.setAttribute("delimiter", delimiter);
             separatecontacts.setAttribute("autodetectswaps", (autodetectswaps ? "yes" : "no"));
             element.appendChild(separatecontacts);
@@ -621,13 +622,13 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
         findRoot();
         if ((!isColumnAggregated(colNum)) && (!isColumnMergedInOther(colNum))) {    //only meaningful when !isColumnMergedInOther
 
-            Element mergein = doc.createElement("mergein");
-            mergein.setAttribute("set", mergeiniset.toString());
-            mergein.setAttribute("order", order.toString());
-
             NodeList dataNodeList = returnXPathNodeList("//columnschema/column[@number=\"" + colNum.toString() + "\"]");
 
             Element theColumnElement = returnFirstElement(dataNodeList);
+
+            Element mergein = theColumnElement.getOwnerDocument().createElement("mergein");
+            mergein.setAttribute("set", mergeiniset.toString());
+            mergein.setAttribute("order", order.toString());
 
             theColumnElement.appendChild(mergein);
 
@@ -695,10 +696,10 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
         Element mergeset = returnFirstElement(dataNodeList);
 
         if (mergeset.getNodeName().equals("null")) {
-            mergeset = doc.createElement("mergeset");
+            mergeset = mergeset.getOwnerDocument().createElement("mergeset");
             mergeset.setAttribute("number", num.toString());
 
-            Element delimiter = doc.createElement("delimiter");
+            Element delimiter = mergeset.getOwnerDocument().createElement("delimiter");
             delimiter.setAttribute("value", newDelimiter);
 
             mergeset.appendChild(delimiter);
@@ -779,7 +780,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
             mergeset.removeChild(deleteElement);
         }
 
-        Element selectedtype = doc.createElement("delimiter");
+        Element selectedtype = mergeset.getOwnerDocument().createElement("delimiter");
         selectedtype.setAttribute("value", delim);
 
         mergeset.appendChild(selectedtype);
@@ -884,7 +885,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
             aggregatedColumnElement.removeChild(deleteElement);
         }
 
-        Element candidatetypeElement = doc.createElement("candidatetype");
+        Element candidatetypeElement = aggregatedColumnElement.getOwnerDocument().createElement("candidatetype");
         candidatetypeElement.setAttribute("value", type);
 
         aggregatedColumnElement.appendChild(candidatetypeElement);
@@ -904,7 +905,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
             aggregatedColumnElement.removeChild(deleteElement);
         }
 
-        Element selectedtypeElement = doc.createElement("selectedtype");
+        Element selectedtypeElement = aggregatedColumnElement.getOwnerDocument().createElement("selectedtype");
         selectedtypeElement.setAttribute("value", type);
 
         aggregatedColumnElement.appendChild(selectedtypeElement);
