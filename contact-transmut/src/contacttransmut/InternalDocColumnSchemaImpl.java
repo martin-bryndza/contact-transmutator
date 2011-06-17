@@ -824,7 +824,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
             columnElement.removeChild(deleteElement);
         }
 
-        Element candidatetypeElement = doc.createElement("candidatetype");
+        Element candidatetypeElement = columnElement.getOwnerDocument().createElement("candidatetype");
         candidatetypeElement.setAttribute("value", type);
 
         columnElement.appendChild(candidatetypeElement);
@@ -844,7 +844,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
             columnElement.removeChild(deleteElement);
         }
 
-        Element selectedtypeElement = doc.createElement("selectedtype");
+        Element selectedtypeElement = columnElement.getOwnerDocument().createElement("selectedtype");
         selectedtypeElement.setAttribute("value", type);
 
         columnElement.appendChild(selectedtypeElement);
