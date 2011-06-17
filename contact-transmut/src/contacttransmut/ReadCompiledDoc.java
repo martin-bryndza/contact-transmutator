@@ -48,4 +48,9 @@ public class ReadCompiledDoc implements InputFilter{
         return columnSchema;
     }
 
+    private int getNumberOfColumns(Document compiledDoc){
+        
+        return 1;
+    }
+
 }

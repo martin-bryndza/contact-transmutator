@@ -18,6 +18,7 @@ import contacttransmut.InternalDocColumnSchemaImpl;
 import contacttransmut.InternalDocCompiler;
 import contacttransmut.OutputFilter;
 import contacttransmut.ReadCSV;
+import contacttransmut.ReadCompiledDoc;
 import contacttransmut.VCFTypesEnum;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComboBox;
@@ -1113,7 +1115,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         columnSchMgr = new ColumnSchemaManager(columnSchema);
 
         comboMgr.createMainComboBoxes();
-        comboMgr.updateComboBoxesEnabledValues();
+        comboMgr.updateComboBoxesEnabledValues(comboBoxes);
+        comboMgr.updateAddToLables();
     
         setVisible(false);
         jMainWindowFrame2.pack();
@@ -1172,21 +1175,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     }//GEN-LAST:event_jMainWindowCancelButtonMouseReleased
 
     private void jMainWindowNextButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMainWindowNextButtonMouseReleased
-        //check whether there is column with type formated name
-        boolean formatedNameSelected = false;
-        for (int i = 0; i<jContactsListTable.getColumnCount(); i++){
-            if (comboBoxes.get(i).getSelectedIndex() == 0){
-                formatedNameSelected = true;
-                break;
-            }
-        }
-        if (!formatedNameSelected)
-            formatedNameSelected = columnSchema.isTypeInColumnSchema(VCFTypesEnum.Formatted_Name);
-        if (!formatedNameSelected){
-            JOptionPane.showMessageDialog(this,"Formatted Name column type is mandatory. Please select one.","Error",JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
         //hide main window
         jMainWindowFrame2.setVisible(false);
 
@@ -1264,16 +1252,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         } else {
             jMainWindowFrame2.setVisible(true);
             return;
-        }
-
-        //set the column types to the column schema
-        for (int i = 0; i<jContactsListTable.getColumnCount(); i++){
-            String type = ((String)((ComboItem)comboBoxes.get(i).getSelectedItem()).value).replace(" ", "_");
-            if (type.equals("ADD_TO_COLUMN_#...") || type.equals("SPLIT_INTO...")){
-                continue;
-            }
-            columnSchema.setCandidateType(i, type);
-            columnSchema.setSelectedtypeType(i, type);
         }
 
         //compile the column schema and data
@@ -1506,7 +1484,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             comboBoxes.get(i).setSelectedIndex(comboMgr.getIndexOfValue("ADD_TO_COLUMN_#..."));
         }
         columnSchMgr.update();
-        comboMgr.updateComboBoxesEnabledValues();
+        comboMgr.updateComboBoxesEnabledValues(comboBoxes);
         comboMgr.updateAddToLables();
 
         jAddToFrame.setVisible(false);
@@ -1519,14 +1497,17 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private void jSplitIntoCancelButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoCancelButtonMouseReleased
         int myColumn = Integer.parseInt(jColumnToSplitLabel.getText());
         if (!columnSchema.isColumnAggregated(myColumn)){
-            comboBoxes.get(myColumn).setSelectedIndex(9);
+            columnSchMgr.popColumnSchema();
         }
+        comboMgr.updateComboBoxesEnabledValues(comboBoxes);
+        comboMgr.updateAddToLables();
         jSplitIntoFrame.setVisible(false);
         jSplitIntoContactsFrame.setVisible(false);
         jSplitIntoTypeSettingsFrame.setVisible(false);
     }//GEN-LAST:event_jSplitIntoCancelButtonMouseReleased
 
     private void jSplitIntoNumberOfColumnsSettingsButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoNumberOfColumnsSettingsButtonMouseReleased
+        columnSchMgr.pushColumnSchema();
         try{
             fillInSplitIntoTypesSettingsForm();
         } catch (NumberFormatException ex){
@@ -1538,9 +1519,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     }//GEN-LAST:event_jSplitIntoNumberOfColumnsSettingsButtonMouseReleased
 
     private void jSplitIntoTypeSettingsCancelButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoTypeSettingsCancelButtonMouseReleased
-        for (int i = 0; i < splitIntoColumnsTypes.size(); i++){
-            setComboBoxTo(splitIntoColumnsTypes.get(i), 9);
-        }
+        //revert changes in this window
+        columnSchMgr.popColumnSchema();
         fillInSplitIntoTypesSettingsForm();
         jSplitIntoTypeSettingsFrame.setVisible(false);
     }//GEN-LAST:event_jSplitIntoTypeSettingsCancelButtonMouseReleased
@@ -1550,28 +1530,16 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     }//GEN-LAST:event_jSplitIntoTypeSettingsOkButtonMouseReleased
 
     private void jSplitIntoOkButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoOkButtonMouseReleased
-        int numberOfColumns = 0;
-        int columnToSplit = Integer.parseInt(jColumnToSplitLabel.getText());
         try{
-            numberOfColumns = Integer.parseInt(jSplitIntoNumberOfColumnsTextField.getText());
+            int temp = Integer.parseInt(jSplitIntoNumberOfColumnsTextField.getText());
         } catch (NumberFormatException ex){
             JOptionPane.showMessageDialog(this,"Invalid number of columns","Error",JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // changeColumnSchema
-        columnSchema.columnMergeOff(columnToSplit);
-        columnSchema.columnAggregateOn(columnToSplit, jSplitIntoDelimeterTextField.getText(), numberOfColumns, jSplitIntoContactsCheckBox.isSelected(), jSplitIntoContactsAreEmployeesCheckBox.isSelected(), jSplitIntoContactsOrigIntoSourceCheckBox.isSelected(), jSplitIntoContactsOrigIntoContactsCheckBox.isSelected(), jSplitIntoContactsDelimeterOfContactsTextField.getText(), jSplitIntoContactsSwapsCheckBox.isSelected());
-        for (int i = 0; i<splitIntoColumnsTypes.size(); i++){
-            String type = ((String)((ComboItem)splitIntoColumnsTypes.get(i).getSelectedItem()).value).replace(" ", "_");
-            columnSchema.setAggregatedCandidateType(columnToSplit, i, type);
-            columnSchema.setAggregatedSelectedtypeType(columnToSplit, i, type);
-        }
-        for (int i = splitIntoColumnsTypes.size(); i<numberOfColumns; i++){
-            String type = "Note";
-            columnSchema.setAggregatedCandidateType(columnToSplit, i, type);
-            columnSchema.setAggregatedSelectedtypeType(columnToSplit, i, type);
-        }
+        columnSchMgr.update();
+        comboMgr.updateComboBoxesEnabledValues(comboBoxes);
+        comboMgr.updateAddToLables();
 
         jSplitIntoFrame.setVisible(false);
         jSplitIntoContactsFrame.setVisible(false);
@@ -1595,6 +1563,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     }//GEN-LAST:event_jSplitIntoContactsCheckBoxMouseClicked
 
     private void jSplitIntoContactsColumnTypesSettingsButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoContactsColumnTypesSettingsButtonMouseReleased
+        columnSchMgr.pushColumnSchema();
         jSplitIntoNumberOfColumnsTextField.setText(jSplitIntoContactsNumberOfColumnsTextField.getText());
         try{
             fillInSplitIntoTypesSettingsForm();
@@ -1621,168 +1590,49 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     }//GEN-LAST:event_jSplitIntoContactsSettingsButtonMouseReleased
 
     private void jMainWindowRefreshButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMainWindowRefreshButtonMouseReleased
-        //chcek whether there is a formated name column
-        boolean formatedNameSelected = false;
-        for (int i = 0; i<jContactsListTable.getColumnCount(); i++){
-            if (comboBoxes.get(i).getSelectedIndex() == 0){
-                formatedNameSelected = true;
-                break;
-            }
-        }
-        if (!formatedNameSelected)
-            formatedNameSelected = columnSchema.isTypeInColumnSchema(VCFTypesEnum.Formatted_Name);
-        if (!formatedNameSelected){
-            JOptionPane.showMessageDialog(this,"Formatted Name column type is mandatory. Please select one.","Error",JOptionPane.ERROR_MESSAGE);
-            return;
-        }
+          //compile
+        InternalDoc2CompiledDoc compiler = new InternalDocCompiler(internalDoc, columnSchema);
+        compiler.compile();
+        Document compiledDoc = compiler.getCompiledValidContacts();
 
-        //apply columns formats to column schema
-        for (int i = 0; i<jContactsListTable.getColumnCount(); i++){
-            String type = ((String)((ComboItem)comboBoxes.get(i).getSelectedItem()).value).replace(" ", "_");
-            if (columnSchema.isColumnAggregated(i) || columnSchema.isColumnMergedInOther(i)){
-                continue;
-            }
-            if (columnSchema.isColumnMergedInOther(i) && columnSchema.queryMergeOrder(i) == 1){
-                columnSchema.setMergesetCandidateType(columnSchema.queryMergeSet(i), type);
-                columnSchema.setMergesetSelectedType(columnSchema.queryMergeSet(i), type);
-                continue;
-            }
-            columnSchema.columnAggregateOff(i);
-            columnSchema.columnMergeOff(i);
-            columnSchema.setCandidateType(i, type);
-            columnSchema.setSelectedtypeType(i, type);
+        //show CompiledDoc
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer trans = null;
+        try {
+            trans = tf.newTransformer();
+            trans.transform(new DOMSource(compiledDoc), new StreamResult(stream));
+        } catch (TransformerException ex) {
+            Logger.getLogger(Document.class.getName()).log(Level.SEVERE, null, ex);
         }
+        String rawCD = stream.toString();
+        rawCD = rawCD.replaceAll(">", ">\n");
+        rawCD = rawCD.replaceAll("<contacts>", "<contacts>\n");
+        rawCD = rawCD.replaceAll("</contact>", "</contact>\n");
+        jCompiledDocTextArea.setText(rawCD);
+        jCompiledDocTextFrame.pack();
+        jCompiledDocTextFrame.setVisible(true);
 
-        jMainWindowShowColumnSchemaButtonMouseReleased(evt);
-
-//        //compile
-//        InternalDoc2CompiledDoc compiler = new InternalDocCompiler(internalDoc, columnSchema);
-//        compiler.compile();
-//        Document compiledDoc = compiler.getCompiledValidContacts();
-//
-//        //show CompiledDoc
-//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//        TransformerFactory tf = TransformerFactory.newInstance();
-//        Transformer trans = null;
-//        try {
-//            trans = tf.newTransformer();
-//            trans.transform(new DOMSource(compiledDoc), new StreamResult(stream));
-//        } catch (TransformerException ex) {
-//            Logger.getLogger(Document.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        jCompiledDocTextArea.setText(stream.toString());
-//        jCompiledDocTextFrame.pack();
-//        jCompiledDocTextFrame.setVisible(true);
-//
 //        //load compiled doc
 //        InputFilter readCompiledDoc = new ReadCompiledDoc(compiledDoc);
 //        internalDoc = readCompiledDoc.read();
 //        columnSchema = readCompiledDoc.getColumnSchema();
-//
-//        //refresh gui
-//        comboBoxes.clear();
-//        addToLables.clear();
-//        columnsToAdd.clear();
-//        splitIntoColumnsTypes.clear();
-//
-//        tableModel.initTable(internalDoc, columnSchema);
-//
-//        // <editor-fold defaultstate="collapsed" desc="vytvorenie ComboBoxes">
-//        boolean nameSelected = false;
-//        boolean birthdaySelected = false;
-//        boolean uniqueIdentifierSelected = false;
-//        ArrayList<Object[]> itemsList = new ArrayList<Object[]>();
-//
-//        for (int i = 0; i<jContactsListTable.getColumnCount(); i++){
-//            // <editor-fold defaultstate="collapsed" desc="naplnenie hodnotami">
-//            itemsList.add(new Object[]{
-//                new ComboItem(VCFTypesEnum.Formatted_Name.toDisplayString()),       //0
-//                new ComboItem(VCFTypesEnum.Name.toDisplayString()),                 //1
-//                new ComboItem(VCFTypesEnum.Telephone.toDisplayString()),            //2
-//                new ComboItem(VCFTypesEnum.Telephone_home.toDisplayString()),
-//                new ComboItem(VCFTypesEnum.Telephone_work.toDisplayString()),
-//                new ComboItem(VCFTypesEnum.Telephone_work_fax.toDisplayString()),   //5
-//                new ComboItem(VCFTypesEnum.Telephone_work_video.toDisplayString()),
-//                new ComboItem(VCFTypesEnum.Email.toDisplayString()),
-//                new ComboItem(VCFTypesEnum.Email_work.toDisplayString()),
-//                new ComboItem(VCFTypesEnum.Note.toDisplayString()),
-//                new ComboItem(VCFTypesEnum.Photograph.toDisplayString()),           //10
-//                new ComboItem(VCFTypesEnum.Sound.toDisplayString()),
-//                new ComboItem(VCFTypesEnum.Delivery_Address.toDisplayString()),
-//                new ComboItem(VCFTypesEnum.Delivery_Address_home.toDisplayString()),
-//                new ComboItem(VCFTypesEnum.Delivery_Address_work.toDisplayString()),
-//                new ComboItem(VCFTypesEnum.Label_Address.toDisplayString()),        //15
-//                new ComboItem(VCFTypesEnum.Label_Address_home.toDisplayString()),
-//                new ComboItem(VCFTypesEnum.Label_Address_work.toDisplayString()),
-//                new ComboItem(VCFTypesEnum.Birthday.toDisplayString()),
-//                new ComboItem(VCFTypesEnum.Nickname.toDisplayString()),
-//                new ComboItem(VCFTypesEnum.Organization_Name_or_Organizational_unit
-//                        .toDisplayString()),                                        //20
-//                new ComboItem(VCFTypesEnum.Role_or_occupation.toDisplayString()),
-//                new ComboItem(VCFTypesEnum.Logo.toDisplayString()),
-//                new ComboItem(VCFTypesEnum.URL.toDisplayString()),
-//                new ComboItem(VCFTypesEnum.URL_home.toDisplayString()),
-//                new ComboItem(VCFTypesEnum.URL_work.toDisplayString()),             //25
-//                new ComboItem(VCFTypesEnum.Unique_Identifier.toDisplayString()),    //26
-//                new ComboItem("ADD TO COLUMN #..."),
-//                new ComboItem("SPLIT INTO...")
-//            });
-//            //</editor-fold>
-//            comboBoxes.add(new JComboBox(itemsList.get(i)));
-//            comboBoxes.get(i).setRenderer(new ComboRenderer());
-//            comboBoxes.get(i).addActionListener(new ComboListener(comboBoxes.get(i)));
-//            addToLables.add(new JLabel(""));
-//            //every column must have candidate type
-//            String candidateType = columnSchema.queryCandidateType(i);
-//            String type = VCFTypesEnum.valueOf(candidateType).toDisplayString();
-//            comboBoxes.get(i).setSelectedItem(new ComboItem(type));
-//            // <editor-fold defaultstate="collapsed" desc="cardinality check">
-//            if (type.equals(VCFTypesEnum.Name.toDisplayString())) {
-//                if (nameSelected == true) {
-//                    throw new IllegalArgumentException("Name type has allready been selected. Watch VCF types cardinality!");
-//                }
-//                nameSelected = true;
-//            } else if (type.equals(VCFTypesEnum.Birthday.toDisplayString())) {
-//                if (birthdaySelected == true) {
-//                    throw new IllegalArgumentException("Birthday type has allready been selected. Watch VCF types cardinality!");
-//                }
-//                birthdaySelected = true;
-//            } else if (type.equals(VCFTypesEnum.Unique_Identifier.toDisplayString())) {
-//                if (uniqueIdentifierSelected == true) {
-//                    throw new IllegalArgumentException("Unique_Identifier type has allready been selected. Watch VCF types cardinality!");
-//                }
-//                uniqueIdentifierSelected = true;
-//            }
-//            // </editor-fold>
-//            jComboBoxesToolBar.add(comboBoxes.get(i));
-//            comboBoxes.get(i).setVisible(true);
-//            jComboBoxesToolBar.add(addToLables.get(i));
-//        }
-//
-//        // <editor-fold defaultstate="collapsed" desc="disable after cardinality check">
-//        if (nameSelected) {
-//            for (int i = 0; i < comboBoxes.size(); i++) {
-//                if (comboBoxes.get(i).getSelectedIndex() != (1)) {
-//                    ((CanEnable) comboBoxes.get(i).getItemAt(1)).setEnabled(false);
-//                }
-//            }
-//        }
-//        if (birthdaySelected) {
-//            for (int i = 0; i < comboBoxes.size(); i++) {
-//                if (comboBoxes.get(i).getSelectedIndex() != (1)) {
-//                    ((CanEnable) comboBoxes.get(i).getItemAt(18)).setEnabled(false);
-//                }
-//            }
-//        }if (uniqueIdentifierSelected) {
-//            for (int i = 0; i < comboBoxes.size(); i++) {
-//                if (comboBoxes.get(i).getSelectedIndex() != (1)) {
-//                    ((CanEnable) comboBoxes.get(i).getItemAt(26)).setEnabled(false);
-//                }
-//            }
-//        }
-//        //</editor-fold>
-//        //</editor-fold>
 
+        //refresh gui
+        comboBoxes.clear();
+        addToLables.clear();
+        columnsToAdd.clear();
+        splitIntoColumnsTypes.clear();
+        jComboBoxesToolBar.removeAll();
+
+        tableModel.initTable(internalDoc, columnSchema);
+
+        comboMgr.createMainComboBoxes();
+        comboMgr.updateComboBoxesEnabledValues(comboBoxes);
+        comboMgr.updateAddToLables();
+
+        jMainWindowFrame2.setVisible(false);
+        jMainWindowFrame2.setVisible(true);
 
     }//GEN-LAST:event_jMainWindowRefreshButtonMouseReleased
 
@@ -1796,97 +1646,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 new ContactTransmutGUIMain().setVisible(true);
             }
         });
-    }
-
-    private void deleteMergeset(int mergesetNum) {
-        int thatOldMergesetBaseColumn = columnSchema.getAllMergesetMembers(mergesetNum).get(1);
-        for (int i = 0; i < comboBoxes.size(); i++) {
-            if (!addToLables.get(i).getText().equals("")) {
-                if (Integer.parseInt(addToLables.get(i).getText().substring(4)) == thatOldMergesetBaseColumn) {
-                    comboBoxes.get(i).setSelectedIndex(9);
-                    addToLables.get(i).setText("");
-                    columnSchema.columnMergeOff(i);
-                }
-            }
-        }
-        columnSchema.columnMergeOff(thatOldMergesetBaseColumn);
-        columnSchema.deleteMergeset(mergesetNum);
-    }
-
-    private void setComboBoxTo(JComboBox combo, int index){
-        // <editor-fold defaultstate="collapsed" desc="osetrenie kardinality">
-        Object currentItem = combo.getSelectedItem();
-        int changeToIndex = index;
-        if (((ComboItem) currentItem).value.toString().equals(VCFTypesEnum.Name.toDisplayString())) {
-            for (int i = 0; i < comboBoxes.size(); i++) {
-                if (!(((JComboBox) comboBoxes.get(i)).equals(combo))) {
-                    ((CanEnable) comboBoxes.get(i).getItemAt(1)).setEnabled(true);
-                }
-            }
-            for (int i = 0; i < splitIntoColumnsTypes.size(); i++) {
-                if (!(((JComboBox) splitIntoColumnsTypes.get(i)).equals(combo))) {
-                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(1)).setEnabled(true);
-                }
-            }
-        } else if (((ComboItem) currentItem).value.toString().equals(VCFTypesEnum.Birthday.toDisplayString())) {
-            for (int i = 0; i < comboBoxes.size(); i++) {
-                if (!(((JComboBox) comboBoxes.get(i)).equals(combo))) {
-                    ((CanEnable) comboBoxes.get(i).getItemAt(18)).setEnabled(true);
-                }
-            }
-            for (int i = 0; i < splitIntoColumnsTypes.size(); i++) {
-                if (!(((JComboBox) splitIntoColumnsTypes.get(i)).equals(combo))) {
-                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(18)).setEnabled(true);
-                }
-            }
-        } else if (((ComboItem) currentItem).value.toString().equals(VCFTypesEnum.Unique_Identifier.toDisplayString())) {
-            for (int i = 0; i < comboBoxes.size(); i++) {
-                if (!(((JComboBox) comboBoxes.get(i)).equals(combo))) {
-                    ((CanEnable) comboBoxes.get(i).getItemAt(26)).setEnabled(true);
-                }
-            }
-            for (int i = 0; i < splitIntoColumnsTypes.size(); i++) {
-                if (!(((JComboBox) splitIntoColumnsTypes.get(i)).equals(combo))) {
-                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(26)).setEnabled(true);
-                }
-            }
-        }
-        if (changeToIndex == 1) {
-            for (int i = 0; i < comboBoxes.size(); i++) {
-                if (!(((JComboBox) comboBoxes.get(i)).equals(combo))) {
-                    ((CanEnable) comboBoxes.get(i).getItemAt(1)).setEnabled(false);
-                }
-            }
-            for (int i = 0; i < splitIntoColumnsTypes.size(); i++) {
-                if (!(((JComboBox) splitIntoColumnsTypes.get(i)).equals(combo))) {
-                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(1)).setEnabled(false);
-                }
-            }
-        } else if (changeToIndex == 18) {
-            for (int i = 0; i < comboBoxes.size(); i++) {
-                if (!(((JComboBox) comboBoxes.get(i)).equals(combo))) {
-                    ((CanEnable) comboBoxes.get(i).getItemAt(18)).setEnabled(false);
-                }
-            }
-            for (int i = 0; i < splitIntoColumnsTypes.size(); i++) {
-                if (!(((JComboBox) splitIntoColumnsTypes.get(i)).equals(combo))) {
-                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(18)).setEnabled(false);
-                }
-            }
-        } else if (changeToIndex == 26) {
-            for (int i = 0; i < comboBoxes.size(); i++) {
-                if (!(((JComboBox) comboBoxes.get(i)).equals(combo))) {
-                    ((CanEnable) comboBoxes.get(i).getItemAt(26)).setEnabled(false);
-                }
-            }
-            for (int i = 0; i < splitIntoColumnsTypes.size(); i++) {
-                if (!(((JComboBox) splitIntoColumnsTypes.get(i)).equals(combo))) {
-                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(26)).setEnabled(false);
-                }
-            }
-        }
-        // </editor-fold>
-        combo.setSelectedIndex(index);
     }
 
     private void jAddToSubmitButtonMouseReleasedAction(){
@@ -1944,9 +1703,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private void fillInSplitIntoTypesSettingsForm() throws NumberFormatException{
         int columnNumber = Integer.parseInt(jColumnToSplitLabel.getText());
         int numberOfColumns = Integer.parseInt(jSplitIntoNumberOfColumnsTextField.getText());
-        boolean nameSelected = false;
-        boolean birthdaySelected = false;
-        boolean uniqueIdentifierSelected = false;
         jSplitIntoTypeSettingsToolBar.removeAll();
         jSplitIntoTypeSettingsNumberOfColumnsLabel.setText(String.valueOf(numberOfColumns));
         ArrayList<Object[]> itemsList = new ArrayList<Object[]>();
@@ -1989,75 +1745,9 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             if (!columnSchema.queryAggregatedCandidateType(columnNumber, i).equals("")) {
                 String type = VCFTypesEnum.valueOf(columnSchema.queryAggregatedCandidateType(columnNumber, i)).toDisplayString();
                 splitIntoColumnsTypes.get(i).setSelectedItem(new ComboItem(type));
-                // <editor-fold defaultstate="collapsed" desc="cardinality check">
-                if (type.equals(VCFTypesEnum.Name.toDisplayString())) {
-                    if (nameSelected == true || !(((CanEnable) comboBoxes.get(columnNumber).getItemAt(1)).isEnabled())) {
-                        throw new IllegalArgumentException("Name type has allready been selected. Watch VCF types cardinality!");
-                    }
-                    nameSelected = true;
-                } else if (type.equals(VCFTypesEnum.Birthday.toDisplayString())) {
-                    if (birthdaySelected == true || !(((CanEnable) comboBoxes.get(columnNumber).getItemAt(18)).isEnabled())) {
-                        throw new IllegalArgumentException("Birthday type has allready been selected. Watch VCF types cardinality!");
-                    }
-                    birthdaySelected = true;
-                } else if (type.equals(VCFTypesEnum.Unique_Identifier.toDisplayString())) {
-                    if (uniqueIdentifierSelected == true || !(((CanEnable) comboBoxes.get(columnNumber).getItemAt(26)).isEnabled())) {
-                        throw new IllegalArgumentException("Unique_Identifier type has allready been selected. Watch VCF types cardinality!");
-                    }
-                    uniqueIdentifierSelected = true;
-                }
-                // </editor-fold>
+                comboMgr.updateComboBoxesEnabledValues(splitIntoColumnsTypes);
             }
         }
-        for (int i = 0; i < numberOfColumns; i++) {
-            for (int j = 0; j < splitIntoColumnsTypes.get(i).getItemCount(); j++) {
-                if (!(((CanEnable) comboBoxes.get(columnNumber).getItemAt(j)).isEnabled())) {
-                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(j)).setEnabled(false);
-                }
-            }
-            jSplitIntoTypeSettingsToolBar.add(splitIntoColumnsTypes.get(i));
-        }
-        // <editor-fold defaultstate="collapsed" desc="disable after cardinality check">
-        if (nameSelected) {
-            for (int i = 0; i < comboBoxes.size(); i++) {
-                if (comboBoxes.get(i).getSelectedIndex() != (1)) {
-                    ((CanEnable) comboBoxes.get(i).getItemAt(1)).setEnabled(false);
-                }
-            }
-            for (int i = 0; i < splitIntoColumnsTypes.size(); i++) {
-                if (splitIntoColumnsTypes.get(i).getSelectedIndex() != (1)) {
-                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(1)).setEnabled(false);
-                }
-            }
-            nameSelected = false;
-        }
-        if (birthdaySelected) {
-            for (int i = 0; i < comboBoxes.size(); i++) {
-                if (comboBoxes.get(i).getSelectedIndex() != (18)) {
-                    ((CanEnable) comboBoxes.get(i).getItemAt(18)).setEnabled(false);
-                }
-            }
-            for (int i = 0; i < splitIntoColumnsTypes.size(); i++) {
-                if (splitIntoColumnsTypes.get(i).getSelectedIndex() != (18)) {
-                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(18)).setEnabled(false);
-                }
-            }
-            birthdaySelected = false;
-        }
-        if (uniqueIdentifierSelected) {
-            for (int i = 0; i < comboBoxes.size(); i++) {
-                if (comboBoxes.get(i).getSelectedIndex() != (26)) {
-                    ((CanEnable) comboBoxes.get(i).getItemAt(26)).setEnabled(false);
-                }
-            }
-            for (int i = 0; i < splitIntoColumnsTypes.size(); i++) {
-                if (splitIntoColumnsTypes.get(i).getSelectedIndex() != (26)) {
-                    ((CanEnable) splitIntoColumnsTypes.get(i).getItemAt(26)).setEnabled(false);
-                }
-            }
-            uniqueIdentifierSelected = false;
-        }
-        //</editor-fold>
     }
 
     public void prepareSplitIntoWindow(int colNumber) {
@@ -2089,21 +1779,14 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             jSplitIntoNumberOfColumnsTextField.setEnabled(true);
             jSplitIntoNumberOfColumnsSettingsButton.setEnabled(true);
             jSplitIntoDelimeterTextField.setEnabled(true);
-
-            //fill in column type settings form -> when displayed
         }
-        //fill in the settings form -> when displayed
-//        try {
-//            fillInSplitIntoTypesSettingsForm();
-//        } catch (NumberFormatException ex) {
-//            JOptionPane.showMessageDialog(jMainWindowFrame2, "An error occured while parsing number of columns.", "Error", JOptionPane.ERROR_MESSAGE);
-//            return;
-//        }
-    }
-
-    public void showSplitIntoWindow(boolean value){
-        jSplitIntoFrame.pack();
-        jSplitIntoFrame.setVisible(value);
+        
+        try {
+            fillInSplitIntoTypesSettingsForm();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(jMainWindowFrame2, "An error occured while parsing number of columns.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
     }
 
     public void prepareAddToWindow(int columnNumber){
@@ -2171,7 +1854,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 String tempItemVCFFormat = comboMgr.getSelectedValueStr(combo);
                 if (comboMgr.getIndexOfValue(tempItemVCFFormat) <= (comboMgr.getIndexOfValue("ADD_TO_COLUMN_#...")-1)){
                     columnSchMgr.update();
-                    comboMgr.updateComboBoxesEnabledValues();
+                    comboMgr.updateComboBoxesEnabledValues(comboBoxes);
+                    comboMgr.updateAddToLables();
                 }
 
                 //if the add to was selected
@@ -2186,7 +1870,41 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 //if the split into was selected
                 else if (comboMgr.getIndexOfValue(tempItemVCFFormat) == comboMgr.getIndexOfValue("SPLIT_INTO...")){
                     if (!jSplitIntoFrame.isVisible()){
-                        
+                        //if the column is aggregated
+                        if (columnSchema.isColumnAggregated(columnNumber)){
+                            columnSchMgr.pushColumnSchema();
+                            prepareSplitIntoWindow(columnNumber);
+                            jSplitIntoFrame.pack();
+                            jSplitIntoFrame.setVisible(true);
+                        }
+                        //if the column is not aggregated
+                        else {
+                            //if the column is base in a mergeset
+                            if (columnSchema.isColumnMergedInOther(columnNumber) && columnSchema.queryMergeOrder(columnNumber) == 1) {
+                                Object[] options = {"Yes", "No"};
+                                int n = JOptionPane.showOptionDialog(jMainWindowFrame2, "The column is the base column in a merging. Cancel the merging?", "Problem!", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+                                int mergeset = columnSchema.queryMergeSet(columnNumber);
+                                if (n == 0) {
+                                    HashMap<Integer, Integer> allMergesetMembers = columnSchema.getAllMergesetMembers(mergeset);
+                                    for (Integer i : allMergesetMembers.values()) {
+                                        comboBoxes.get(i).setSelectedIndex(9);
+                                    }
+                                    columnSchema.deleteMergeset(mergeset);
+                                    columnSchMgr.update();
+                                } else {
+                                    combo.setSelectedIndex(comboMgr.getIndexOfValue(columnSchema.queryMergesetCandidateType(mergeset)));
+                                    return;
+                                }
+                            }
+                            //continue
+                            columnSchMgr.pushColumnSchema();
+                            prepareSplitIntoWindow(columnNumber);
+                            columnSchMgr.update();
+                            comboMgr.updateComboBoxesEnabledValues(comboBoxes);
+                            comboMgr.updateAddToLables();
+                            jSplitIntoFrame.pack();
+                            jSplitIntoFrame.setVisible(true);
+                        }
                     }
                 }
                 
@@ -2257,18 +1975,20 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
     class ColumnSchemaManager {
 
-        InternalDocColumnSchema cs;
-        InternalDocColumnSchema oldCs;
+        Stack<InternalDocColumnSchema> columnSchemaStack;
 
         ColumnSchemaManager(InternalDocColumnSchema columnSchema){
-            cs = columnSchema;
-            oldCs = columnSchema;
+            columnSchemaStack = new Stack<InternalDocColumnSchema>();
+        }
+
+        public void popColumnSchema(){
+            columnSchema = columnSchemaStack.pop();
         }
 
         public void update(){
             //find new mergeset number
             int newMergesetNum = 0;
-            ArrayList<Integer> allMergesetNum = cs.getAllMergesets();
+            ArrayList<Integer> allMergesetNum = columnSchema.getAllMergesets();
             if (allMergesetNum != null ){
                 boolean success = false;
                 do{
@@ -2282,10 +2002,10 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 }while(!success);
             }
 
-            //backup CS
-            oldCs = cs;
+            //save old CS
+            InternalDocColumnSchema oldCs = columnSchema;
             //set CS to default
-            cs = new InternalDocColumnSchemaImpl(oldCs.getColumnCount());
+            InternalDocColumnSchema cs = new InternalDocColumnSchemaImpl(oldCs.getColumnCount());
 
             for(JComboBox combo : comboBoxes){
                 int column = comboBoxes.indexOf(combo);
@@ -2343,44 +2063,68 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 //if split into is selected
                 else if (combo.getSelectedIndex() == 28){
                     //if is aggregated in old CS
-                    if (oldCs.isColumnAggregated(column) && Integer.parseInt(jColumnToSplitLabel.getText()) != (column)){
-                        cs.columnAggregateOn(
-                                column,
-                                oldCs.queryAggregateSettingDelimiter(column),
-                                oldCs.queryAggregateSettingNumberofcolumns(column),
-                                oldCs.queryAggregateSettingIntoseparatecontacts(column),
-                                oldCs.queryAggregateSettingEmployees(column),
-                                oldCs.queryAggregateSettingOriginalsourcenote(column),
-                                oldCs.queryAggregateSettingOriginaltargetnote(column),
-                                oldCs.queryAggregateSettingSeparatecontactsdelimiter(column),
-                                oldCs.queryAggregateSettingAutodetectswaps(column));
-                        for (int i = 0; i < oldCs.queryAggregateSettingNumberofcolumns(column); i++) {
-                            String type = oldCs.queryAggregatedSelectedtypeType(column, i);
-                            cs.setAggregatedCandidateType(column, i, type);
-                            cs.setAggregatedSelectedtypeType(column, i, type);
-                        }
-                    }
-                    //else column is newly aggregated -> new values are in split window
-                    else {
-                        cs.columnAggregateOn(
+                    if (oldCs.isColumnAggregated(column)){
+                        //if column is in split window
+                        if (Integer.parseInt(jColumnToSplitLabel.getText()) == column){
+                            int numberOfColumns = Integer.parseInt(jSplitIntoNumberOfColumnsTextField.getText());
+                            cs.columnAggregateOn(
                                 column,
                                 jSplitIntoDelimeterTextField.getText(),
-                                Integer.parseInt(jSplitIntoContactsNumberOfColumnsTextField.getText()),
+                                numberOfColumns,
                                 jSplitIntoContactsCheckBox.isSelected(),
                                 jSplitIntoContactsAreEmployeesCheckBox.isSelected(),
                                 jSplitIntoContactsOrigIntoSourceCheckBox.isSelected(),
                                 jSplitIntoContactsOrigIntoContactsCheckBox.isSelected(),
                                 jSplitIntoContactsDelimeterOfContactsTextField.getText(),
                                 jSplitIntoContactsSwapsCheckBox.isSelected());
-                        for (int i = 0; i < splitIntoColumnsTypes.size(); i++) {
-                            String type = comboMgr.getSelectedValueStr(splitIntoColumnsTypes.get(i));
-                            cs.setAggregatedCandidateType(column, i, type);
-                            cs.setAggregatedSelectedtypeType(column, i, type);
+                            for (int i=0; i<splitIntoColumnsTypes.size(); i++){
+                                cs.setAggregatedCandidateType(column, i, comboMgr.getSelectedValueStr(splitIntoColumnsTypes.get(i)));
+                                cs.setAggregatedSelectedtypeType(column, i, comboMgr.getSelectedValueStr(splitIntoColumnsTypes.get(i)));
+                            }
+                            for (int i=splitIntoColumnsTypes.size(); i<numberOfColumns; i++){
+                                cs.setAggregatedCandidateType(column, i, VCFTypesEnum.Note.toString());
+                                cs.setAggregatedSelectedtypeType(column, i, VCFTypesEnum.Note.toString());
+                            }
                         }
+                        //else it is and old aggregation -> copy values
+                        else{
+                            cs.columnAggregateOn(
+                                    column,
+                                    oldCs.queryAggregateSettingDelimiter(column),
+                                    oldCs.queryAggregateSettingNumberofcolumns(column),
+                                    oldCs.queryAggregateSettingIntoseparatecontacts(column),
+                                    oldCs.queryAggregateSettingEmployees(column),
+                                    oldCs.queryAggregateSettingOriginalsourcenote(column),
+                                    oldCs.queryAggregateSettingOriginaltargetnote(column),
+                                    oldCs.queryAggregateSettingSeparatecontactsdelimiter(column),
+                                    oldCs.queryAggregateSettingAutodetectswaps(column));
+                            for (int i = 0; i < oldCs.queryAggregateSettingNumberofcolumns(column); i++) {
+                                String type = oldCs.queryAggregatedSelectedtypeType(column, i);
+                                cs.setAggregatedCandidateType(column, i, type);
+                                cs.setAggregatedSelectedtypeType(column, i, type);
+                            }
+                        }
+                    }
+                    //else column is newly aggregated but has no subcolumns (it has only been chosen to be splitted)
+                    else {
+                        cs.columnAggregateOn(
+                                column,
+                                "",
+                                0,
+                                false,
+                                false,
+                                false,
+                                false,
+                                "",
+                                false);
                     }
                 }
             }
             columnSchema = cs;
+        }
+
+        public void pushColumnSchema() {
+            columnSchemaStack.push(columnSchema);
         }
     }
 
@@ -2433,18 +2177,19 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     addToLables.add(new JLabel(""));
 
                     //if column is aggregated, set its combo box to agregated
+                    columnSchMgr.pushColumnSchema();
                     if (columnSchema.isColumnAggregated(i)) {
-                        comboBoxes.get(i).setSelectedItem(new ComboItem("SPLIT INTO..."));
+                        comboBoxes.get(i).setSelectedIndex(comboMgr.getIndexOfValue("SPLIT_INTO..."));
                     } //if column is merged
                     else if (columnSchema.isColumnMergedInOther(i)) {
                         int mergsetNumber = columnSchema.queryMergeSet(i);
                         //if is first in merging, set its combo box to the mergeset type
                         if (columnSchema.queryMergeOrder(i) == 1) {
                             String candidType = columnSchema.queryMergesetCandidateType(columnSchema.queryMergeSet(i));
-                            comboBoxes.get(i).setSelectedItem(new ComboItem(VCFTypesEnum.valueOf(candidType).toDisplayString()));
+                            comboBoxes.get(i).setSelectedIndex(comboMgr.getIndexOfValue(candidType));
                         } //if it is not first, set its combo box to merging
                         else {
-                            comboBoxes.get(i).setSelectedItem(new ComboItem("ADD TO COLUMN #..."));
+                            comboBoxes.get(i).setSelectedIndex(comboMgr.getIndexOfValue("ADD_TO_COLUMN_#..."));
                             int mergeTo = columnSchema.getAllMergesetMembers(mergsetNumber).get(columnSchema.queryMergeOrder(i));
                             addToLables.get(i).setText(String.valueOf(mergeTo));
                         }
@@ -2457,12 +2202,13 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     jComboBoxesToolBar.add(comboBoxes.get(i));
                     comboBoxes.get(i).setVisible(true);
                     jComboBoxesToolBar.add(addToLables.get(i));
+                    columnSchMgr.popColumnSchema();
                 }
                 columnSchMgr.update();
 
             }
             
-            public void updateComboBoxesEnabledValues(){
+            public void updateComboBoxesEnabledValues(ArrayList<JComboBox> comboBoxes){
                 for (JComboBox combo : comboBoxes) {
                     if (columnSchema.isTypeInColumnSchema(VCFTypesEnum.Name)){
                        if (combo.getSelectedIndex() != (1)){
@@ -2500,16 +2246,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     }
                 }
             }
-
-//            public void setSelectedValue(int comboBoxIndex, int indexOfValue) {
-//                JComboBox temp = getComboBoxAtIndex(comboBoxIndex);
-//                setSelectedValue(temp, indexOfValue);
-//            }
-//
-//            public void setSelectedValue(JComboBox comboBox, int indexOfValue) {
-//                comboBox.setSelectedIndex(indexOfValue);
-//                //TODO
-//            }
 
             public String getSelectedValueStr(int comboBoxIndex) {
                 JComboBox temp = getComboBoxAtIndex(comboBoxIndex);
