@@ -51,7 +51,7 @@ KEY	Public_Key	(0,n)
 public class VCFHelperImpl implements VCFHelper {
     private InternalDocColumnSchema  docColumnSchema; //InternalDocColumnSchemaImpl for the ReadText-produced document (must be valid)
 
-    VCFHelperImpl(InternalDocColumnSchema newSchema) {
+    public VCFHelperImpl(InternalDocColumnSchema newSchema) {
         docColumnSchema = newSchema;
     }
 

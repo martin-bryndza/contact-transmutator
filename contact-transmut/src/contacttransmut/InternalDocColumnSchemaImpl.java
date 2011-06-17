@@ -715,6 +715,10 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
         Element mergeset = returnFirstElement(dataNodeList);
         if (!mergeset.getTagName().equals("null")) {
+            HashMap<Integer,Integer> members = getAllMergesetMembers(num);
+            for (int i = 1; i<=members.size(); i++){
+                columnMergeOff(members.get(i));
+            }
             Element mergesetParent = (Element) mergeset.getParentNode();
             mergesetParent.removeChild(mergeset);
             return true;

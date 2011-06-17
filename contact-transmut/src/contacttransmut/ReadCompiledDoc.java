@@ -23,7 +23,7 @@ public class ReadCompiledDoc implements InputFilter{
     private InternalDocColumnSchema columnSchema;
     private DocumentBuilderFactory dbf;
     private DocumentBuilder db;
-    private Document doc;
+    private Document doc;  //internalDoc
 
     public ReadCompiledDoc(Document compiledDoc){
         this.compiledDoc = compiledDoc;
