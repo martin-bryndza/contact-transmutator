@@ -106,10 +106,8 @@ Public_Key_home ("Public_Key_home");
     }
 
     public String toDisplayString(){
+        if (this.name.toString().equals(this.Organization_Name_or_Organizational_unit.toString()))
+            return this.name.replace("_", " ").substring(0, 17).concat("...");
         return this.name.replace("_", " ");
-    }
-
-    public VCFTypesEnum toEnumTypeFromDisplayString(String displayString){
-        return VCFTypesEnum.valueOf(displayString.replace(" ", "_"));
     }
 }

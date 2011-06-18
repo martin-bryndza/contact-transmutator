@@ -25,6 +25,7 @@ import contacttransmut.VCFTypesEnum;
 import contacttransmut.WriteCSV;
 import contacttransmut.WriteVCF;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -72,7 +73,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private InternalDocColumnSchema columnSchema = null;
     private ContactsListTableModel tableModel = new ContactsListTableModel();
     private ArrayList<javax.swing.JComboBox> comboBoxes = new ArrayList<JComboBox>(); // in main
-    private ArrayList<javax.swing.JLabel> addToLables = new ArrayList<JLabel>(); //in main next to comboBoxes
     private List<JTextField> columnsToAdd = new LinkedList<JTextField>(); //in add to menu
     private ArrayList<javax.swing.JComboBox> splitIntoColumnsTypes= new ArrayList<JComboBox>(); //in split into menu
 
@@ -196,6 +196,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jNextButton1 = new javax.swing.JButton();
         jCancelButton1 = new javax.swing.JButton();
         jBackButton1 = new javax.swing.JButton();
+        jEncodingComboBox1 = new javax.swing.JComboBox();
+        jEncodingLabel1 = new javax.swing.JLabel();
 
         jOriginalFileTextArea.setColumns(20);
         jOriginalFileTextArea.setFont(new java.awt.Font("Arial", 0, 12));
@@ -1008,7 +1010,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             }
         });
 
-        jSelectInputLabel1.setFont(new java.awt.Font("Arial", 0, 18));
+        jSelectInputLabel1.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
         jSelectInputLabel1.setText("Please select the input file:");
 
         jNextButton1.setText("Next >");
@@ -1028,32 +1030,43 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jBackButton1.setText("< Back");
         jBackButton1.setEnabled(false);
 
+        jEncodingComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "UTF-8", "UTF-16", "US-ASCII ", "windows-1250", "windows-1252", "windows-1251", "ISO-8859-1", "ISO-8859-2", "ISO-8859-5", "KOI8-R" }));
+
+        jEncodingLabel1.setFont(new java.awt.Font("Arial", 0, 18)); // NOI18N
+        jEncodingLabel1.setText("Encoding:");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(168, 168, 168)
-                .addComponent(jInputFileTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jBrowseButton1)
-                .addContainerGap(87, Short.MAX_VALUE))
-            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(80, 80, 80)
                 .addComponent(jMainLabel1)
-                .addContainerGap(70, Short.MAX_VALUE))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(100, 100, 100)
-                .addComponent(jSelectInputLabel1)
-                .addContainerGap(276, Short.MAX_VALUE))
+                .addContainerGap(80, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(373, Short.MAX_VALUE)
+                .addContainerGap(383, Short.MAX_VALUE)
                 .addComponent(jBackButton1)
                 .addGap(4, 4, 4)
                 .addComponent(jNextButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jCancelButton1)
                 .addContainerGap())
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(100, 100, 100)
+                .addComponent(jSelectInputLabel1)
+                .addContainerGap(286, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(136, 136, 136)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jEncodingLabel1)
+                        .addGap(18, 18, 18)
+                        .addComponent(jEncodingComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jInputFileTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jBrowseButton1)))
+                .addContainerGap(117, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1063,10 +1076,14 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 .addGap(30, 30, 30)
                 .addComponent(jSelectInputLabel1)
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jBrowseButton1)
-                    .addComponent(jInputFileTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jInputFileTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jBrowseButton1))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jEncodingLabel1)
+                    .addComponent(jEncodingComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 75, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jBackButton1)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -1102,10 +1119,11 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         InputFilter inputFilter;
         inputFile = new File(filePath);
         //TODO: detect encoding
+        String encoding = jEncodingComboBox1.getSelectedItem().toString();
         if (filePath.toLowerCase().endsWith(".csv")){
-            inputFilter = new ReadCSV(inputFile.toString(),"UTF-8",",","\"");
+            inputFilter = new ReadCSV(inputFile.toString(),encoding,",","\"");
         } else if (filePath.toLowerCase().endsWith(".vcf")){
-            inputFilter = new ReadVCF(inputFile.toString(), "UTF-8");
+            inputFilter = new ReadVCF(inputFile.toString(),encoding);
         } else if (filePath.toLowerCase().endsWith(".ods")){
             try {
                 inputFilter = new ODSInput(inputFile.toString());
@@ -1142,7 +1160,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         comboMgr.createMainComboBoxes();
         comboMgr.updateComboBoxesEnabledValues(comboBoxes);
-        comboMgr.updateAddToLables();
+        comboMgr.updateAddToNumbers();
     
         setVisible(false);
         jMainWindowFrame2.pack();
@@ -1206,7 +1224,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jInternalDocTextFrame.setVisible(false);
         
         comboBoxes.clear();
-        addToLables.clear();
         columnsToAdd.clear();
         splitIntoColumnsTypes.clear();
         jComboBoxesToolBar.removeAll();
@@ -1307,6 +1324,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         chooser.addChoosableFileFilter(filterADR);
         chooser.addChoosableFileFilter(filterODS);
         chooser.addChoosableFileFilter(filterVCF);
+        chooser.addChoosableFileFilter(chooser.getAcceptAllFileFilter());
         chooser.setDialogTitle("Save as...");
         chooser.setApproveButtonText("Save");
         int returnVal = chooser.showOpenDialog(jMainWindowPanel);
@@ -1321,11 +1339,13 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         compiler.compile();
         Document compiledDoc = compiler.getCompiledValidContacts();
 
+        //TODO: add output encoding options
+        String encoding = jEncodingComboBox1.getSelectedItem().toString();
         OutputFilter outputFilter = null;
         if (savePath.toLowerCase().endsWith(".csv")){
-            outputFilter = new WriteCSV(savePath, "UTF-8", ",", "\"", compiledDoc);
+            outputFilter = new WriteCSV(savePath, encoding, ",", "\"", compiledDoc);
         } else if (savePath.toLowerCase().endsWith(".vcf")){
-            outputFilter = new WriteVCF(savePath, "UTF-8", compiledDoc);
+            outputFilter = new WriteVCF(savePath, encoding, compiledDoc);
         } else if (savePath.toLowerCase().endsWith(".ods")){
             JOptionPane.showMessageDialog(this,"File type not supported yet.","Sorry!",JOptionPane.INFORMATION_MESSAGE);
             return;
@@ -1333,7 +1353,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this,"File type not supported yet.","Sorry!",JOptionPane.INFORMATION_MESSAGE);
             return;
         } else {
-            JOptionPane.showMessageDialog(this,"Choose a valid file. (*.csv, *.ods, *.vcf, *.adr)","Invalid file path!",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,"Choose a valid file type. (*.csv, *.ods, *.vcf, *.adr)","Invalid file path!",JOptionPane.ERROR_MESSAGE);
             //return;
         }
         outputFilter.write();
@@ -1547,7 +1567,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         }
         columnSchMgr.update();
         comboMgr.updateComboBoxesEnabledValues(comboBoxes);
-        comboMgr.updateAddToLables();
+        comboMgr.updateAddToNumbers();
 
         setButtonsEnabled(jMainWindowFrame2, true);
 
@@ -1615,7 +1635,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         columnSchMgr.discardPopColumnSchema();
         columnSchMgr.update();
         comboMgr.updateComboBoxesEnabledValues(comboBoxes);
-        comboMgr.updateAddToLables();
+        comboMgr.updateAddToNumbers();
 
         setButtonsEnabled(jMainWindowFrame2, true);
 
@@ -1730,7 +1750,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         //refresh gui
         comboBoxes.clear();
-        addToLables.clear();
         columnsToAdd.clear();
         splitIntoColumnsTypes.clear();
         jComboBoxesToolBar.removeAll();
@@ -1742,7 +1761,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         comboMgr.createMainComboBoxes();
         comboMgr.updateComboBoxesEnabledValues(comboBoxes);
-        comboMgr.updateAddToLables();
+        comboMgr.updateAddToNumbers();
 
         jMainWindowFrame2.setVisible(false);
         jMainWindowFrame2.setVisible(true);
@@ -1988,10 +2007,10 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 
                 //if a type was selected and the combo box is from main window
                 String tempItemVCFFormat = comboMgr.getSelectedValueStr(combo);
-                if (comboMgr.getIndexOfValue(tempItemVCFFormat) <= (comboMgr.getIndexOfValue("ADD_TO_COLUMN_#...")-1) && columnNumber >= 0){
+                if (comboMgr.getIndexOfValue(tempItemVCFFormat) <= (comboMgr.getIndexOfValue("DELETE_THIS")) && columnNumber >= 0){
                     columnSchMgr.update();
                     comboMgr.updateComboBoxesEnabledValues(comboBoxes);
-                    comboMgr.updateAddToLables();
+                    comboMgr.updateAddToNumbers();
                 }
 
                 //if the add to was selected
@@ -2042,7 +2061,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                             prepareSplitIntoWindow(columnNumber);
                             columnSchMgr.update();
                             comboMgr.updateComboBoxesEnabledValues(comboBoxes);
-                            comboMgr.updateAddToLables();
+                            comboMgr.updateAddToNumbers();
                             setButtonsEnabled(jMainWindowFrame2, false);
                             jSplitIntoFrame.pack();
                             jSplitIntoFrame.setVisible(true);
@@ -2088,6 +2107,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             String val = (String)value;
             if (val.equals("ADD TO COLUMN #...") || val.equals("SPLIT INTO..."))
                 return null;
+            if (val.startsWith("Organization"))
+                return VCFTypesEnum.Organization_Name_or_Organizational_unit;
             return VCFTypesEnum.valueOf(((String)value).replace(" ", "_"));
         }
 
@@ -2167,7 +2188,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 int column = comboBoxes.indexOf(combo);
 
                 //if a type is selected
-                if (combo.getSelectedIndex() <= 26){
+                if (combo.getSelectedIndex() <= comboMgr.getIndexOfValue("DELETE_THIS")){
                     String type = comboMgr.getSelectedValueStr(combo);
 
                     //if merged in oldCS and first in that mergeset
@@ -2193,7 +2214,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 }
 
                 //if add to is selected
-                else if (combo.getSelectedIndex() == 27){
+                else if (combo.getSelectedIndex() == comboMgr.getIndexOfValue("ADD_TO_COLUMN_#...")){
                     ArrayList<Integer> newToMergeList = new ArrayList<Integer>();
                     for (int i = 0; i < columnsToAdd.size(); i++) {
                         String component = columnsToAdd.get(i).getText();
@@ -2217,7 +2238,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 }
 
                 //if split into is selected
-                else if (combo.getSelectedIndex() == 28){
+                else if (combo.getSelectedIndex() == comboMgr.getIndexOfValue("SPLIT_INTO...")){
                     //if is aggregated in old CS
                     if (oldCs.isColumnAggregated(column)){
                         //if column is in split window
@@ -2292,7 +2313,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         public void createMainComboBoxes() {
             ArrayList<Object[]> itemsList = new ArrayList<Object[]>();
             comboBoxes.clear();
-            addToLables.clear();
             for (int i = 0; i < jContactsListTable.getColumnCount(); i++) {
                 // <editor-fold defaultstate="collapsed" desc="fill in the values">
                 itemsList.add(new Object[]{
@@ -2323,6 +2343,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                             new ComboItem(VCFTypesEnum.URL_home.toDisplayString()),
                             new ComboItem(VCFTypesEnum.URL_work.toDisplayString()), //25
                             new ComboItem(VCFTypesEnum.Unique_Identifier.toDisplayString()), //26
+                            new ComboItem("DELETE_THIS"),
                             new ComboItem("ADD TO COLUMN #..."),
                             new ComboItem("SPLIT INTO...")
                         });
@@ -2330,16 +2351,13 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 comboBoxes.add(new JComboBox(itemsList.get(i)));
                 comboBoxes.get(i).setRenderer(new ComboRenderer());
                 comboBoxes.get(i).addActionListener(new ComboListener(comboBoxes.get(i)));
-                addToLables.add(new JLabel(""));
 
                 //if column is aggregated, set its combo box to agregated
                 updateEnabled = false;
-                //columnSchMgr.pushColumnSchema();
                 if (columnSchema.isColumnAggregated(i)) {
                     comboBoxes.get(i).setSelectedIndex(comboMgr.getIndexOfValue("SPLIT_INTO..."));
                 } //if column is merged
                 else if (columnSchema.isColumnMergedInOther(i)) {
-                    int mergsetNumber = columnSchema.queryMergeSet(i);
                     //if is first in merging, set its combo box to the mergeset type
                     if (columnSchema.queryMergeOrder(i) == 1) {
                         String candidType = columnSchema.queryMergesetCandidateType(columnSchema.queryMergeSet(i));
@@ -2347,8 +2365,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     } //if it is not first, set its combo box to merging
                     else {
                         comboBoxes.get(i).setSelectedIndex(comboMgr.getIndexOfValue("ADD_TO_COLUMN_#..."));
-                        int mergeTo = columnSchema.getAllMergesetMembers(mergsetNumber).get(columnSchema.queryMergeOrder(i));
-                        addToLables.get(i).setText(String.valueOf(mergeTo));
                     }
                 } //if there is some condidate type set in CS, set its combo box
                 else {
@@ -2356,13 +2372,16 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     int indexToSelect = comboMgr.getIndexOfValue(type);
                     comboBoxes.get(i).setSelectedIndex(indexToSelect);
                 }
+                JLabel columnNumberLable = new JLabel(String.valueOf(i) + ":");
+                columnNumberLable.setFont(new Font("Arial", Font.BOLD, 15));
+                jComboBoxesToolBar.add(columnNumberLable);
                 jComboBoxesToolBar.add(comboBoxes.get(i));
                 comboBoxes.get(i).setVisible(true);
-                jComboBoxesToolBar.add(addToLables.get(i));
                 updateEnabled = true;
-                //columnSchMgr.popColumnSchema();
             }
             columnSchMgr.update();
+            comboMgr.updateComboBoxesEnabledValues(comboBoxes);
+            comboMgr.updateAddToNumbers();
 
         }
 
@@ -2375,31 +2394,42 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             boolean isBirthdayUsed = columnSchema.isTypeInColumnSchema(VCFTypesEnum.Birthday);
             boolean isUiUsed = columnSchema.isTypeInColumnSchema(VCFTypesEnum.Unique_Identifier);
             for (JComboBox combo : comboBoxes) {
+                //unable to delete whole mergeset
+                int column = comboMgr.getIndexOfComboBox(combo);
+                if(column >=0 && columnSchema.isColumnMergedInOther(column) && columnSchema.queryMergeOrder(column) == 1){
+                    comboMgr.setComboItemEnabled(combo, comboMgr.getIndexOfValue("DELETE_THIS"), false);
+                } else {
+                    comboMgr.setComboItemEnabled(combo, comboMgr.getIndexOfValue("DELETE_THIS"), true);
+                }
+
+                int index = comboMgr.getIndexOfValue(VCFTypesEnum.Name.toString());
                 if (isNameUsed) {
-                    if (combo.getSelectedIndex() != (1)) {
-                        comboMgr.setComboItemEnabled(combo, 1, false);
+                    if (combo.getSelectedIndex() != (index)) {
+                        comboMgr.setComboItemEnabled(combo, index, false);
                     }
                 } else {
-                    comboMgr.setComboItemEnabled(combo, 1, true);
+                    comboMgr.setComboItemEnabled(combo, index, true);
                 }
+                index = comboMgr.getIndexOfValue(VCFTypesEnum.Birthday.toString());
                 if (isBirthdayUsed) {
-                    if (combo.getSelectedIndex() != (18)) {
-                        comboMgr.setComboItemEnabled(combo, 18, false);
+                    if (combo.getSelectedIndex() != (index)) {
+                        comboMgr.setComboItemEnabled(combo, index, false);
                     }
                 } else {
-                    comboMgr.setComboItemEnabled(combo, 18, true);
+                    comboMgr.setComboItemEnabled(combo, index, true);
                 }
+                index = comboMgr.getIndexOfValue(VCFTypesEnum.Unique_Identifier.toString());
                 if (isUiUsed) {
-                    if (combo.getSelectedIndex() != (26)) {
-                        comboMgr.setComboItemEnabled(combo, 26, false);
+                    if (combo.getSelectedIndex() != (index)) {
+                        comboMgr.setComboItemEnabled(combo, index, false);
                     }
                 } else {
-                    comboMgr.setComboItemEnabled(combo, 26, true);
+                    comboMgr.setComboItemEnabled(combo, index, true);
                 }
             }
         }
 
-        public void updateAddToLables() {
+        public void updateAddToNumbers() {
             if (!updateEnabled) {
                 return;
             }
@@ -2411,11 +2441,11 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     HashMap<Integer, Integer> allMergesetMembers = columnSchema.getAllMergesetMembers(mergeset);
                     if (allMergesetMembers != null && allMergesetMembers.get(1) != null) {
                         int baseColumn = allMergesetMembers.get(1);
-                        addToLables.get(column).setText(String.valueOf(baseColumn));
+                        ((ComboItem)combo.getItemAt(combo.getSelectedIndex())).value = "ADD TO COLUMN " + baseColumn;
                         continue;
                     }
                 }
-                addToLables.get(column).setText("");
+                ((ComboItem)combo.getItemAt(comboMgr.getIndexOfValue("ADD_TO_COLUMN_#..."))).value = "ADD TO COLUMN #...";
             }
         }
 
@@ -2425,7 +2455,10 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         }
 
         public String getSelectedValueStr(JComboBox comboBox) {
-            return ((ComboItem) comboBox.getSelectedItem()).toString().replace(" ", "_");
+            String selectedItem = ((ComboItem) comboBox.getSelectedItem()).toString();
+            if (selectedItem.startsWith("Organization"))
+                return VCFTypesEnum.Organization_Name_or_Organizational_unit.toString();
+            return selectedItem.replace(" ", "_");
         }
 
         public VCFTypesEnum getSelectedValueVCF(int comboBoxIndex) {
@@ -2515,7 +2548,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             if (value.equals(VCFTypesEnum.Logo.toString())) {
                 return 22;
             }
-            if (value.equals(VCFTypesEnum.Organization_Name_or_Organizational_unit.toString())) {
+            if (value.startsWith("Organization")) {
                 return 20;
             }
             if (value.equals(VCFTypesEnum.Note.toString())) {
@@ -2536,11 +2569,14 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             if (value.equals(VCFTypesEnum.Unique_Identifier.toString())) {
                 return 26;
             }
-            if (value.equals("ADD_TO_COLUMN_#...")) {
+            if (value.equals("DELETE_THIS")) {
                 return 27;
             }
-            if (value.equals("SPLIT_INTO...")) {
+            if (value.startsWith("ADD_TO_COLUMN_")) {
                 return 28;
+            }
+            if (value.equals("SPLIT_INTO...")) {
+                return 29;
             }
             return 9;
             // </editor-fold>
@@ -2574,6 +2610,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private javax.swing.JFrame jCompiledDocTextFrame;
     private javax.swing.JScrollPane jContactsListScrollPane;
     private javax.swing.JTable jContactsListTable;
+    private javax.swing.JComboBox jEncodingComboBox1;
+    private javax.swing.JLabel jEncodingLabel1;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JFrame jFileChooserFrame;
     private javax.swing.JLabel jFileChooserLabel;
