@@ -2031,13 +2031,16 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         public void popColumnSchema(){
             columnSchema = columnSchemaStack.pop();
+            System.err.println("Old column schema restored");
         }
         
         public void discardPopColumnSchema(){
             columnSchemaStack.pop();
+            System.err.println("Old column schema discarded");
         }
 
         public void update(){
+            System.err.println("Column schema updated");
             //find new mergeset number
             int newMergesetNum = 0;
             ArrayList<Integer> allMergesetNum = columnSchema.getAllMergesets();
@@ -2177,7 +2180,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         }
 
         public void pushColumnSchema() {
-            columnSchemaStack.push(columnSchema);
+            columnSchemaStack.push(columnSchema.returnClonedColumnSchema());
         }
     }
 
@@ -2261,6 +2264,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             }
             
             public void updateComboBoxesEnabledValues(ArrayList<JComboBox> comboBoxes){
+                System.err.println("Combo boxes enabled values updated.");
                 boolean isNameUsed = columnSchema.isTypeInColumnSchema(VCFTypesEnum.Name);
                 boolean isBirthdayUsed = columnSchema.isTypeInColumnSchema(VCFTypesEnum.Birthday);
                 boolean isUiUsed = columnSchema.isTypeInColumnSchema(VCFTypesEnum.Unique_Identifier);
@@ -2290,6 +2294,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             }
 
             public void updateAddToLables(){
+                System.err.println("Add to lables updated.");
                 for (JComboBox combo : comboBoxes){
                     int column = comboMgr.getIndexOfComboBox(combo);
                     if (combo.getSelectedIndex() == getIndexOfValue("ADD_TO_COLUMN_#...")){
