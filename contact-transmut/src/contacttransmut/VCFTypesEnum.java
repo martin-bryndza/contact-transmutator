@@ -4,13 +4,11 @@
  */
 package contacttransmut;
 
-/**
- *
- * @author jakub svoboda
- */
 
-/*
+/**
+ * Enum type of some of possible (and used in-app) data fields in VCF format.
  * this is good for VCFHelper, better for checking typos and auto-completion in IDE
+ * @author Jakub Svoboda
  */
 public enum VCFTypesEnum {
 

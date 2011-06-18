@@ -49,6 +49,8 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
     private VCFHelper outFormValidtr;
     private boolean errorsDetected;
     private boolean countAllColumns;
+    private Integer maxContactsEvar = -1;
+    private Integer currentlyProccessingContact = 0;
 
     /**
      * Constructor.
@@ -89,6 +91,25 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
         rootDocRawReadTextDoc = returnFirstElement(docRawReadTextDocNodeList);
     }
 
+    /**
+     * Returns current status of compilation. Use with getMaxContacts().
+     * @return The number of the currently processed contact
+     */
+    public Integer getCurrentStatus() {
+        return currentlyProccessingContact;
+    }
+
+    /**
+     * Returns number of contacts for compilation. Use with getCurrentStatus().
+     * @return The total number of contacts to process.
+     */
+    public Integer getMaxContacts() {
+        if (maxContactsEvar == -1) {
+            maxContactsEvar = returnXPathNodeList(docRawReadTextDoc, "//contact/uncategorized").getLength();
+        }
+        return maxContactsEvar;
+
+    }
     /**
      * Private helper method.
      * Returns NodeList selected by XPath over specified Document
@@ -254,6 +275,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
         // ignore // System.err.println("blabla3: " + (rawContacts.getLength()));
 
         for (int rawContCount = 0; rawContCount < rawContacts.getLength(); rawContCount++) {
+            currentlyProccessingContact = rawContCount;
             Element currentContactElement;
             if (rawContacts.item(rawContCount) instanceof Element) {
                 // ignore // System.err.println("blabla0: " + rawContacts.item(rawContCount).toString());
