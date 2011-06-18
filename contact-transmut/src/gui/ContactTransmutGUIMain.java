@@ -581,6 +581,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jLabel8.setText("Into separate contacts:");
 
         jSplitIntoContactsSettingsButton.setText("Settings");
+        jSplitIntoContactsSettingsButton.setEnabled(false);
         jSplitIntoContactsSettingsButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 jSplitIntoContactsSettingsButtonMouseReleased(evt);
@@ -592,6 +593,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         jSplitIntoDelimeterTextField.setText(",");
 
+        jSplitIntoContactsCheckBox.setEnabled(false);
         jSplitIntoContactsCheckBox.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jSplitIntoContactsCheckBoxMouseClicked(evt);
@@ -970,7 +972,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         jFileChooserFrame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jFileChooserLabel.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        jFileChooserLabel.setFont(new java.awt.Font("Tahoma", 1, 24));
         jFileChooserLabel.setText("SAVING...");
 
         javax.swing.GroupLayout jFileChooserFrameLayout = new javax.swing.GroupLayout(jFileChooserFrame.getContentPane());
@@ -1133,8 +1135,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
        
         tableModel.initTable(internalDoc, columnSchema);
         
-        comboMgr = new ComboBoxesManager(comboBoxes);
-        columnSchMgr = new ColumnSchemaManager(columnSchema);
+        comboMgr = new ComboBoxesManager();
+        columnSchMgr = new ColumnSchemaManager();
 
         comboMgr.createMainComboBoxes();
         comboMgr.updateComboBoxesEnabledValues(comboBoxes);
@@ -1278,7 +1280,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         }
 
         //compile the column schema and data
-        InternalDoc2CompiledDoc compiler = new InternalDocCompiler(internalDoc, columnSchema);
+        InternalDoc2CompiledDoc compiler = new InternalDocCompiler(internalDoc, columnSchema,false);
         compiler.compile();
         Document compiledDoc = compiler.getCompiledValidContacts();
 
@@ -1370,8 +1372,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         if (jInternalDocTextFrame.isVisible()) {
             jInternalDocTextFrame.requestFocus();
         } else {
-
-            internalDoc = tableModel.getInternalDoc();
 
             if (internalDoc == null) {
                 jInternalDocTextArea.setText("Document is null!!!");
@@ -1503,8 +1503,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             }
         }
 
-
-
         //set all merge components to add to
         for (Integer i : columnsToAddNumbers){
             comboBoxes.get(i).setSelectedIndex(comboMgr.getIndexOfValue("ADD_TO_COLUMN_#..."));
@@ -1633,7 +1631,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
     private void jMainWindowRefreshButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMainWindowRefreshButtonMouseReleased
           //compile
-        InternalDoc2CompiledDoc compiler = new InternalDocCompiler(internalDoc, columnSchema);
+        InternalDoc2CompiledDoc compiler = new InternalDocCompiler(internalDoc, columnSchema,true);
         compiler.compile();
         Document compiledDoc = compiler.getCompiledValidContacts();
 
@@ -1655,10 +1653,10 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jCompiledDocTextFrame.pack();
         jCompiledDocTextFrame.setVisible(true);
 
-//        //load compiled doc
-//        InputFilter readCompiledDoc = new ReadCompiledDoc(compiledDoc);
-//        internalDoc = readCompiledDoc.read();
-//        columnSchema = readCompiledDoc.getColumnSchema();
+        //load compiled doc
+        InputFilter readCompiledDoc = new ReadCompiledDoc(compiledDoc);
+        internalDoc = readCompiledDoc.read();
+        columnSchema = readCompiledDoc.getColumnSchema();
 
         //refresh gui
         comboBoxes.clear();
@@ -1668,6 +1666,9 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jComboBoxesToolBar.removeAll();
         jColumnToSplitLabel.setText("-1");
         jColumnToAddLabel.setText("-1");
+        jAddToBaseColumnTextField.setText("-1");
+
+        jMainWindowFrame2.setVisible(false);
 
         tableModel.initTable(internalDoc, columnSchema);
 
@@ -1675,7 +1676,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         comboMgr.updateComboBoxesEnabledValues(comboBoxes);
         comboMgr.updateAddToLables();
 
-        jMainWindowFrame2.setVisible(false);
         jMainWindowFrame2.setVisible(true);
 
     }//GEN-LAST:event_jMainWindowRefreshButtonMouseReleased
@@ -1754,7 +1754,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         ArrayList<Object[]> itemsList = new ArrayList<Object[]>();
         columnSchMgr.pushColumnSchema();
         for (int i = 0; i < numberOfColumns; i++) {
-            // <editor-fold defaultstate="collapsed" desc="naplnenie hodnotami">
+            // <editor-fold defaultstate="collapsed" desc="fill in the values">
             itemsList.add(new Object[]{
                         new ComboItem(VCFTypesEnum.Formatted_Name.toDisplayString()), //0
                         new ComboItem(VCFTypesEnum.Name.toDisplayString()), //1
@@ -2025,7 +2025,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         Stack<InternalDocColumnSchema> columnSchemaStack;
 
-        ColumnSchemaManager(InternalDocColumnSchema columnSchema){
+        ColumnSchemaManager(){
             columnSchemaStack = new Stack<InternalDocColumnSchema>();
         }
 
@@ -2183,14 +2183,14 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         class ComboBoxesManager {
 
-            public ComboBoxesManager(ArrayList<JComboBox> comboBoxes) {
+            public ComboBoxesManager() {
             }
 
             public void createMainComboBoxes() {
                 ArrayList<Object[]> itemsList = new ArrayList<Object[]>();
 
                 for (int i = 0; i < jContactsListTable.getColumnCount(); i++) {
-                    // <editor-fold defaultstate="collapsed" desc="naplnenie hodnotami">
+                    // <editor-fold defaultstate="collapsed" desc="fill in the values">
                     itemsList.add(new Object[]{
                                 new ComboItem(VCFTypesEnum.Formatted_Name.toDisplayString()), //0
                                 new ComboItem(VCFTypesEnum.Name.toDisplayString()), //1
@@ -2223,7 +2223,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                                 new ComboItem("SPLIT INTO...")
                             });
                     //</editor-fold>
-
                     comboBoxes.add(new JComboBox(itemsList.get(i)));
                     comboBoxes.get(i).setRenderer(new ComboRenderer());
                     comboBoxes.get(i).addActionListener(new ComboListener(comboBoxes.get(i)));
@@ -2262,22 +2261,25 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             }
             
             public void updateComboBoxesEnabledValues(ArrayList<JComboBox> comboBoxes){
+                boolean isNameUsed = columnSchema.isTypeInColumnSchema(VCFTypesEnum.Name);
+                boolean isBirthdayUsed = columnSchema.isTypeInColumnSchema(VCFTypesEnum.Birthday);
+                boolean isUiUsed = columnSchema.isTypeInColumnSchema(VCFTypesEnum.Unique_Identifier);
                 for (JComboBox combo : comboBoxes) {
-                    if (columnSchema.isTypeInColumnSchema(VCFTypesEnum.Name)){
+                    if (isNameUsed){
                        if (combo.getSelectedIndex() != (1)){
                            comboMgr.setComboItemEnabled(combo, 1, false);
                        }
                     } else{
                         comboMgr.setComboItemEnabled(combo, 1, true);
                     }
-                    if (columnSchema.isTypeInColumnSchema(VCFTypesEnum.Birthday)){
+                    if (isBirthdayUsed){
                        if (combo.getSelectedIndex() != (18)){
                            comboMgr.setComboItemEnabled(combo, 18, false);
                        }
                     } else{
                         comboMgr.setComboItemEnabled(combo, 18, true);
                     }
-                    if (columnSchema.isTypeInColumnSchema(VCFTypesEnum.Unique_Identifier)){
+                    if (isUiUsed){
                        if (combo.getSelectedIndex() != (26)){
                            comboMgr.setComboItemEnabled(combo, 26, false);
                        }
@@ -2296,7 +2298,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                         if (allMergesetMembers != null && allMergesetMembers.get(1) != null){
                             int baseColumn = allMergesetMembers.get(1);
                             addToLables.get(column).setText(String.valueOf(baseColumn));
-                            return;
+                            continue;
                         }
                     }
                     addToLables.get(column).setText("");
@@ -2338,95 +2340,96 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             }
 
             private int getIndexOfValue(String value) {
-                int answer = 9;
+                // <editor-fold defaultstate="collapsed" desc="if-return field">
                 if (value.equals(VCFTypesEnum.Name.toString())) {
-                    answer = 1;
+                    return 1;
                 }
                 if (value.equals(VCFTypesEnum.Formatted_Name.toString())) {
-                    answer = 0;
+                    return 0;
                 }
                 if (value.equals(VCFTypesEnum.Nickname.toString())) {
-                    answer = 19;
+                    return 19;
                 }
                 if (value.equals(VCFTypesEnum.Photograph.toString())) {
-                    answer = 10;
+                    return 10;
                 }
                 if (value.equals(VCFTypesEnum.Birthday.toString())) {
-                    answer = 18;
+                    return 18;
                 }
                 if (value.equals(VCFTypesEnum.Delivery_Address.toString())) {
-                    answer = 12;
+                    return 12;
                 }
                 if (value.equals(VCFTypesEnum.Delivery_Address_work.toString())) {
-                    answer = 14;
+                    return 14;
                 }
                 if (value.equals(VCFTypesEnum.Delivery_Address_home.toString())) {
-                    answer = 13;
+                    return 13;
                 }
                 if (value.equals(VCFTypesEnum.Label_Address.toString())) {
-                    answer = 15;
+                    return 15;
                 }
                 if (value.equals(VCFTypesEnum.Label_Address_work.toString())) {
-                    answer = 17;
+                    return 17;
                 }
                 if (value.equals(VCFTypesEnum.Label_Address_home.toString())) {
-                    answer = 16;
+                    return 16;
                 }
                 if (value.equals(VCFTypesEnum.Telephone.toString())) {
-                    answer = 2;
+                    return 2;
                 }
                 if (value.equals(VCFTypesEnum.Telephone_work.toString())) {
-                    answer = 4;
+                    return 4;
                 }
                 if (value.equals(VCFTypesEnum.Telephone_work_fax.toString())) {
-                    answer = 5;
+                    return 5;
                 }
                 if (value.equals(VCFTypesEnum.Telephone_work_video.toString())) {
-                    answer = 6;
+                    return 6;
                 }
                 if (value.equals(VCFTypesEnum.Telephone_home.toString())) {
-                    answer = 3;
+                    return 3;
                 }
                 if (value.equals(VCFTypesEnum.Email.toString())) {
-                    answer = 7;
+                    return 7;
                 }
                 if (value.equals(VCFTypesEnum.Email_work.toString())) {
-                    answer = 8;
+                    return 8;
                 }
                 if (value.equals(VCFTypesEnum.Role_or_occupation.toString())) {
-                    answer = 21;
+                    return 21;
                 }
                 if (value.equals(VCFTypesEnum.Logo.toString())) {
-                    answer = 22;
+                    return 22;
                 }
                 if (value.equals(VCFTypesEnum.Organization_Name_or_Organizational_unit.toString())) {
-                    answer = 20;
+                    return 20;
                 }
                 if (value.equals(VCFTypesEnum.Note.toString())) {
-                    answer = 9;
+                    return 9;
                 }
                 if (value.equals(VCFTypesEnum.Sound.toString())) {
-                    answer = 11;
+                    return 11;
                 }
                 if (value.equals(VCFTypesEnum.URL.toString())) {
-                    answer = 23;
+                    return 23;
                 }
                 if (value.equals(VCFTypesEnum.URL_work.toString())) {
-                    answer = 25;
+                    return 25;
                 }
                 if (value.equals(VCFTypesEnum.URL_home.toString())) {
-                    answer = 24;
+                    return 24;
                 }
                 if (value.equals(VCFTypesEnum.Unique_Identifier.toString())) {
-                    answer = 26;
+                    return 26;
                 }
                 if (value.equals("ADD_TO_COLUMN_#...")) {
-                    answer = 27;
+                    return 27;
                 }
                 if (value.equals("SPLIT_INTO...")) {
-                    answer = 28;
+                    return 28;
                 }
-                return answer;
+                return 9;
+                // </editor-fold>
             }
         }
 

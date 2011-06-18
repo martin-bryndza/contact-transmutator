@@ -18,8 +18,8 @@ import org.w3c.dom.NodeList;
  */
 public class ContactsListTableModel extends AbstractTableModel{
 
-    private Document internalDoc;
-    private InternalDocColumnSchema columnSchema;
+    private static Document internalDoc;
+    private static InternalDocColumnSchema columnSchema;
     private int rowCount = 0;
     private int columnCount = 0;
     private ArrayList<ArrayList<String>> data;
@@ -56,14 +56,6 @@ public class ContactsListTableModel extends AbstractTableModel{
         fireTableDataChanged();
 
 
-    }
-
-    public InternalDocColumnSchema getColumnSchema(){
-        return columnSchema;
-    }
-
-    public Document getInternalDoc(){
-        return internalDoc;
     }
 
     public int getRowCount() {
