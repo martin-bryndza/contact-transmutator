@@ -79,6 +79,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private ComboBoxesManager comboMgr;
     private ColumnSchemaManager columnSchMgr;
 
+    boolean updateEnabled = true;
+
     /** Creates new form ContactTransmutGUIMain */
     public ContactTransmutGUIMain() {
         initComponents();
@@ -1752,7 +1754,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jSplitIntoTypeSettingsToolBar.removeAll();
         jSplitIntoTypeSettingsNumberOfColumnsLabel.setText(String.valueOf(numberOfColumns));
         ArrayList<Object[]> itemsList = new ArrayList<Object[]>();
-        columnSchMgr.pushColumnSchema();
+        updateEnabled = false;
+        //columnSchMgr.pushColumnSchema();
         for (int i = 0; i < numberOfColumns; i++) {
             // <editor-fold defaultstate="collapsed" desc="fill in the values">
             itemsList.add(new Object[]{
@@ -1793,7 +1796,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             splitIntoColumnsTypes.get(i).setSelectedIndex(temp); //will be set to note if there is no type
             jSplitIntoTypeSettingsToolBar.add(splitIntoColumnsTypes.get(i));
         }
-        columnSchMgr.popColumnSchema();
+        updateEnabled = true;
+        //columnSchMgr.popColumnSchema();
         columnSchMgr.update();
         comboMgr.updateComboBoxesEnabledValues(splitIntoColumnsTypes);
     }
@@ -2040,6 +2044,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         }
 
         public void update(){
+            if (!updateEnabled)
+                return;
             System.err.println("Column schema updated");
             //find new mergeset number
             int newMergesetNum = 0;
@@ -2232,7 +2238,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     addToLables.add(new JLabel(""));
 
                     //if column is aggregated, set its combo box to agregated
-                    columnSchMgr.pushColumnSchema();
+                    updateEnabled = false;
+                    //columnSchMgr.pushColumnSchema();
                     if (columnSchema.isColumnAggregated(i)) {
                         comboBoxes.get(i).setSelectedIndex(comboMgr.getIndexOfValue("SPLIT_INTO..."));
                     } //if column is merged
@@ -2257,13 +2264,16 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     jComboBoxesToolBar.add(comboBoxes.get(i));
                     comboBoxes.get(i).setVisible(true);
                     jComboBoxesToolBar.add(addToLables.get(i));
-                    columnSchMgr.popColumnSchema();
+                    updateEnabled = true;
+                    //columnSchMgr.popColumnSchema();
                 }
                 columnSchMgr.update();
 
             }
             
             public void updateComboBoxesEnabledValues(ArrayList<JComboBox> comboBoxes){
+                if (!updateEnabled)
+                    return;
                 System.err.println("Combo boxes enabled values updated.");
                 boolean isNameUsed = columnSchema.isTypeInColumnSchema(VCFTypesEnum.Name);
                 boolean isBirthdayUsed = columnSchema.isTypeInColumnSchema(VCFTypesEnum.Birthday);
@@ -2294,6 +2304,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             }
 
             public void updateAddToLables(){
+                if (!updateEnabled)
+                    return;
                 System.err.println("Add to lables updated.");
                 for (JComboBox combo : comboBoxes){
                     int column = comboMgr.getIndexOfComboBox(combo);
