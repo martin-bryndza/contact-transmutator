@@ -42,7 +42,8 @@ public class Main {
             //InputFilter test = new ReadCSV(fileName, encoding, ",", "\"");
             
              //pre test ods xml odkomentuj tieto riadky   --Martina
-            String fileName = "content.xml";
+            //String fileName = "content.xml";
+            String fileName = "odstest.ods";
             InputFilter test = new ODSInput(fileName);
             
             // Test nacitani VCF

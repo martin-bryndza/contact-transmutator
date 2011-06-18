@@ -219,8 +219,13 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
     }
 
+        /**
+         * Returns cloned column schema.
+         * Java operates with pointers. Implementing deep copy constructor for this class would be troublesome. This is the best way to make an independent copy of columnschema.
+         * @return new InternalDocColumnSchema
+         */
     public InternalDocColumnSchema returnClonedColumnSchema() {
-        System.err.println("new column schema created!");
+        // ignore // System.err.println("new column schema created!");
         InternalDocColumnSchema newSchema = new InternalDocColumnSchemaImpl(doc);
         return newSchema;
     }

@@ -58,7 +58,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
      * @param countColumns true if all output cells/columns should have counter attribute
      */
     public InternalDocCompiler(Document newDocRawReadTextDoc, InternalDocColumnSchema newDocColumnSchema, boolean countColumns) {
-        System.err.println("blabla5: called");
+        // ignore // System.err.println("blabla5: called");
         docRawReadTextDoc = newDocRawReadTextDoc;
         docColumnSchema = newDocColumnSchema;
         outFormValidtr = new VCFHelperImpl(docColumnSchema);
@@ -144,7 +144,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
      * @throws DOMException
      */
     private void writeField(Integer contactNumber, String dataType, String contents, boolean canHaveMultipleRecordsOfSameDataType) throws DOMException {
-        System.err.println("short writeField called: Integer contactNumber=" + contactNumber + ", String dataType=" + dataType + ", String contents=" + contents + ", boolean canHaveMultipleRecordsOfSameDataType=" + (canHaveMultipleRecordsOfSameDataType ? "true" : "false"));
+        // ignore // System.err.println("short writeField called: Integer contactNumber=" + contactNumber + ", String dataType=" + dataType + ", String contents=" + contents + ", boolean canHaveMultipleRecordsOfSameDataType=" + (canHaveMultipleRecordsOfSameDataType ? "true" : "false"));
         writeField(contactNumber, dataType, contents, canHaveMultipleRecordsOfSameDataType, false);
     }
 
@@ -158,7 +158,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
      * @throws DOMException
      */
     private void writeField(Integer contactNumber, String dataType, String contents, boolean canHaveMultipleRecordsOfSameDataType, Integer contentsColumnCount) throws DOMException {
-        System.err.println("short writeField called: Integer contactNumber=" + contactNumber + ", String dataType=" + dataType + ", String contents=" + contents + ", boolean canHaveMultipleRecordsOfSameDataType=" + (canHaveMultipleRecordsOfSameDataType ? "true" : "false"));
+        // ignore // System.err.println("short writeField called: Integer contactNumber=" + contactNumber + ", String dataType=" + dataType + ", String contents=" + contents + ", boolean canHaveMultipleRecordsOfSameDataType=" + (canHaveMultipleRecordsOfSameDataType ? "true" : "false"));
         writeField(contactNumber, dataType, contents, canHaveMultipleRecordsOfSameDataType, false, contentsColumnCount);
     }
 
@@ -172,7 +172,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
      * @throws DOMException
      */
     private void writeField(Integer contactNumber, String dataType, String contents, boolean canHaveMultipleRecordsOfSameDataType, boolean thisIsOriginalNoteEmbedding) throws DOMException {
-        System.err.println("middle writeField called: Integer contactNumber=" + contactNumber + ", String dataType=" + dataType + ", String contents=" + contents + ", boolean canHaveMultipleRecordsOfSameDataType=" + (canHaveMultipleRecordsOfSameDataType ? "true" : "false"));
+        // ignore // System.err.println("middle writeField called: Integer contactNumber=" + contactNumber + ", String dataType=" + dataType + ", String contents=" + contents + ", boolean canHaveMultipleRecordsOfSameDataType=" + (canHaveMultipleRecordsOfSameDataType ? "true" : "false"));
         writeField(contactNumber, dataType, contents, canHaveMultipleRecordsOfSameDataType, thisIsOriginalNoteEmbedding, 0);
     }
 
@@ -187,12 +187,12 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
      * @throws DOMException
      */
     private void writeField(Integer contactNumber, String dataType, String contents, boolean canHaveMultipleRecordsOfSameDataType, boolean thisIsOriginalNoteEmbedding, Integer contentsColumnCount) throws DOMException {
-        System.err.println("long writeField called: Integer contactNumber=" + contactNumber + ", String dataType=" + dataType + ", String contents=" + contents + ", boolean canHaveMultipleRecordsOfSameDataType=" + (canHaveMultipleRecordsOfSameDataType ? "true" : "false") + ", boolean thisIsOriginalNoteEmbedding=" + (thisIsOriginalNoteEmbedding ? "true" : "false"));
+        // ignore // System.err.println("long writeField called: Integer contactNumber=" + contactNumber + ", String dataType=" + dataType + ", String contents=" + contents + ", boolean canHaveMultipleRecordsOfSameDataType=" + (canHaveMultipleRecordsOfSameDataType ? "true" : "false") + ", boolean thisIsOriginalNoteEmbedding=" + (thisIsOriginalNoteEmbedding ? "true" : "false"));
         Element field = null;
         NodeList nodes = returnXPathNodeList(docCompiled, "//contact[@number=\"" + contactNumber + "\"]");
         String writeContents = contents;
         if (nodes.getLength() == 0) { //create
-            System.err.println("create hive");
+            // ignore // System.err.println("create hive");
             Element newContact = docCompiled.createElement("contact");
             newContact.setAttribute("number", contactNumber.toString());
             field = docCompiled.createElement(dataType);
@@ -203,7 +203,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
             rootDocCompiled.appendChild(newContact);
 
         } else { //update
-            System.err.println("update hive");
+            // ignore // System.err.println("update hive");
             Element contact = returnFirstElement(nodes);
             NodeList checkNodes = contact.getElementsByTagName(dataType);
             if (thisIsOriginalNoteEmbedding) {
@@ -244,21 +244,21 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
         //rootDocRawReadTextDoc.getChildNodes();
         NodeList rawContacts = returnXPathNodeList(docRawReadTextDoc, "//contact/uncategorized");
 
-        System.err.println("blabla4: " + docColumnSchema.toString());
-        System.err.println("blabla6: " + docRawReadTextDoc.toString());
+        // ignore // System.err.println("blabla4: " + docColumnSchema.toString());
+        // ignore // System.err.println("blabla6: " + docRawReadTextDoc.toString());
 //TODO jakub svoboda tidy up
 
 
 
-        System.err.println("blabla2: " + rawContacts.toString());
-        System.err.println("blabla3: " + (rawContacts.getLength()));
+        // ignore // System.err.println("blabla2: " + rawContacts.toString());
+        // ignore // System.err.println("blabla3: " + (rawContacts.getLength()));
 
         for (int rawContCount = 0; rawContCount < rawContacts.getLength(); rawContCount++) {
             Element currentContactElement;
             if (rawContacts.item(rawContCount) instanceof Element) {
-                System.err.println("blabla0: " + rawContacts.item(rawContCount).toString());
+                // ignore // System.err.println("blabla0: " + rawContacts.item(rawContCount).toString());
                 Element thisRawContact0 = (Element) rawContacts.item(rawContCount);
-                System.err.println("blabla1: " + thisRawContact0.toString());
+                // ignore // System.err.println("blabla1: " + thisRawContact0.toString());
                 //Element thisRawContact = returnFirstElement(thisRawContact0.getElementsByTagName("uncategorized"));
                 Element thisRawContact = thisRawContact0; //todo jakub svoboda: check and tidy up
                 currentContactElement = thisRawContact;
@@ -278,16 +278,16 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                     if ((!(contents.trim().equals(""))) && (!(/*if column is planned for deletion, ignore*/docColumnSchema.querySelectedtypeType(counter).equals("DELETE_THIS")))) {
                         if (docColumnSchema.isColumnAggregated(counter)) { //aggregated column...
                             // ============== AGGREGATED COLUMN =============
-                            System.err.println("compiler aggr");
+                            // ignore // System.err.println("compiler aggr");
                             Integer numOfColumns = docColumnSchema.queryAggregateSettingNumberofcolumns(counter);
                             if (numOfColumns == null) {
-                                System.err.println("InternalDocCompiler-err001: AGGREGATED: numOfColumns == null");
+                                // ignore // System.err.println("InternalDocCompiler-err001: AGGREGATED: numOfColumns == null");
                                 //log event
                             }
                             if (docColumnSchema.queryAggregateSettingIntoseparatecontacts(counter)) { //generate separate contacts
                                 if (docColumnSchema.queryAggregateSettingAutodetectswaps(counter)) { //auto-detecting
                                     // ******* AGGREGATED, INTO SEPARATE, AUTO-DETECTION *******
-                                    System.err.println("InternalDocCompiler-err002: NOT IMPLEMENTED");
+                                    // ignore // System.err.println("InternalDocCompiler-err002: NOT IMPLEMENTED");
                                     //log event
                                     //TODO!
                                     //Not implemented!
@@ -297,11 +297,11 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                     String delimiter1 = docColumnSchema.queryAggregateSettingDelimiter(counter);
                                     String delimiter2 = docColumnSchema.queryAggregateSettingSeparatecontactsdelimiter(counter);
                                     if (delimiter1 == null) {
-                                        System.err.println("InternalDocCompiler-err003: AGGREGATED: delimiter1 == null");
+                                        // ignore // System.err.println("InternalDocCompiler-err003: AGGREGATED: delimiter1 == null");
                                         //log event
                                     }
                                     if (delimiter2 == null) {
-                                        System.err.println("InternalDocCompiler-err004: AGGREGATED: delimiter2 == null");
+                                        // ignore // System.err.println("InternalDocCompiler-err004: AGGREGATED: delimiter2 == null");
                                         //log event
                                     }
                                     contentsScanner.useDelimiter(delimiter2);
@@ -318,7 +318,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                                 thisAggrFieldType = docColumnSchema.queryAggregatedSelectedtypeType(counter, columnCounter);
                                             }
                                             if (thisAggrFieldType == null) {
-                                                System.err.println("InternalDocCompiler-err005: AGGREGATED: thisAggrFieldType == null");
+                                                // ignore // System.err.println("InternalDocCompiler-err005: AGGREGATED: thisAggrFieldType == null");
                                                 //log event
                                             }
                                             String thisAggrContents = contentsScanner.next();
@@ -351,7 +351,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                                 }
 
                                             } catch (DOMException e) {
-                                                System.err.println("InternalDocCompiler-err006: creating: writeField(rawContCount, vcfNoteType, contents, false, true) failed");
+                                                // ignore // System.err.println("InternalDocCompiler-err006: creating: writeField(rawContCount, vcfNoteType, contents, false, true) failed");
                                                 //log event
                                             }
                                         }
@@ -367,7 +367,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                                 String fieldContents = (String) attribPair.getValue();
                                                 if (!(outFormValidtr.vcfCanHaveMultipleInstances(fieldType))) {
                                                     if (newContact.getElementsByTagName(fieldType).getLength() != 0) {
-                                                        System.err.println("InternalDocCompiler-err007: creating: (newContact.getElementsByTagName(fieldType).getLength() != 0)");
+                                                        // ignore // System.err.println("InternalDocCompiler-err007: creating: (newContact.getElementsByTagName(fieldType).getLength() != 0)");
                                                         //log event
                                                     }
                                                 }
@@ -410,7 +410,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                                     thisAggrFieldType = docColumnSchema.queryAggregatedSelectedtypeType(counter, columnCounter);
                                                 }
                                                 if (thisAggrFieldType == null) {
-                                                    System.err.println("InternalDocCompiler-err008: AGGREGATED2: thisAggrFieldType == null");
+                                                    // ignore // System.err.println("InternalDocCompiler-err008: AGGREGATED2: thisAggrFieldType == null");
                                                     //log event
                                                 }
                                                 String thisAggrContents = contentsScanner2.next();
@@ -452,7 +452,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                                     writeField(rawContCount, vcfNoteType, contents, false, true);
                                                 }
                                             } catch (DOMException e) {
-                                                System.err.println("InternalDocCompiler-err009: creating2: writeField(rawContCount, vcfNoteType, contents, false, true) failed");
+                                                // ignore // System.err.println("InternalDocCompiler-err009: creating2: writeField(rawContCount, vcfNoteType, contents, false, true) failed");
                                                 //log event
                                             }
                                         }
@@ -468,7 +468,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                                 String fieldContents = (String) attribPair.getValue();
                                                 if (!(outFormValidtr.vcfCanHaveMultipleInstances(fieldType))) {
                                                     if (newContact.getElementsByTagName(fieldType).getLength() != 0) {
-                                                        System.err.println("InternalDocCompiler-err010: creating2: (newContact.getElementsByTagName(fieldType).getLength() != 0)");
+                                                        // ignore // System.err.println("InternalDocCompiler-err010: creating2: (newContact.getElementsByTagName(fieldType).getLength() != 0)");
                                                         //log event
                                                     }
                                                 }
@@ -490,12 +490,12 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
 
                                 }
                             } else { //only make new columns
-                                System.err.println("only new columns");
+                                // ignore // System.err.println("only new columns");
                                 // ******** AGGREGATED, ONLY SPLIT COLUMNS *********
                                 Scanner contentsScanner = new Scanner(contents);
                                 String delimiter1 = docColumnSchema.queryAggregateSettingDelimiter(counter);
                                 if (delimiter1 == null) {
-                                    System.err.println("InternalDocCompiler-err011: AGGREGATED3: delimiter1 == null");
+                                    // ignore // System.err.println("InternalDocCompiler-err011: AGGREGATED3: delimiter1 == null");
                                     //log event
                                 }
                                 contentsScanner.useDelimiter(delimiter1);
@@ -503,18 +503,18 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                 Integer columnAggrCounter = 0;
                                 boolean moreThanOne = false;
                                 while (contentsScanner.hasNext()) {
-                                    System.err.println("while (contentsScanner.hasNext()) columnAggrCounter="+columnAggrCounter+", numOfColumns="+numOfColumns);
+                                    // ignore // System.err.println("while (contentsScanner.hasNext()) columnAggrCounter="+columnAggrCounter+", numOfColumns="+numOfColumns);
                                     if (columnAggrCounter < (numOfColumns - 1)) { //write directly to a new field
                                         String thisAggrFieldType = docColumnSchema.queryAggregatedCandidateType(counter, columnAggrCounter);
                                         if (thisAggrFieldType == null) {
                                             thisAggrFieldType = docColumnSchema.queryAggregatedSelectedtypeType(counter, columnAggrCounter);
                                         }
                                         if (thisAggrFieldType == null) {
-                                            System.err.println("InternalDocCompiler-err012: thisAggrFieldType == null");
+                                            // ignore // System.err.println("InternalDocCompiler-err012: thisAggrFieldType == null");
                                             //log event
                                         }
                                         String thisAggrContents = contentsScanner.next();
-                                        System.err.println("thisAggrContents="+thisAggrContents);
+                                        // ignore // System.err.println("thisAggrContents="+thisAggrContents);
                                         try {
                                             if (countAllColumns) {
                                                 writeField(rawContCount, thisAggrFieldType, thisAggrContents, outFormValidtr.vcfCanHaveMultipleInstances(thisAggrFieldType), counter);
@@ -522,28 +522,28 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                                 writeField(rawContCount, thisAggrFieldType, thisAggrContents, outFormValidtr.vcfCanHaveMultipleInstances(thisAggrFieldType));
                                             }
                                         } catch (DOMException e) {
-                                            System.err.println("InternalDocCompiler-err013: writeField(rawContCount, thisAggrFieldType, thisAggrContents, outFormValidtr.vcfCanHaveMultipleInstances(counter)) failed");
+                                            // ignore // System.err.println("InternalDocCompiler-err013: writeField(rawContCount, thisAggrFieldType, thisAggrContents, outFormValidtr.vcfCanHaveMultipleInstances(counter)) failed");
                                             //log event
                                         }
                                         columnAggrCounter++;
                                     } else { //commit to writeContents
-                                        System.err.println("commit to writeContents morethanone="+(moreThanOne?"true":"false")+", writeContents="+writeContents);
+                                        // ignore // System.err.println("commit to writeContents morethanone="+(moreThanOne?"true":"false")+", writeContents="+writeContents);
                                         if (moreThanOne) { //if there are any overflown data
                                             writeContents += delimiter1;
                                         }
                                         writeContents += contentsScanner.next();
                                         moreThanOne = true;
-                                            System.err.println("writeContents="+writeContents);
+                                            // ignore // System.err.println("writeContents="+writeContents);
                                     }
                                 }
                                 if (!writeContents.equals("")) { //commit overflown data if any
-                                    System.err.println("commit overflown data if any");
+                                    // ignore // System.err.println("commit overflown data if any");
                                     String thisAggrFieldType = docColumnSchema.queryAggregatedCandidateType(counter, columnAggrCounter);
                                     if (thisAggrFieldType == null) {
                                         thisAggrFieldType = docColumnSchema.queryAggregatedSelectedtypeType(counter, columnAggrCounter);
                                     }
                                     if (thisAggrFieldType == null) {
-                                        System.err.println("InternalDocCompiler-err014: thisAggrFieldType == null");
+                                        // ignore // System.err.println("InternalDocCompiler-err014: thisAggrFieldType == null");
                                         //log event
                                     }
                                     try {
@@ -554,7 +554,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                         }
 
                                     } catch (DOMException e) {
-                                        System.err.println("InternalDocCompiler-err015: writeField(rawContCount, thisAggrFieldType, writeContents, outFormValidtr.vcfCanHaveMultipleInstances(counter)) failed");
+                                        // ignore // System.err.println("InternalDocCompiler-err015: writeField(rawContCount, thisAggrFieldType, writeContents, outFormValidtr.vcfCanHaveMultipleInstances(counter)) failed");
                                         //log event
                                     }
                                 }
@@ -564,14 +564,14 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                 // ============= COLUMN IN MERGESET ===============
                                 Integer belongsInMergeset = docColumnSchema.queryMergeSet(counter);
                                 if (belongsInMergeset == null) {
-                                    System.err.println("InternalDocCompiler-err016: MERGESET: belongsInMergeset == null");
+                                    // ignore // System.err.println("InternalDocCompiler-err016: MERGESET: belongsInMergeset == null");
                                     //log event
                                 }
                                 if (!(docColumnSchema.getAllMergesets().contains(belongsInMergeset))) {
-                                    System.err.println("InternalDocCompiler-err017: MERGESET: (!(docColumnSchema.getAllMergesets().contains(belongsInMergeset)))");
+                                    // ignore // System.err.println("InternalDocCompiler-err017: MERGESET: (!(docColumnSchema.getAllMergesets().contains(belongsInMergeset)))");
                                     //log event
                                 }
-                                System.err.println("compiler info: mergeset added");
+                                // ignore // System.err.println("compiler info: mergeset added");
                                 processMergeSets = true;
                                 columnsInMergeset.add(counter); //note the column in a mergeset
                                 if (!(usedMergesets.contains(belongsInMergeset))) { //if not already noted...
@@ -582,17 +582,17 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                 //TODO: jakub svoboda check corectness and tidy up
                             } else { //normal column...                                //normal column...
                                 // =========== NORMAL COLUMN ===========
-                                System.err.println("NORMAL COLUMN counter="+counter);
-                                System.err.println("candidate="+docColumnSchema.queryCandidateType(counter)+", selected="+docColumnSchema.querySelectedtypeType(counter));
+                                // ignore // System.err.println("NORMAL COLUMN counter="+counter);
+                                // ignore // System.err.println("candidate="+docColumnSchema.queryCandidateType(counter)+", selected="+docColumnSchema.querySelectedtypeType(counter));
                                 String type = docColumnSchema.querySelectedtypeType(counter);
                                 if (type == null) {
                                     type = docColumnSchema.queryCandidateType(counter);
                                 }
                                 if (type == null) {
-                                    System.err.println("InternalDocCompiler-err018: normal: type == null");
+                                    // ignore // System.err.println("InternalDocCompiler-err018: normal: type == null");
                                     //log event
                                 }
-                                System.err.println("type="+type);
+                                // ignore // System.err.println("type="+type);
 
                                 try {
                                     if (countAllColumns) {
@@ -602,12 +602,12 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                     }
 
                                 } catch (DOMException e) {
-                                    System.err.println("InternalDocCompiler-err019: MERGESET: writeField(rawContCount, type, contents, outFormValidtr.vcfCanHaveMultipleInstances(counter)) failed");
-                                    System.err.println("exception=" + e);
-                                    System.err.println("rawContCount=" + rawContCount);
-                                    System.err.println("type=" + type);
-                                    System.err.println("contents=" + contents);
-                                    System.err.println("outFormValidtr.vcfCanHaveMultipleInstances(counter)=" + outFormValidtr.vcfCanHaveMultipleInstances(counter));
+                                    // ignore // System.err.println("InternalDocCompiler-err019: MERGESET: writeField(rawContCount, type, contents, outFormValidtr.vcfCanHaveMultipleInstances(counter)) failed");
+                                    // ignore // System.err.println("exception=" + e);
+                                    // ignore // System.err.println("rawContCount=" + rawContCount);
+                                    // ignore // System.err.println("type=" + type);
+                                    // ignore // System.err.println("contents=" + contents);
+                                    // ignore // System.err.println("outFormValidtr.vcfCanHaveMultipleInstances(counter)=" + outFormValidtr.vcfCanHaveMultipleInstances(counter));
                                     //log event
                                 }
                             }
@@ -618,15 +618,15 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
 
                 }
                 // ********** PROCESS MERGESETS HERE ***********
-                System.err.println("InternalDocCompiler-info031: process mergesets here");
+                // ignore // System.err.println("InternalDocCompiler-info031: process mergesets here");
                 if (processMergeSets) { //there are mergesets to process
                     processMergeSets = false;
-                    System.err.println("InternalDocCompiler-info032: there are mergesets to process");
+                    // ignore // System.err.println("InternalDocCompiler-info032: there are mergesets to process");
 
                     ArrayList<Integer> allMergesets = docColumnSchema.getAllMergesets();
                     Iterator<Integer> usedMergesetsIter = usedMergesets.iterator();
                     while (usedMergesetsIter.hasNext()) {
-                        System.err.println("InternalDocCompiler-info034: while (usedMergesetsIter.hasNext())");
+                        // ignore // System.err.println("InternalDocCompiler-info034: while (usedMergesetsIter.hasNext())");
 
                         Integer thisMergeset = usedMergesetsIter.next();
                         HashMap<Integer, Integer> allMergesetMembers = docColumnSchema.getAllMergesetMembers(thisMergeset);
@@ -635,17 +635,17 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                         String mergesetValue = "";
                         boolean firstEntry = true;
                         while (membersIter.hasNext()) {
-                            System.err.println("InternalDocCompiler-info035: while (membersIter.hasNext())");
+                            // ignore // System.err.println("InternalDocCompiler-info035: while (membersIter.hasNext())");
 
                             Integer attribPairKey = membersIter.next(); //order of column in mergeset
                             Integer attribPairValue = allMergesetMembers.get(attribPairKey); //number of the column
                             //Map.Entry attribPair = (Map.Entry) membersIter.next();
-                            System.err.println("attribPairKey=" + attribPairKey + " attribPairValue=" + attribPairValue);
+                            // ignore // System.err.println("attribPairKey=" + attribPairKey + " attribPairValue=" + attribPairValue);
 
                             //attribPair.getKey();
                             //attribPair.getValue();
                             if (columnsInMergeset.contains((Integer) attribPairValue)) {
-                                System.err.println("if (columnsInMergeset.contains((Integer) attribPairValue=" + attribPairValue);
+                                // ignore // System.err.println("if (columnsInMergeset.contains((Integer) attribPairValue=" + attribPairValue);
 
                                 String contentsOfField = null;
                                 NodeList childsOfContact = currentContactElement.getChildNodes();
@@ -658,7 +658,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                         }
                                     }
                                 }
-                                System.err.println("contentsOfField=" + contentsOfField + ", firstentry:" + (firstEntry ? "true" : "false"));
+                                // ignore // System.err.println("contentsOfField=" + contentsOfField + ", firstentry:" + (firstEntry ? "true" : "false"));
 
                                 if (contentsOfField != null) {
 
@@ -669,19 +669,19 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                         mergesetValue = mergesetValue + docColumnSchema.queryMergesetDelimiter(thisMergeset) + " " + contentsOfField;
                                     }
                                 }
-                                System.err.println("mergesetValue=" + mergesetValue);
+                                // ignore // System.err.println("mergesetValue=" + mergesetValue);
 
                             }
                         }
 
                         //write mergeset into contact
-                        System.err.println("InternalDocCompiler-info036: write mergeset into contact, thisMergeset=" + thisMergeset);
+                        // ignore // System.err.println("InternalDocCompiler-info036: write mergeset into contact, thisMergeset=" + thisMergeset);
                         String type = docColumnSchema.queryMergesetSelectedType(thisMergeset);
                         if (type == null) {
                             type = docColumnSchema.queryMergesetCandidateType(thisMergeset);
                         }
                         if (type == null) {
-                            System.err.println("InternalDocCompiler-err020: WRITE MERGESET: type == null");
+                            // ignore // System.err.println("InternalDocCompiler-err020: WRITE MERGESET: type == null");
                             //log event
                         }
 
@@ -693,14 +693,14 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                             }
 
                         } catch (DOMException e) {
-                            System.err.println("InternalDocCompiler-err021: WRITE MERGESET: writeField(rawContCount, type, mergesetValue, outFormValidtr.vcfCanHaveMultipleInstances(type)) failed");
+                            // ignore // System.err.println("InternalDocCompiler-err021: WRITE MERGESET: writeField(rawContCount, type, mergesetValue, outFormValidtr.vcfCanHaveMultipleInstances(type)) failed");
                             //log event
                         }
                     }
                 }
 
                 //check if FN is present
-                System.err.println("InternalDocCompiler-info041: check if FN is present");
+                // ignore // System.err.println("InternalDocCompiler-info041: check if FN is present");
                 NodeList nodes = currentContactElement.getElementsByTagName(VCFTypesEnum.Formatted_Name.toString());
                 if (nodes.getLength() == 0) {
                     nodes = currentContactElement.getElementsByTagName(VCFTypesEnum.Name.toString());
@@ -717,7 +717,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                         }
                     }
                     if (((nodes.getLength() != 0) && ((nodes.item(0)) instanceof Element)) && (((Element) nodes.item(0)).getTextContent().trim() == null ? "" != null : !((Element) nodes.item(0)).getTextContent().trim().equals(""))) {
-                        System.err.println("InternalDocCompiler-info042: create the FN, otherwise ignore it...");
+                        // ignore // System.err.println("InternalDocCompiler-info042: create the FN, otherwise ignore it...");
                         //create the FN, otherwise ignore it...
                         Element fn = docCompiled.createElement(VCFTypesEnum.Formatted_Name.toString());
                         fn.setTextContent(((Element) nodes.item(0)).getTextContent().trim());
@@ -732,7 +732,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
     }
 
     public Document getCompiledValidContacts() {
-        System.err.println("InternalDocCompiler-info022: getCompiledValidContacts called, returning docCompiled");
+        // ignore // System.err.println("InternalDocCompiler-info022: getCompiledValidContacts called, returning docCompiled");
         //log event
 
         TransformerFactory tfx = TransformerFactory.newInstance();
@@ -741,13 +741,13 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
             transx = tfx.newTransformer();
         } catch (TransformerConfigurationException ex) {
             Logger.getLogger(InternalDocCompiler.class.getName()).log(Level.SEVERE, null, ex);
-            System.err.println("errx1");
+            // ignore // System.err.println("errx1");
         }
         try {
             transx.transform(new DOMSource(docCompiled), new StreamResult(System.err));
         } catch (TransformerException ex) {
             Logger.getLogger(InternalDocCompiler.class.getName()).log(Level.SEVERE, null, ex);
-            System.err.println("errx2");
+            // ignore // System.err.println("errx2");
         }
 
 
@@ -759,7 +759,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
      * @return null Document
      */
     public Document getCompiledInvalidContacts() {
-        System.err.println("InternalDocCompiler-err023: DO NOT USE THIS METHOD! - getCompiledInvalidContacts called");
+        // ignore // System.err.println("InternalDocCompiler-err023: DO NOT USE THIS METHOD! - getCompiledInvalidContacts called");
         //log event
         return null;
     }
@@ -769,7 +769,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
      * @return always true
      */
     public boolean compileErrorsDetected() {
-        System.err.println("InternalDocCompiler-err024: DO NOT USE THIS METHOD! - compileErrorsDetected called");
+        // ignore // System.err.println("InternalDocCompiler-err024: DO NOT USE THIS METHOD! - compileErrorsDetected called");
         //log event
         return true;
     }
