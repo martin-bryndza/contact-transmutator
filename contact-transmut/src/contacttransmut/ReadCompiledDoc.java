@@ -83,11 +83,15 @@ public class ReadCompiledDoc implements InputFilter{
                 else if (indexesTable.get(indexCD) != null && indexesUsedInThisContact.contains(indexCD)){
                     //get how many times it has been used in this contact to find out, if we need to add a column into the array
                     //it should be grater by one
-                    if (getNumberOfDuplicates(indexesUsedInThisContact, indexCD) == indexesTable.get(indexCD).size()+1){
+                    int numberOfSameColumnsUsed = getNumberOfDuplicates(indexesUsedInThisContact, indexCD);
+                    int numberOfColumnsIndexed = indexesTable.get(indexCD).size();
+                    //if the number of indexed columns and number of duplicates are the same and we are going to use another duplicate, we need to assign nex column
+                    if (numberOfSameColumnsUsed == numberOfColumnsIndexed){
                         indexesTable.get(indexCD).add(nextFreeColumn);
                     }
+                    //else if we have less duplicates then columns assigned, we just use one of the assigned
                     //else it is a bug
-                    else {
+                    else if (numberOfSameColumnsUsed > numberOfColumnsIndexed) {
                         stateIsOK = false;
                         System.err.println("ReadCompiledDoc ERROR while creating indexesTable - errNo: 1");
                         return;
