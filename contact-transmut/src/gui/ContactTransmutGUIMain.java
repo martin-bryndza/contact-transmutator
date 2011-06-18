@@ -16,10 +16,14 @@ import contacttransmut.InternalDoc2CompiledDoc;
 import contacttransmut.InternalDocColumnSchema;
 import contacttransmut.InternalDocColumnSchemaImpl;
 import contacttransmut.InternalDocCompiler;
+import contacttransmut.ODSInput;
 import contacttransmut.OutputFilter;
 import contacttransmut.ReadCSV;
 import contacttransmut.ReadCompiledDoc;
+import contacttransmut.ReadVCF;
 import contacttransmut.VCFTypesEnum;
+import contacttransmut.WriteCSV;
+import contacttransmut.WriteVCF;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -47,12 +51,14 @@ import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -179,7 +185,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jCompiledDocScrollPane = new javax.swing.JScrollPane();
         jCompiledDocTextArea = new javax.swing.JTextArea();
         jFileChooserFrame = new javax.swing.JFrame();
-        jLabel17 = new javax.swing.JLabel();
+        jFileChooserLabel = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jMainLabel1 = new javax.swing.JLabel();
         jBrowseButton1 = new javax.swing.JButton();
@@ -964,8 +970,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         jFileChooserFrame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel17.setFont(new java.awt.Font("Tahoma", 1, 24));
-        jLabel17.setText("SAVING...");
+        jFileChooserLabel.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
+        jFileChooserLabel.setText("SAVING...");
 
         javax.swing.GroupLayout jFileChooserFrameLayout = new javax.swing.GroupLayout(jFileChooserFrame.getContentPane());
         jFileChooserFrame.getContentPane().setLayout(jFileChooserFrameLayout);
@@ -973,14 +979,14 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             jFileChooserFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jFileChooserFrameLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel17)
+                .addComponent(jFileChooserLabel)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jFileChooserFrameLayout.setVerticalGroup(
             jFileChooserFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jFileChooserFrameLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel17)
+                .addComponent(jFileChooserLabel)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1095,11 +1101,27 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         if (filePath.toLowerCase().endsWith(".csv")){
             inputFilter = new ReadCSV(inputFile.toString(),"UTF-8",",","\"");
         } else if (filePath.toLowerCase().endsWith(".vcf")){
-            JOptionPane.showMessageDialog(this,"File type not supported yet.","Sorry!",JOptionPane.INFORMATION_MESSAGE);
-            return;
-        } else if (filePath.toLowerCase().endsWith(".osd")){
-            JOptionPane.showMessageDialog(this,"File type not supported yet.","Sorry!",JOptionPane.INFORMATION_MESSAGE);
-            return;
+            inputFilter = new ReadVCF(inputFile.toString(), "UTF-8");
+        } else if (filePath.toLowerCase().endsWith(".ods")){
+            try {
+                inputFilter = new ODSInput(inputFile.toString());
+            } catch (SAXException ex) {
+                Logger.getLogger(ContactTransmutGUIMain.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(this,"Problem with parsing of the document.","Error!",JOptionPane.ERROR_MESSAGE);
+                return;
+            } catch (ParserConfigurationException ex) {
+                Logger.getLogger(ContactTransmutGUIMain.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(this,"Problem with parsing of the document.","Error!",JOptionPane.ERROR_MESSAGE);
+                return;
+            } catch (IOException ex) {
+                Logger.getLogger(ContactTransmutGUIMain.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(this,"Unable to manipulate with the input file.","Error!",JOptionPane.ERROR_MESSAGE);
+                return;
+            } catch (Exception ex) {
+                Logger.getLogger(ContactTransmutGUIMain.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(this,"An error occured.","Error!",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
         } else {
             JOptionPane.showMessageDialog(this,"Choose a valid file. (*.csv, *.ods, *.vcf)","Invalid file path!",JOptionPane.ERROR_MESSAGE);
             return;
@@ -1128,11 +1150,11 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         // <editor-fold defaultstate="collapsed" desc="filter typov suborov">
         FileFilter filter = null;
-        try {
-            filter = new FileFilter() {
+        filter = new FileFilter() {
 
-                @Override
-                public boolean accept(File f) {
+            @Override
+            public boolean accept(File f) {
+                try {
                     if ((f.isFile() && (f.toString().toLowerCase().endsWith("csv")
                             || f.toString().toLowerCase().endsWith("ods")
                             || f.toString().toLowerCase().endsWith("vcf")))
@@ -1141,16 +1163,17 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     } else {
                         return false;
                     }
+                } catch (Exception e) {
+                    //no idea why it comes out but everything works just OK
+                    return true;
                 }
+            }
 
-                @Override
-                public String getDescription() {
-                    return "CSV, ODS, VCF files";
-                }
-            };
-        } catch (Exception ex) {
-            //no idea why it comes out but everything works OK
-        }
+            @Override
+            public String getDescription() {
+                return "CSV, ODS, VCF files";
+            }
+        };
         // </editor-fold>
               
         chooser.setFileFilter(filter);
@@ -1175,9 +1198,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     }//GEN-LAST:event_jMainWindowCancelButtonMouseReleased
 
     private void jMainWindowNextButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMainWindowNextButtonMouseReleased
-        //hide main window
-        jMainWindowFrame2.setVisible(false);
-
         //choose where to save and the filetype
         String savePath = "";
         JFileChooser chooser = new JFileChooser();
@@ -1213,10 +1233,15 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         FileFilter filterCSV = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                if ((f.isFile() && f.toString().toLowerCase().endsWith("csv")) || f.isDirectory()) {
+                try {
+                    if ((f.isFile() && f.toString().toLowerCase().endsWith("csv")) || f.isDirectory()) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } catch (Exception e) {
+                    //no idea why it comes out but everything works just OK
                     return true;
-                } else {
-                    return false;
                 }
             }
             @Override
@@ -1245,12 +1270,10 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         chooser.addChoosableFileFilter(filterVCF);
         chooser.setDialogTitle("Save as...");
         chooser.setApproveButtonText("Save");
-        jFileChooserFrame.setVisible(true);
-        int returnVal = chooser.showOpenDialog(jFileChooserFrame);
+        int returnVal = chooser.showOpenDialog(jMainWindowPanel);
         if(returnVal == JFileChooser.APPROVE_OPTION){
             savePath = (chooser.getSelectedFile().toString());
         } else {
-            jMainWindowFrame2.setVisible(true);
             return;
         }
 
@@ -1261,12 +1284,10 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         OutputFilter outputFilter = null;
         if (savePath.toLowerCase().endsWith(".csv")){
-            JOptionPane.showMessageDialog(this,"File type not supported yet.","Sorry!",JOptionPane.INFORMATION_MESSAGE);
-            return;
+            outputFilter = new WriteCSV(savePath, "UTF-8", ",", "\"", compiledDoc);
         } else if (savePath.toLowerCase().endsWith(".vcf")){
-            JOptionPane.showMessageDialog(this,"File type not supported yet.","Sorry!",JOptionPane.INFORMATION_MESSAGE);
-            return;
-        } else if (savePath.toLowerCase().endsWith(".osd")){
+            outputFilter = new WriteVCF(savePath, "UTF-8", compiledDoc);
+        } else if (savePath.toLowerCase().endsWith(".ods")){
             JOptionPane.showMessageDialog(this,"File type not supported yet.","Sorry!",JOptionPane.INFORMATION_MESSAGE);
             return;
         } else if (savePath.toLowerCase().endsWith(".adr")){
@@ -1277,6 +1298,11 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             //return;
         }
         outputFilter.write();
+        Object[] options = {"Continue editing...", "Close program."};
+        int n = JOptionPane.showOptionDialog(this, "", "Continue?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+        if (n != 0) {
+            System.exit(0);
+        }
 
     }//GEN-LAST:event_jMainWindowNextButtonMouseReleased
 
@@ -1496,9 +1522,9 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
     private void jSplitIntoCancelButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoCancelButtonMouseReleased
         int myColumn = Integer.parseInt(jColumnToSplitLabel.getText());
-        if (!columnSchema.isColumnAggregated(myColumn)){
-            columnSchMgr.popColumnSchema();
-        }
+
+        columnSchMgr.popColumnSchema();
+        comboBoxes.get(myColumn).setSelectedIndex(comboMgr.getIndexOfValue(columnSchema.queryCandidateType(myColumn)));
         comboMgr.updateComboBoxesEnabledValues(comboBoxes);
         comboMgr.updateAddToLables();
         jSplitIntoFrame.setVisible(false);
@@ -1526,6 +1552,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     }//GEN-LAST:event_jSplitIntoTypeSettingsCancelButtonMouseReleased
 
     private void jSplitIntoTypeSettingsOkButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoTypeSettingsOkButtonMouseReleased
+        columnSchMgr.discardPopColumnSchema();
         jSplitIntoTypeSettingsFrame.setVisible(false);
     }//GEN-LAST:event_jSplitIntoTypeSettingsOkButtonMouseReleased
 
@@ -1537,6 +1564,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             return;
         }
 
+        columnSchMgr.discardPopColumnSchema();
         columnSchMgr.update();
         comboMgr.updateComboBoxesEnabledValues(comboBoxes);
         comboMgr.updateAddToLables();
@@ -1552,8 +1580,10 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             jSplitIntoNumberOfColumnsTextField.setEnabled(true);
             jSplitIntoNumberOfColumnsSettingsButton.setEnabled(true);
             jSplitIntoDelimeterTextField.setEnabled(true);
+            columnSchMgr.update();
             return;
         }
+        columnSchMgr.pushColumnSchema();
         jSplitIntoContactsSettingsButton.setEnabled(true);
         jSplitIntoNumberOfColumnsTextField.setEnabled(false);
         jSplitIntoNumberOfColumnsSettingsButton.setEnabled(false);
@@ -1577,15 +1607,27 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
     private void jSplitIntoContactsCancelButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoContactsCancelButtonMouseReleased
         jSplitIntoContactsFrame.setVisible(false);
+        int colNumber = Integer.parseInt(jColumnToSplitLabel.getText());
+        columnSchMgr.popColumnSchema();
+        //fill in the settings form
+        jSplitIntoContactsNumberOfColumnsTextField.setText(String.valueOf(columnSchema.queryAggregateSettingNumberofcolumns(colNumber)));
+        jSplitIntoContactsDelimeterOfContactsTextField.setText(columnSchema.queryAggregateSettingSeparatecontactsdelimiter(colNumber));
+        jSplitIntoContactsDelimeterOfColumnsTextField.setText(columnSchema.queryAggregateSettingDelimiter(colNumber));
+        jSplitIntoContactsAreEmployeesCheckBox.setSelected(columnSchema.queryAggregateSettingEmployees(colNumber));
+        jSplitIntoContactsOrigIntoSourceCheckBox.setSelected(columnSchema.queryAggregateSettingOriginalsourcenote(colNumber));
+        jSplitIntoContactsOrigIntoContactsCheckBox.setSelected(columnSchema.queryAggregateSettingOriginaltargetnote(colNumber));
     }//GEN-LAST:event_jSplitIntoContactsCancelButtonMouseReleased
 
     private void jSplitIntoContactsOkButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoContactsOkButtonMouseReleased
+        columnSchMgr.discardPopColumnSchema();
+        columnSchMgr.update();
         jSplitIntoContactsFrame.setVisible(false);
         jSplitIntoNumberOfColumnsTextField.setText(jSplitIntoContactsNumberOfColumnsTextField.getText());
         jSplitIntoDelimeterTextField.setText(jSplitIntoContactsDelimeterOfColumnsTextField.getText());
     }//GEN-LAST:event_jSplitIntoContactsOkButtonMouseReleased
 
     private void jSplitIntoContactsSettingsButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSplitIntoContactsSettingsButtonMouseReleased
+        columnSchMgr.pushColumnSchema();
         jSplitIntoContactsFrame.setVisible(true);
     }//GEN-LAST:event_jSplitIntoContactsSettingsButtonMouseReleased
 
@@ -1624,6 +1666,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         columnsToAdd.clear();
         splitIntoColumnsTypes.clear();
         jComboBoxesToolBar.removeAll();
+        jColumnToSplitLabel.setText("-1");
+        jColumnToAddLabel.setText("-1");
 
         tableModel.initTable(internalDoc, columnSchema);
 
@@ -1697,6 +1741,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jAddToToolBar.setVisible(false);
         jAddToToolBar.setVisible(true);
         jAddToPlusButton.setEnabled(true);
+        jAddToPlusButton.setVisible(false);
+        jAddToPlusButton.setVisible(true);
         return;
     }
 
@@ -1706,6 +1752,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jSplitIntoTypeSettingsToolBar.removeAll();
         jSplitIntoTypeSettingsNumberOfColumnsLabel.setText(String.valueOf(numberOfColumns));
         ArrayList<Object[]> itemsList = new ArrayList<Object[]>();
+        columnSchMgr.pushColumnSchema();
         for (int i = 0; i < numberOfColumns; i++) {
             // <editor-fold defaultstate="collapsed" desc="naplnenie hodnotami">
             itemsList.add(new Object[]{
@@ -1741,13 +1788,14 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             splitIntoColumnsTypes.add(new JComboBox(itemsList.get(i)));
             splitIntoColumnsTypes.get(i).setRenderer(new ComboRenderer());
             splitIntoColumnsTypes.get(i).addActionListener(new ComboListener(splitIntoColumnsTypes.get(i)));
-            splitIntoColumnsTypes.get(i).setSelectedIndex(9);
-            if (!columnSchema.queryAggregatedCandidateType(columnNumber, i).equals("")) {
-                String type = VCFTypesEnum.valueOf(columnSchema.queryAggregatedCandidateType(columnNumber, i)).toDisplayString();
-                splitIntoColumnsTypes.get(i).setSelectedItem(new ComboItem(type));
-                comboMgr.updateComboBoxesEnabledValues(splitIntoColumnsTypes);
-            }
+            String type = columnSchema.queryAggregatedCandidateType(columnNumber, i);
+            int temp = comboMgr.getIndexOfValue(type);
+            splitIntoColumnsTypes.get(i).setSelectedIndex(temp); //will be set to note if there is no type
+            jSplitIntoTypeSettingsToolBar.add(splitIntoColumnsTypes.get(i));
         }
+        columnSchMgr.popColumnSchema();
+        columnSchMgr.update();
+        comboMgr.updateComboBoxesEnabledValues(splitIntoColumnsTypes);
     }
 
     public void prepareSplitIntoWindow(int colNumber) {
@@ -1779,13 +1827,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             jSplitIntoNumberOfColumnsTextField.setEnabled(true);
             jSplitIntoNumberOfColumnsSettingsButton.setEnabled(true);
             jSplitIntoDelimeterTextField.setEnabled(true);
-        }
-        
-        try {
-            fillInSplitIntoTypesSettingsForm();
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(jMainWindowFrame2, "An error occured while parsing number of columns.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
         }
     }
 
@@ -1850,9 +1891,9 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 //get the number of column currently changed
                 int columnNumber = comboMgr.getIndexOfComboBox(combo);
                 
-                //if a type was selected
+                //if a type was selected and the combo box is from main window
                 String tempItemVCFFormat = comboMgr.getSelectedValueStr(combo);
-                if (comboMgr.getIndexOfValue(tempItemVCFFormat) <= (comboMgr.getIndexOfValue("ADD_TO_COLUMN_#...")-1)){
+                if (comboMgr.getIndexOfValue(tempItemVCFFormat) <= (comboMgr.getIndexOfValue("ADD_TO_COLUMN_#...")-1) && columnNumber >= 0){
                     columnSchMgr.update();
                     comboMgr.updateComboBoxesEnabledValues(comboBoxes);
                     comboMgr.updateAddToLables();
@@ -1887,7 +1928,10 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                                 if (n == 0) {
                                     HashMap<Integer, Integer> allMergesetMembers = columnSchema.getAllMergesetMembers(mergeset);
                                     for (Integer i : allMergesetMembers.values()) {
-                                        comboBoxes.get(i).setSelectedIndex(9);
+                                        columnSchMgr.pushColumnSchema();
+                                        if (i != allMergesetMembers.get(1))
+                                            comboBoxes.get(i).setSelectedIndex(9);
+                                        columnSchMgr.popColumnSchema();
                                     }
                                     columnSchema.deleteMergeset(mergeset);
                                     columnSchMgr.update();
@@ -1907,7 +1951,11 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                         }
                     }
                 }
-                
+                //if columnNumber is <0, then it was split into combo box changed
+                else if (columnNumber < 0){
+                    columnSchMgr.update();
+                    comboMgr.updateComboBoxesEnabledValues(splitIntoColumnsTypes);
+                }
                 else {
                     combo.setSelectedItem(currentItem);
                 }
@@ -1984,6 +2032,10 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         public void popColumnSchema(){
             columnSchema = columnSchemaStack.pop();
         }
+        
+        public void discardPopColumnSchema(){
+            columnSchemaStack.pop();
+        }
 
         public void update(){
             //find new mergeset number
@@ -2005,7 +2057,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             //save old CS
             InternalDocColumnSchema oldCs = columnSchema;
             //set CS to default
-            InternalDocColumnSchema cs = new InternalDocColumnSchemaImpl(oldCs.getColumnCount());
+            int columnCount = oldCs.getColumnCount();
+            InternalDocColumnSchema cs = new InternalDocColumnSchemaImpl(columnCount);
 
             for(JComboBox combo : comboBoxes){
                 int column = comboBoxes.indexOf(combo);
@@ -2239,11 +2292,14 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     int column = comboMgr.getIndexOfComboBox(combo);
                     if (combo.getSelectedIndex() == getIndexOfValue("ADD_TO_COLUMN_#...")){
                         int mergeset = columnSchema.queryMergeSet(column);
-                        int baseColumn = columnSchema.getAllMergesetMembers(mergeset).get(1);
-                        addToLables.get(column).setText(String.valueOf(baseColumn));
-                    } else {
-                        addToLables.get(column).setText("");
+                        HashMap<Integer, Integer> allMergesetMembers = columnSchema.getAllMergesetMembers(mergeset);
+                        if (allMergesetMembers != null && allMergesetMembers.get(1) != null){
+                            int baseColumn = allMergesetMembers.get(1);
+                            addToLables.get(column).setText(String.valueOf(baseColumn));
+                            return;
+                        }
                     }
+                    addToLables.get(column).setText("");
                 }
             }
 
@@ -2403,6 +2459,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private javax.swing.JTable jContactsListTable;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JFrame jFileChooserFrame;
+    private javax.swing.JLabel jFileChooserLabel;
     private javax.swing.JTextField jInputFileTextField1;
     private javax.swing.JScrollPane jInternalDocScrollPane;
     private javax.swing.JTextArea jInternalDocTextArea;
@@ -2415,7 +2472,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
-    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;

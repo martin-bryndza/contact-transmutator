@@ -730,7 +730,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
         Element mergeset = returnFirstElement(dataNodeList);
 
         if (mergeset.getNodeName().equals("null")) {
-            mergeset = mergeset.getOwnerDocument().createElement("mergeset");
+            mergeset = root.getOwnerDocument().createElement("mergeset");
             mergeset.setAttribute("number", num.toString());
 
             Element delimiter = mergeset.getOwnerDocument().createElement("delimiter");
@@ -1016,21 +1016,21 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
     //<editor-fold defaultstate="collapsed" desc="added by Martin B.">
     public int getColumnCount(){
-        int columnCount = 0;
+//        int columnCount = 0;
 
         NodeList columnList = returnXPathNodeList("//columnschema/column");
-        for (int i = 0; i < columnList.getLength(); i++){
-            Element column = (Element)columnList.item(i);
-            if(column.getAttribute("mergeInOther").equals("yes")){
-                //do not increment
-            } else if(column.getAttribute("aggregated").equals("yes")){
-                NodeList aggColumnList = column.getElementsByTagName("column");
-                columnCount += aggColumnList.getLength();
-            } else {
-                columnCount++;
-            }
-        }
-        return columnCount;
+//        for (int i = 0; i < columnList.getLength(); i++){
+//            Element column = (Element)columnList.item(i);
+//            if(column.getAttribute("mergeInOther").equals("yes")){
+//                //do not increment
+//            } else if(column.getAttribute("aggregated").equals("yes")){
+//                NodeList aggColumnList = column.getElementsByTagName("column");
+//                columnCount += aggColumnList.getLength();
+//            } else {
+//                columnCount++;
+//            }
+//        }
+        return columnList.getLength();//columnCount;
     }
 
     public boolean isTypeInColumnSchema(VCFTypesEnum type){
