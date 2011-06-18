@@ -74,8 +74,11 @@ public class Main {
             System.out.println("");
 
             System.out.println("printing csvout.csv:");
-            OutputFilter testWriteCSV = new WriteCSV("csvout.csv", "UTF-8", ",", "\"", docWC);
+            //OutputFilter testWriteCSV = new WriteCSV("csvout.csv", "UTF-8", ",", "\"", docWC);
+                OutputFilter testWriteCSV = new ODSWrite("sem.xml",  docWC);
             testWriteCSV.write();
+            
+            
         }
 
 
