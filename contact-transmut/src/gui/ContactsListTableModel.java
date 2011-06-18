@@ -40,16 +40,18 @@ public class ContactsListTableModel extends AbstractTableModel{
         for (int i = 0; i < contactList.getLength(); i++) {
             Element contact = (Element) contactList.item(i);
             data.add(new ArrayList<String>());
+            ArrayList<String> currentList = data.get(i);
+            for (int z=0; z<columnCount; z++){
+                currentList.add("");
+            }
             NodeList uncategorizedList = contact.getElementsByTagName("uncategorized");
             for (int j = 0; j < uncategorizedList.getLength(); j++) {
                 Element uncategorized = (Element) uncategorizedList.item(j);
                 NodeList dataList = uncategorized.getElementsByTagName("data");
                 for (int k = 0; k < dataList.getLength(); k++) {
                     Element eData = (Element) dataList.item(k);
-                    data.get(i).add(eData.getTextContent());
+                    currentList.set(Integer.parseInt(eData.getAttribute("counter")), eData.getTextContent());
                 }
-                for (int m = 0; m < columnCount - dataList.getLength(); m++)
-                    data.get(i).add("");
             }
         }
 

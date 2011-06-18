@@ -6,6 +6,8 @@
 package contacttransmut;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -31,8 +33,12 @@ public class ReadCompiledDoc implements InputFilter{
     private DocumentBuilderFactory dbf;
     private DocumentBuilder db;
     private Document doc;  //internalDoc
+    private int numberOfColumns;
+    private HashMap<Integer,ArrayList<Integer>> indexesTable;
+    private boolean stateIsOK = true;
 
     public ReadCompiledDoc(Document compiledDoc){
+        stateIsOK = true;
         this.compiledDoc = compiledDoc;
         dbf = DocumentBuilderFactory.newInstance();
         try {
@@ -41,18 +47,81 @@ public class ReadCompiledDoc implements InputFilter{
             Logger.getLogger(ReadCSV.class.getName()).log(Level.SEVERE, null, ex);
         }
         doc = db.newDocument(); //this is internal XML DOM we use to process the data
+
+        //find out the number of columns and create hash table <index of column in CompiledDoc, index in output>
+        //index in output must be a list, because aggregated columns have the same index in CompiledDoc
+        indexesTable = new HashMap<Integer, ArrayList<Integer>>();
+        NodeList contactList = compiledDoc.getElementsByTagName("contact");
+        for (int i=0; i<contactList.getLength(); i++){
+            Element contactElement = (Element) contactList.item(i);
+            //a List to help detecting aggregations
+            ArrayList<Integer> indexesUsedInThisContact = new ArrayList<Integer>();
+            NodeList dataList = contactElement.getChildNodes();
+            for (int j=0; j<dataList.getLength(); j++){
+                Element dataElement = (Element) dataList.item(j);
+
+                //get the index in CompiledDoc
+                int indexCD;
+                try {
+                    indexCD = Integer.parseInt(dataElement.getAttribute("columnCounter"));
+                } catch (NumberFormatException numberFormatException) {
+                    indexCD = 10000;
+                }
+
+                //count the next free column -> it is the SUM of all Arrays in indexesTable
+                int nextFreeColumn = 0;
+                for (ArrayList<Integer> array : indexesTable.values()){
+                    nextFreeColumn += array.size();
+                }
+
+                //if there is no mapping for this index, create new one and use next column
+                if (indexesTable.get(indexCD) == null){
+                    indexesTable.put(indexCD, new ArrayList<Integer>());
+                    indexesTable.get(indexCD).add(nextFreeColumn);
+                }
+                // else if there is such mapping, but this data item is from aggregation (has been used in this contact)
+                else if (indexesTable.get(indexCD) != null && indexesUsedInThisContact.contains(indexCD)){
+                    //get how many times it has been used in this contact to find out, if we need to add a column into the array
+                    //it should be grater by one
+                    if (getNumberOfDuplicates(indexesUsedInThisContact, indexCD) == indexesTable.get(indexCD).size()+1){
+                        indexesTable.get(indexCD).add(nextFreeColumn);
+                    }
+                    //else it is a bug
+                    else {
+                        stateIsOK = false;
+                        System.err.println("ReadCompiledDoc ERROR while creating indexesTable - errNo: 1");
+                        return;
+                    }
+                }
+                //else the column is allready in the hash table -> do nothing
+
+
+                //add the index to used
+                indexesUsedInThisContact.add(indexCD);
+            }
+        }
+
+        //count the number of columns -> it is the SUM of all Arrays in indexesTable
+        numberOfColumns = 0;
+        for (ArrayList<Integer> array : indexesTable.values()) {
+            numberOfColumns += array.size();
+        }
     }
 
     public Document read() {
+        //check state
+        if (!stateIsOK){
+            System.err.println("ReadCompiledDoc ERROR: tried to read not with not correctly instantiazed entity - errNo: 2");
+            return null;
+        }
+
         //create root element
-        int numberOfColumns = getNumberOfColumns(compiledDoc);
         Element root = doc.createElement("root");
         root.setAttribute("maxColumnNumber", String.valueOf(numberOfColumns));
         doc.appendChild(root);
 
         //for each contact node
         NodeList contactList = compiledDoc.getElementsByTagName("contact");
-        int temp1 = contactList.getLength();
         for (int i=0; i<contactList.getLength(); i++){
             //create contact element and uncategorized element
             Element contact = root.getOwnerDocument().createElement("contact");
@@ -60,28 +129,61 @@ public class ReadCompiledDoc implements InputFilter{
             Element uncategorized = contact.getOwnerDocument().createElement("uncategorized");
             contact.appendChild(uncategorized);
 
+            //a List to help detecting aggregations
+            ArrayList<Integer> indexesUsedInThisContact = new ArrayList<Integer>();
+
+            //a List to help detecting unused columns
+            ArrayList<Integer> columnsUsedInThisContact = new ArrayList<Integer>();
+
             //for each data node of the contact
-            Element cont = (Element) contactList.item(i);
-            NodeList dataList = cont.getChildNodes();
+            Element contactElement = (Element) contactList.item(i);
+            NodeList dataList = contactElement.getChildNodes();
+            //first, go through data and put them into correct columns
             for (int j=0; j<dataList.getLength(); j++){
-                int temp = dataList.getLength();
-                //create data element and fill it with value
+                Element dataElement = (Element) dataList.item(j);
+
+                //get the index in CompiledDoc
+                int indexCD;
+                try {
+                    indexCD = Integer.parseInt(dataElement.getAttribute("columnCounter"));
+                } catch (NumberFormatException numberFormatException) {
+                    indexCD = 10000;
+                }
+
+                //add the index to used
+                indexesUsedInThisContact.add(indexCD);
+
+                //get the correct column for the field -> corresponding array int the indexesTable and corresponding index in the array
+                int column = indexesTable.get(indexCD).get(getNumberOfDuplicates(indexesUsedInThisContact, indexCD)-1);
+
+                if (columnsUsedInThisContact.contains(column)){
+                    System.err.println("ReadCompiledDoc ERROR: tried to use allready used column - errNo: 3");
+                    return null;
+                }
+
+                //create data element and fill it with column index
                 Element data = uncategorized.getOwnerDocument().createElement("data");
-                data.setAttribute("counter", String.valueOf(j));
-                data.setTextContent(dataList.item(j).getTextContent());
+                data.setAttribute("counter", String.valueOf(column));
+                data.setTextContent(dataElement.getTextContent());
                 uncategorized.appendChild(data);
+                
+                //add the column to used
+                columnsUsedInThisContact.add(column);
             }
 
-            //the rest will be empty data nodes
-            for (int j=dataList.getLength(); j<numberOfColumns; j++){
-                Element data = uncategorized.getOwnerDocument().createElement("data");
-                data.setAttribute("counter", String.valueOf(j));
-                uncategorized.appendChild(data);
+            //go through all columns and create the empty ones
+            for (int j=0; j<numberOfColumns; j++){
+                //if the column has not been used -> it is empty
+                if (!columnsUsedInThisContact.contains(j)) {
+                    Element data = uncategorized.getOwnerDocument().createElement("data");
+                    data.setAttribute("counter", String.valueOf(j));
+                    uncategorized.appendChild(data);
+                }
             }
         }
 
         // <editor-fold defaultstate="collapsed" desc="print to System.err">
-        System.err.println("");
+        System.err.println("\n Returning InternalDoc:");
         if (doc == null) {
             System.err.println("Document is null!!!");
         } else {
@@ -108,17 +210,16 @@ public class ReadCompiledDoc implements InputFilter{
     }
 
     public InternalDocColumnSchema getColumnSchema() {
-        columnSchema = new InternalDocColumnSchemaImpl(getNumberOfColumns(compiledDoc));
+        columnSchema = new InternalDocColumnSchemaImpl(numberOfColumns);
         return columnSchema;
     }
 
-    private int getNumberOfColumns(Document compiledDoc){
+    private int getNumberOfDuplicates(ArrayList<Integer> list, Integer item){
         int result = 0;
-        NodeList contactList = compiledDoc.getElementsByTagName("contact");
-        for (int i=0; i<contactList.getLength(); i++){
-            int numberOfItems = contactList.item(i).getChildNodes().getLength();
-            if (numberOfItems > result){
-                result = numberOfItems;
+        if (list.contains(item)){
+            for (Integer i : list){
+                if (i==item)
+                    result++;
             }
         }
         return result;
