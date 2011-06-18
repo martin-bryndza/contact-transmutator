@@ -18,6 +18,8 @@ import java.util.HashMap;
  */
 public interface InternalDocColumnSchema {
 
+        public InternalDocColumnSchema returnClonedColumnSchema();
+ 
     /**
      * Is column merged in other column/mergeset?
      *

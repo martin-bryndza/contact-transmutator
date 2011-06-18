@@ -193,9 +193,11 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
         } catch (TransformerConfigurationException ex) {
             Logger.getLogger(InternalDocColumnSchemaImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
-            String result = null;
+           // String result = null;
+
+            DOMResult result = new DOMResult();
         try {
-            trans.transform(new DOMSource(newDoc), new StreamResult(result));
+            trans.transform(new DOMSource(newDoc), result);
         } catch (TransformerException ex) {
             Logger.getLogger(InternalDocColumnSchemaImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -208,13 +210,10 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(ReadCSV.class.getName()).log(Level.SEVERE, null, ex);
         }
-        try {
-            doc = db.parse(result);
-        } catch (SAXException ex) {
-            Logger.getLogger(InternalDocColumnSchemaImpl.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(InternalDocColumnSchemaImpl.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        doc = (Document)result.getNode();
+
+        //doc = db.parse(result);
+
 
         findRoot();
 
