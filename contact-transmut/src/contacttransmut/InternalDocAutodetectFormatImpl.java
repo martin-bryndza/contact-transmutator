@@ -22,7 +22,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
+ * Experimental class for type autodetection of columns.
  *
+ * This class is not used in the app currently and is only proof-of-work in progress.
+ * Please ignore
+ * 
  * @author jakub svoboda
  */
 public class InternalDocAutodetectFormatImpl /*implements InternalDocAutodetectFormat */ {

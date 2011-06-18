@@ -28,12 +28,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-/**
- *
- * @author jakub svoboda
- */
 
-/*
+/**
+ * ColumnSchema implementation.
+ *
  * Make W3C XML DOM for managing column schema.
  * This column schema will be used by:
  * 1) auto-detection
@@ -57,6 +55,8 @@ import org.w3c.dom.NodeList;
  * 
  * bear in mind the result should be VCF-compatible
  *
+ * some of the features may not be currently implemented, refer to the source code
+ *
  * notes:
  * column
  *   mergedinother - merged in set?
@@ -77,7 +77,7 @@ import org.w3c.dom.NodeList;
  *                       yes->some columns can be ommited and swaps are automatically detected
  *     type - present only when autodetectswaps="yes"
  *       number - corresponding //aggregatedcolumns/column@number
- *         regexp - redefine regular expression to detect this column type
+ *         regexp - redefine regular expression to detect this column type - currently not implemented
  * candidatetype - type of column based on auto-detection (values from VCFHelperEnum.toString())
  * selectedtype - type of column selected by user (values from VCFHelperEnum.toString())
  * mergein
@@ -144,6 +144,9 @@ import org.w3c.dom.NodeList;
  *   </columnschema>
  * </root>
  *
+ * JavaDoc comments from Interface are applicable.
+ * 
+ * @author Jakub Svoboda
  */
 public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
@@ -152,6 +155,10 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
     private DocumentBuilderFactory dbf;
     private DocumentBuilder db;
 
+    /**
+     * Constructor. Only number of columns is specified - this only parameter cannot be changed for existing columnschema.
+     * @param columns number of columns
+     */
     public InternalDocColumnSchemaImpl(Integer columns) {
         // create new internal XML DOM for processing the data
         dbf = DocumentBuilderFactory.newInstance();
@@ -169,6 +176,12 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
         addColumns(columns);
     }
 
+    /**
+     * Internal helper method. Returns NodeList for given XPath expression.
+     * Handy for selecting multiple nodes based on some criteria.
+     * @param newXpath XPath expression to select nodes
+     * @return NodeList of selected nodes
+     */
     private NodeList returnXPathNodeList(String newXpath) {
         XPath xpath = XPathFactory.newInstance().newXPath(); //new xpath
         NodeList dataNodeList = null;
@@ -180,6 +193,11 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
         return dataNodeList;
     }
 
+    /**
+     * Helper method that returns first element of a NodeList
+     * @param dataNodeList input NodeList
+     * @return first Element in NodeList (=not first Node)
+     */
     private Element returnFirstElement(NodeList dataNodeList) {
         if (dataNodeList.getLength() <= 0){
             return new ElementImpl(new DocumentImpl(), "null");
@@ -195,8 +213,11 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
         return retElement;
     }
 
-    //the document is public and accessible outside
-    //each InternalDocColumnSchemaImpl method should locate columnschema element again (document could have been replaced and the root variable voided)
+ 
+    /**
+     * Helper method that locates root of the ColumnSchema Document. Handy in case the document changed before.
+     * each InternalDocColumnSchemaImpl method should locate columnschema element again (document could have been replaced and the root variable voided)
+     */
     private void findRoot() {
         NodeList dataNodeList = returnXPathNodeList("//columnschema");
 
@@ -206,6 +227,11 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
     //say I have read document with maxColumnNumber="7"
     //so there are 8 columns in there
     //so I’ll just call addColumns(8)
+    /**
+     * Private helper method to initialize ColumnSchema with given number of columns.
+     *
+     * @param numOfColumns number of columns
+     */
     private void addColumns(Integer numOfColumns) {
         findRoot();
 
@@ -226,6 +252,14 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
         return queryNumberedElementAttributeYesNo(colNumber, "//columnschema/column", "aggregated");
     }
 
+    /**
+     * Helper method that queries whether given column has given attribute set.
+     * Please read and understand the source code before using this method.
+     * @param colNumber number of column
+     * @param newXpath XPath to locate certain column’s Element
+     * @param attribute name of attribute
+     * @return true if set, false if not set or not meaningful
+     */
     private boolean queryNumberedElementAttributeYesNo(Integer colNumber, String newXpath, String attribute) {
         NodeList dataNodeList = returnXPathNodeList(newXpath + "[@number=\"" + colNumber.toString() + "\"]");
 

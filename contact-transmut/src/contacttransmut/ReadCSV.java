@@ -17,6 +17,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
+ * ReadCSV implementation of Input filter.
+ * Reads correct and even broken CSV files.
  *
  * @author jakub svoboda
  */
@@ -34,6 +36,13 @@ public class ReadCSV implements InputFilter {
      * other methods (eg. readVCF()) should return ColumnSchema to identify the columns
      */
 
+    /**
+     * Constructor. Parameters are specified here and read is triggered by calling read() method.
+     * @param aFileName input file filename/path
+     * @param aEncoding input file encoding (eg. UTF-8 for UTF-8)
+     * @param aDelimiter delimiter for delimiting cells used in file
+     * @param aQuote quote used for delimiting cells in file
+     */
     public ReadCSV(String aFileName, String aEncoding, String aDelimiter, String aQuote) {
         fileEncoding = aEncoding;
         fileFileName = aFileName;
@@ -55,9 +64,11 @@ public class ReadCSV implements InputFilter {
 
 
 
-    //Todo: write javadoc
-    //this method’s implementation is completed and will not be changed
     //this is CSV-to-XML parser
+    /**
+     * Reads specified file and outputs raw "InternalDoc" Document
+     * @return Document for use in GUI and compiler
+     */
     public Document read() {
 
         Integer maxI = 0;
@@ -227,6 +238,10 @@ public class ReadCSV implements InputFilter {
         return doc;
     }
 
+    /**
+     * Returns blank columnschema
+     * @return blank columnschema for the read data
+     */
     public InternalDocColumnSchema getColumnSchema() {
         NodeList contactList = doc.getElementsByTagName("contact");
         int maxNumberOfColumns = 0;

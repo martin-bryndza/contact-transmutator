@@ -1,32 +1,14 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package contacttransmut;
 
 /**
+ * VCF Helper that helps with knowledge of what type can have multiple instances in VCF (cardinality)
  *
- * @author jakub svoboda
- */
-
-/* PLEASE READ THIS!
- * This class should have two tasks:
- *
- * Task 1
- * ======
  * VCFHelper is queried whether there can be more fields of XXXXX type per contact
  *  - returns true/false
  *
- * Task 2
- * ======
- * There is no method for this task, but pay attention:
- * There is be a list of VCF data types in VCFHelperImpl.
- * Others should take this list and use it in their classes. For instance in GUI.
- * The GUI should only allow user to choose columns that are from this list and disable
- * "next" button if there are some columns without "SelectedType" from this list!
- * If this is fulfilled, there is no need to check VCF conformity in every damn class then,
- * so please respect this!
  *
+ * @author jakub svoboda
  */
 public interface VCFHelper {
     //constructor should take InternalDocColumnSchema

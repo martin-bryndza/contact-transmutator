@@ -49,6 +49,12 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
     private VCFHelper outFormValidtr;
     private boolean errorsDetected;
 
+    /**
+     * Constructor.
+     * Reads "InternalDoc" and "ColumnSchema". Compiles upon calling compile() method. Then outputs "CompiledDoc" via one output method.
+     * @param newDocRawReadTextDoc "InternalDoc" to process
+     * @param newDocColumnSchema "ColumnSchema" to process
+     */
     public InternalDocCompiler(Document newDocRawReadTextDoc, InternalDocColumnSchema newDocColumnSchema) {
         System.err.println("blabla5: called");
         docRawReadTextDoc = newDocRawReadTextDoc;
@@ -80,6 +86,13 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
         rootDocRawReadTextDoc = returnFirstElement(docRawReadTextDocNodeList);
     }
 
+    /**
+     * Private helper method.
+     * Returns NodeList selected by XPath over specified Document
+     * @param document Document to search
+     * @param newXpath XPath expression to use
+     * @return NodeList of selected nodes
+     */
     private NodeList returnXPathNodeList(Document document, String newXpath) {
         XPath xpath = XPathFactory.newInstance().newXPath(); //new xpath
         NodeList dataNodeList = null;
@@ -91,6 +104,11 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
         return dataNodeList;
     }
 
+    /**
+     * Helper method that returns first element of a NodeList
+     * @param dataNodeList input NodeList
+     * @return first Element in NodeList (=not first Node)
+     */
     private Element returnFirstElement(NodeList dataNodeList) {
         Element retElement = null;
         for (int i = 0; i < dataNodeList.getLength(); i++) {
@@ -114,11 +132,28 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
      * </contacts>
      * </root>
      */
+    /**
+     * Private helper method. Writes a data field in the resulting CompiledDoc.
+     * @param contactNumber number of contact to write into
+     * @param dataType type of data (type of column)
+     * @param contents data contents
+     * @param canHaveMultipleRecordsOfSameDataType if set to false and already writing 2nd or more field of this type for this contact, exception will be thrown
+     * @throws DOMException
+     */
     private void writeField(Integer contactNumber, String dataType, String contents, boolean canHaveMultipleRecordsOfSameDataType) throws DOMException {
         System.err.println("short writeField called: Integer contactNumber="+contactNumber+", String dataType="+dataType+", String contents="+contents+", boolean canHaveMultipleRecordsOfSameDataType="+(canHaveMultipleRecordsOfSameDataType?"true":"false"));
         writeField(contactNumber, dataType, contents, canHaveMultipleRecordsOfSameDataType, false);
     }
 
+    /**
+     * Private helper method. Writes a data field in the resulting CompiledDoc.
+     * @param contactNumber number of contact to write into
+     * @param dataType type of data (type of column)
+     * @param contents data contents
+     * @param canHaveMultipleRecordsOfSameDataType if set to false and already writing 2nd or more field of this type for this contact, exception will be thrown
+     * @param thisIsOriginalNoteEmbedding if true, the data will be appended to existing field of this type if the field already exists; used for embedding original contacts into Note
+     * @throws DOMException
+     */
     private void writeField(Integer contactNumber, String dataType, String contents, boolean canHaveMultipleRecordsOfSameDataType, boolean thisIsOriginalNoteEmbedding) throws DOMException {
        System.err.println("long writeField called: Integer contactNumber="+contactNumber+", String dataType="+dataType+", String contents="+contents+", boolean canHaveMultipleRecordsOfSameDataType="+(canHaveMultipleRecordsOfSameDataType?"true":"false")+", boolean thisIsOriginalNoteEmbedding="+(thisIsOriginalNoteEmbedding?"true":"false"));
          Element field = null;
@@ -637,12 +672,20 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                         return docCompiled;
     }
 
+    /**
+     * Not used for this compiler. GUI and this compiler were designed together to catch errors in GUI, not in compiler.
+     * @return null Document
+     */
     public Document getCompiledInvalidContacts() {
                                          System.err.println("InternalDocCompiler-err023: DO NOT USE THIS METHOD! - getCompiledInvalidContacts called");
                                 //log event
       return null;
     }
 
+    /**
+     * Not used for this compiler. GUI and this compiler were designed together to catch errors in GUI, not in compiler.
+     * @return always true
+     */
     public boolean compileErrorsDetected() {
                                           System.err.println("InternalDocCompiler-err024: DO NOT USE THIS METHOD! - compileErrorsDetected called");
                                //log event

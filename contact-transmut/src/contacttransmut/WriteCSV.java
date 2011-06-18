@@ -17,8 +17,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
- *
- * @author ovečka
+ * WriteCSV implementation of OutputFilter.
+ * Experimental non-ideal implementation. Produces quite valid files, but doesn’t preserve order of columns.
+ * Will be fixed in future.
+ * @author Jakub Svoboda
  */
 public class WriteCSV implements OutputFilter {
     //CONSTRUCTOR: should allow to choose filename, encoding and filetype-specific parameters
@@ -33,6 +35,14 @@ public class WriteCSV implements OutputFilter {
     HashMap<Integer, ArrayList<String>> outputTableContents; //contents of the table
     ArrayList<VCFTypesEnum> outputTableHeader; //headers of the table - data types are written here
 
+    /**
+     * Constructor. Parameters are specified here and write is triggered by calling write() method.
+     * @param aFileName output file filename/path
+     * @param aEncoding output file encoding (eg. UTF-8 for UTF-8)
+     * @param aDelimiter delimiter for delimiting cells used in file
+     * @param aQuote quote used for delimiting cells in file
+     * @param aCompiledDoc input CompiledDoc that will be converted into resulting CSV file
+     */
     public WriteCSV(String aFileName, String aEncoding, String aDelimiter, String aQuote, Document aCompiledDoc) {
         // ignore this // System.err.println("WriteCSV");
         fileEncoding = aEncoding;
@@ -48,6 +58,12 @@ public class WriteCSV implements OutputFilter {
 
     }
 
+    /**
+     * Private helper method that writes cell into the spreadsheet.
+     * @param contactNumber Number of contact/row
+     * @param type Type/column
+     * @param contents contents
+     */
     private void addCell(Integer contactNumber, VCFTypesEnum type, String contents) {
         //helper method to write single cell into the table
 // ignore this // System.err.println("addcell(contactNumber="+contactNumber+", type="+type+", contents="+contents);
@@ -122,7 +138,9 @@ public class WriteCSV implements OutputFilter {
         }
     }
 
-    //writes the CompiledDoc in appropriate format to the file got in constructor
+    /**
+     * writes the CompiledDoc in appropriate format to the file specified in constructor
+     */
     public void write() {
 
         NodeList contactsNL = rootCompiledDoc.getChildNodes(); //get all the contacts in nodelist
