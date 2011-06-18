@@ -278,6 +278,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                     if ((!(contents.trim().equals(""))) && (!(/*if column is planned for deletion, ignore*/docColumnSchema.querySelectedtypeType(counter).equals("DELETE_THIS")))) {
                         if (docColumnSchema.isColumnAggregated(counter)) { //aggregated column...
                             // ============== AGGREGATED COLUMN =============
+                            System.err.println("compiler aggr");
                             Integer numOfColumns = docColumnSchema.queryAggregateSettingNumberofcolumns(counter);
                             if (numOfColumns == null) {
                                 System.err.println("InternalDocCompiler-err001: AGGREGATED: numOfColumns == null");
@@ -489,6 +490,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
 
                                 }
                             } else { //only make new columns
+                                System.err.println("only new columns");
                                 // ******** AGGREGATED, ONLY SPLIT COLUMNS *********
                                 Scanner contentsScanner = new Scanner(contents);
                                 String delimiter1 = docColumnSchema.queryAggregateSettingDelimiter(counter);
@@ -497,10 +499,11 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                     //log event
                                 }
                                 contentsScanner.useDelimiter(delimiter1);
-                                String writeContents = null;
+                                String writeContents = "";
                                 Integer columnAggrCounter = 0;
                                 boolean moreThanOne = false;
                                 while (contentsScanner.hasNext()) {
+                                    System.err.println("while (contentsScanner.hasNext()) columnAggrCounter="+columnAggrCounter+", numOfColumns="+numOfColumns);
                                     if (columnAggrCounter < (numOfColumns - 1)) { //write directly to a new field
                                         String thisAggrFieldType = docColumnSchema.queryAggregatedCandidateType(counter, columnAggrCounter);
                                         if (thisAggrFieldType == null) {
@@ -511,11 +514,12 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                             //log event
                                         }
                                         String thisAggrContents = contentsScanner.next();
+                                        System.err.println("thisAggrContents="+thisAggrContents);
                                         try {
                                             if (countAllColumns) {
-                                                writeField(rawContCount, thisAggrFieldType, thisAggrContents, outFormValidtr.vcfCanHaveMultipleInstances(counter), counter);
+                                                writeField(rawContCount, thisAggrFieldType, thisAggrContents, outFormValidtr.vcfCanHaveMultipleInstances(thisAggrFieldType), counter);
                                             } else {
-                                                writeField(rawContCount, thisAggrFieldType, thisAggrContents, outFormValidtr.vcfCanHaveMultipleInstances(counter));
+                                                writeField(rawContCount, thisAggrFieldType, thisAggrContents, outFormValidtr.vcfCanHaveMultipleInstances(thisAggrFieldType));
                                             }
                                         } catch (DOMException e) {
                                             System.err.println("InternalDocCompiler-err013: writeField(rawContCount, thisAggrFieldType, thisAggrContents, outFormValidtr.vcfCanHaveMultipleInstances(counter)) failed");
@@ -523,14 +527,17 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                         }
                                         columnAggrCounter++;
                                     } else { //commit to writeContents
-                                        writeContents += contentsScanner.next();
+                                        System.err.println("commit to writeContents morethanone="+(moreThanOne?"true":"false")+", writeContents="+writeContents);
                                         if (moreThanOne) { //if there are any overflown data
                                             writeContents += delimiter1;
                                         }
+                                        writeContents += contentsScanner.next();
                                         moreThanOne = true;
+                                            System.err.println("writeContents="+writeContents);
                                     }
                                 }
-                                if (writeContents != null) { //commit overflown data if any
+                                if (!writeContents.equals("")) { //commit overflown data if any
+                                    System.err.println("commit overflown data if any");
                                     String thisAggrFieldType = docColumnSchema.queryAggregatedCandidateType(counter, columnAggrCounter);
                                     if (thisAggrFieldType == null) {
                                         thisAggrFieldType = docColumnSchema.queryAggregatedSelectedtypeType(counter, columnAggrCounter);
@@ -541,9 +548,9 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                     }
                                     try {
                                         if (countAllColumns) {
-                                            writeField(rawContCount, thisAggrFieldType, writeContents, outFormValidtr.vcfCanHaveMultipleInstances(counter), counter);
+                                            writeField(rawContCount, thisAggrFieldType, writeContents, outFormValidtr.vcfCanHaveMultipleInstances(thisAggrFieldType), counter);
                                         } else {
-                                            writeField(rawContCount, thisAggrFieldType, writeContents, outFormValidtr.vcfCanHaveMultipleInstances(counter));
+                                            writeField(rawContCount, thisAggrFieldType, writeContents, outFormValidtr.vcfCanHaveMultipleInstances(thisAggrFieldType));
                                         }
 
                                     } catch (DOMException e) {
@@ -575,20 +582,23 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
                                 //TODO: jakub svoboda check corectness and tidy up
                             } else { //normal column...                                //normal column...
                                 // =========== NORMAL COLUMN ===========
+                                System.err.println("NORMAL COLUMN counter="+counter);
+                                System.err.println("candidate="+docColumnSchema.queryCandidateType(counter)+", selected="+docColumnSchema.querySelectedtypeType(counter));
                                 String type = docColumnSchema.querySelectedtypeType(counter);
                                 if (type == null) {
                                     type = docColumnSchema.queryCandidateType(counter);
                                 }
                                 if (type == null) {
-                                    System.err.println("InternalDocCompiler-err018: MERGESET: type == null");
+                                    System.err.println("InternalDocCompiler-err018: normal: type == null");
                                     //log event
                                 }
+                                System.err.println("type="+type);
 
                                 try {
                                     if (countAllColumns) {
-                                        writeField(rawContCount, type, contents, outFormValidtr.vcfCanHaveMultipleInstances(counter), counter);
+                                        writeField(rawContCount, type, contents, outFormValidtr.vcfCanHaveMultipleInstances(type), counter);
                                     } else {
-                                        writeField(rawContCount, type, contents, outFormValidtr.vcfCanHaveMultipleInstances(counter));
+                                        writeField(rawContCount, type, contents, outFormValidtr.vcfCanHaveMultipleInstances(type));
                                     }
 
                                 } catch (DOMException e) {

@@ -37,13 +37,13 @@ public class Main {
             
              System.out.println("Ukazka vstupniho filtru:");
            
-            String fileName = "csv.csv";
+            //String fileName = "csv.csv";
             String encoding = "UTF-8";
-            InputFilter test = new ReadCSV(fileName, encoding, ",", "\"");
+            //InputFilter test = new ReadCSV(fileName, encoding, ",", "\"");
             
-            // pre test ods xml odkomentuj tieto riadky   --Martina
-            //String fileName = "content.xml";
-            //InputFilter test = new ODSInput(fileName);
+             //pre test ods xml odkomentuj tieto riadky   --Martina
+            String fileName = "content.xml";
+            InputFilter test = new ODSInput(fileName);
             
             // Test nacitani VCF
             // String fileName = "test.vcf";
@@ -56,7 +56,7 @@ public class Main {
             Transformer trans = null;
             trans = tf.newTransformer();
             trans.transform(new DOMSource(loadedContacts), new StreamResult(System.out));
-
+/*
             System.out.println("");
             System.out.println("Ukazka vystupniho filtru (otevri vystupni soubor):");
                 DocumentBuilderFactory factoryWC = DocumentBuilderFactory.newInstance();
@@ -77,7 +77,7 @@ public class Main {
             //OutputFilter testWriteCSV = new WriteCSV("csvout.csv", "UTF-8", ",", "\"", docWC);
                 OutputFilter testWriteCSV = new ODSWrite("sem.xml",  docWC);
             testWriteCSV.write();
-            
+ */
             
         }
 
