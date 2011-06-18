@@ -18,6 +18,10 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -34,7 +38,7 @@ public class ReadCompiledDoc implements InputFilter{
     private DocumentBuilder db;
     private Document doc;  //internalDoc
     private int numberOfColumns;
-    private HashMap<Integer,ArrayList<Integer>> indexesTable;
+    private HashMap<Integer,ArrayList<Integer>> indexesTable; //<index of column in CompiledDoc, index in output>
     private boolean stateIsOK = true;
 
     public ReadCompiledDoc(Document compiledDoc){
@@ -210,11 +214,31 @@ public class ReadCompiledDoc implements InputFilter{
         }
         //</editor-fold>
 
-            return doc;
+        return doc;
     }
 
     public InternalDocColumnSchema getColumnSchema() {
         columnSchema = new InternalDocColumnSchemaImpl(numberOfColumns);
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        for (Integer index : indexesTable.keySet()) {
+            NodeList indexToColumnData = null;
+            try {
+                indexToColumnData = (NodeList) xpath.evaluate("//contact[count(*[@columnCounter=" + index + "]) = " + indexesTable.get(index).size() + "][1]/*[@columnCounter=" + index + "]", compiledDoc, XPathConstants.NODESET);
+            } catch (XPathExpressionException ex) {
+                Logger.getLogger(ReadCompiledDoc.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (indexToColumnData == null) {
+                System.err.println("Error while parsing compiled doc into column schema - errNo:4");
+                return null;
+            }
+            int iterator = 0;
+            for (Integer column : indexesTable.get(index)){
+                String type = ((Element)indexToColumnData.item(iterator)).getTagName();
+                columnSchema.setCandidateType(column, type);
+                columnSchema.setSelectedtypeType(column, type);
+                iterator++;
+            }
+        }
         return columnSchema;
     }
 

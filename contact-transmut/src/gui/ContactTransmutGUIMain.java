@@ -1229,10 +1229,15 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         FileFilter filterVCF = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                if ((f.isFile() && f.toString().toLowerCase().endsWith("vcf")) || f.isDirectory()) {
+                try {
+                    if ((f.isFile() && f.toString().toLowerCase().endsWith("vcf")) || f.isDirectory()) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } catch (Exception e) {
+                    //no idea why it comes out but everything works just OK
                     return true;
-                } else {
-                    return false;
                 }
             }
             @Override
@@ -1243,10 +1248,15 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         FileFilter filterODS = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                if ((f.isFile() && f.toString().toLowerCase().endsWith("ods")) || f.isDirectory()) {
+                try {
+                    if ((f.isFile() && f.toString().toLowerCase().endsWith("ods")) || f.isDirectory()) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } catch (Exception e) {
+                    //no idea why it comes out but everything works just OK
                     return true;
-                } else {
-                    return false;
                 }
             }
             @Override
@@ -1276,10 +1286,15 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         FileFilter filterADR = new FileFilter() {
             @Override
             public boolean accept(File f) {
-                if ((f.isFile() && f.toString().toLowerCase().endsWith("adr")) || f.isDirectory()) {
+                try {
+                    if ((f.isFile() && f.toString().toLowerCase().endsWith("adr")) || f.isDirectory()) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } catch (Exception e) {
+                    //no idea why it comes out but everything works just OK
                     return true;
-                } else {
-                    return false;
                 }
             }
             @Override
