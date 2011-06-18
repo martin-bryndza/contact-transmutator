@@ -28,6 +28,8 @@ public class ODSInput implements InputFilter {
     private DocumentBuilder builderODS;
     private Document document;
     private Document documentODS;
+    private Integer maxColumns;
+    private Element outputRoot;
     
     public ODSInput(String nameFile) throws SAXException, ParserConfigurationException, IOException, Exception{
         
@@ -43,6 +45,7 @@ public class ODSInput implements InputFilter {
        
         document = builder.newDocument();
         Element root = document.createElement("root");
+        outputRoot = root;
         document.appendChild(root);
         
        //nacitanie ODS do pamate; Ak sa nepodari, vyhodi vynimku 
@@ -63,7 +66,7 @@ public class ODSInput implements InputFilter {
      * @param doc - nacitane ODS v pamati
      * @return maximalny pocet stlpcov
      */
-    public Integer maxPocetStlpcov(Document doc){
+    private Integer maxPocetStlpcov(Document doc){
         int number = 0; // maximalny pocet stlpcov
         
         // vytvorenie zoznamu tabuliek z listov ODS
@@ -86,7 +89,9 @@ public class ODSInput implements InputFilter {
                        NamedNodeMap mapaAtributov = elementColumns.getAttributes();
                        
                        //hladanie informacie o pocte stlpcov v tabulke a nasledne porovnanie
-                       int hodnota = Integer.parseInt(mapaAtributov.getNamedItem("table:number-columns-repeated").getNodeValue());
+                       int hodnota = 0;
+                       hodnota = Integer.parseInt(mapaAtributov.getNamedItem("table:number-columns-repeated").getNodeValue());
+
                        if(hodnota > number){number = hodnota;}
                    }
                }
@@ -100,6 +105,7 @@ public class ODSInput implements InputFilter {
      * @return vnutorne XML DOM
      */
     public Document read(){
+        Integer maxColumnInRead = 0;
         //najdenie korenoveho tagu
         Element koren = document.getDocumentElement();
         
@@ -119,25 +125,32 @@ public class ODSInput implements InputFilter {
                 // kontrola, ci ide o riadok tabulky (inak riadiaca informacia)
                 if(row.getNodeName().equals("table:table-row") == true){
                     //vlozenie noveho kontaktu do XML DOM
-                    Element novyKontakt = document.createElement("contact");
-                    koren.appendChild(novyKontakt);
-                    
+                    Element novyKontakt0 = document.createElement("contact");
+                    Element novyKontakt = document.createElement("uncategorized");
+                    koren.appendChild(novyKontakt0);
+                    novyKontakt0.appendChild(novyKontakt);
+
+                    Integer cislovani = -1;
+
                     //zoznam potencialnych buniek v riadku
                     NodeList listOfCells = row.getChildNodes();
                     for(int k = 0; k < listOfCells.getLength(); k++){
                         Node cell = listOfCells.item(k);
-                        
-                        // Kontrola, ci ide o bunku tabulky
+
+                       // Kontrola, ci ide o bunku tabulky
                         if(cell.getNodeName().equals("table:table-cell") == true){
+                            cislovani++; //i prazdna bunka data musi byt zapisana a ocislovana
+                            if (cislovani>maxColumnInRead) maxColumnInRead = cislovani;
+                            Element zaznam = document.createElement("data");
+                            zaznam.setAttribute("counter", cislovani.toString());
+                            novyKontakt.appendChild(zaznam);
                             
-                            if(cell.hasChildNodes() == true){
+                            if(cell.hasChildNodes() == true){ // pokial ma bunka data
                                 
                                 // zapis obsahu bunky do zaznamu kontaktu
                                 String text = cell.getTextContent().trim();
-                                Element zaznam = document.createElement("uncategorized");
-                                zaznam.setTextContent(text);
-                                novyKontakt.appendChild(zaznam);
                                 
+                                zaznam.setTextContent(text);                              
                             }
                             
                         }
@@ -149,6 +162,8 @@ public class ODSInput implements InputFilter {
                 }
             }
         }
+        maxColumns = maxColumnInRead;
+        outputRoot.setAttribute("maxColumnNumber", maxColumnInRead.toString());
          return document;
     }
     
@@ -159,9 +174,11 @@ public class ODSInput implements InputFilter {
      */
     public InternalDocColumnSchema getColumnSchema() {
         // vypocet maximalneho poctu stlpcov
-        Integer maxStlpcov = maxPocetStlpcov(documentODS);
+//        Integer maxStlpcov = maxPocetStlpcov(documentODS);
+
         //Vytvorenie schemy
-        InternalDocColumnSchema novaSchema = new InternalDocColumnSchemaImpl(maxStlpcov);
+//        InternalDocColumnSchema novaSchema = new InternalDocColumnSchemaImpl(maxStlpcov);
+        InternalDocColumnSchema novaSchema = new InternalDocColumnSchemaImpl(maxColumns);
         return novaSchema;
     }
     
