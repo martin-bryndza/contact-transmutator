@@ -7,6 +7,7 @@ package contacttransmut;
 import com.sun.org.apache.xerces.internal.dom.DocumentImpl;
 import com.sun.org.apache.xerces.internal.dom.ElementImpl;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -15,8 +16,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
@@ -27,6 +30,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -174,6 +178,52 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
         root0.appendChild(root);
 
         addColumns(columns);
+    }
+
+    /**
+     * Contructor used for cloning
+     * @param newDoc internal InternalDocColumnSchemaImpl’s Document that will be parsed and duplicated (providing deep copy of InternalDocColumnSchemaImpl)
+     */
+        private InternalDocColumnSchemaImpl(Document newDoc) {
+
+           TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer trans = null;
+        try {
+            trans = tf.newTransformer();
+        } catch (TransformerConfigurationException ex) {
+            Logger.getLogger(InternalDocColumnSchemaImpl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            String result = null;
+        try {
+            trans.transform(new DOMSource(newDoc), new StreamResult(result));
+        } catch (TransformerException ex) {
+            Logger.getLogger(InternalDocColumnSchemaImpl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+        // create new internal XML DOM for processing the data
+        dbf = DocumentBuilderFactory.newInstance();
+        try {
+            db = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(ReadCSV.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            doc = db.parse(result);
+        } catch (SAXException ex) {
+            Logger.getLogger(InternalDocColumnSchemaImpl.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(InternalDocColumnSchemaImpl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        findRoot();
+
+    }
+
+    public InternalDocColumnSchema returnClonedColumnSchema() {
+        System.err.println("new column schema created!");
+        InternalDocColumnSchema newSchema = new InternalDocColumnSchemaImpl(doc);
+        return newSchema;
     }
 
     /**
