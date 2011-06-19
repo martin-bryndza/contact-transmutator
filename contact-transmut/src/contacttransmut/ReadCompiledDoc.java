@@ -191,27 +191,27 @@ public class ReadCompiledDoc implements InputFilter{
         }
 
         // <editor-fold defaultstate="collapsed" desc="print to System.err">
-        System.err.println("\n Returning InternalDoc:");
-        if (doc == null) {
-            System.err.println("Document is null!!!");
-        } else {
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            TransformerFactory tf = TransformerFactory.newInstance();
-            Transformer trans = null;
-            try {
-                trans = tf.newTransformer();
-                trans.transform(new DOMSource(doc), new StreamResult(stream));
-            } catch (TransformerException ex) {
-                Logger.getLogger(Document.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            String rawIntDoc = stream.toString();
-            rawIntDoc = rawIntDoc.replaceAll("/>", "/>\n");
-            rawIntDoc = rawIntDoc.replaceAll("</data>", "</data>\n");
-            rawIntDoc = rawIntDoc.replaceAll("<contact>", "<contact>\n");
-            rawIntDoc = rawIntDoc.replaceAll("</contact>", "</contact>\n\n");
-            rawIntDoc = rawIntDoc.replaceAll("uncategorized>", "uncategorized>\n");
-            System.err.println(rawIntDoc);
-        }
+//        System.err.println("\n Returning InternalDoc:");
+//        if (doc == null) {
+//            System.err.println("Document is null!!!");
+//        } else {
+//            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//            TransformerFactory tf = TransformerFactory.newInstance();
+//            Transformer trans = null;
+//            try {
+//                trans = tf.newTransformer();
+//                trans.transform(new DOMSource(doc), new StreamResult(stream));
+//            } catch (TransformerException ex) {
+//                Logger.getLogger(Document.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//            String rawIntDoc = stream.toString();
+//            rawIntDoc = rawIntDoc.replaceAll("/>", "/>\n");
+//            rawIntDoc = rawIntDoc.replaceAll("</data>", "</data>\n");
+//            rawIntDoc = rawIntDoc.replaceAll("<contact>", "<contact>\n");
+//            rawIntDoc = rawIntDoc.replaceAll("</contact>", "</contact>\n\n");
+//            rawIntDoc = rawIntDoc.replaceAll("uncategorized>", "uncategorized>\n");
+//            System.err.println(rawIntDoc);
+//        }
         //</editor-fold>
 
         return doc;

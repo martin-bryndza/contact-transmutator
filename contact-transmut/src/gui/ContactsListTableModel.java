@@ -7,6 +7,7 @@ package gui;
 
 import contacttransmut.InternalDocColumnSchema;
 import java.util.ArrayList;
+import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -23,10 +24,15 @@ public class ContactsListTableModel extends AbstractTableModel{
     private int rowCount = 0;
     private int columnCount = 0;
     private ArrayList<ArrayList<String>> data;
+    private JTable table;
+    private ArrayList<ArrayList<String>> dataCopied;
+    int[] selectedColumnsToCopy;
+    int[] selectedRowsToCopy;
 
-    public void initTable(Document internalD, InternalDocColumnSchema columnSch){
+    public void initTable(Document internalD, InternalDocColumnSchema columnSch, JTable table){
         internalDoc = internalD;
         columnSchema = columnSch;
+        this.table = table;
 
         NodeList contactList = internalDoc.getElementsByTagName("contact");
 
@@ -34,6 +40,8 @@ public class ContactsListTableModel extends AbstractTableModel{
         columnCount = columnSchema.getColumnCount();
 
         fireTableStructureChanged();
+
+        dataCopied = new ArrayList<ArrayList<String>>();
 
         data = new ArrayList<ArrayList<String>>();
         data.clear();
@@ -101,6 +109,61 @@ public class ContactsListTableModel extends AbstractTableModel{
         dataElement.setTextContent((String) aValue);
     }
 
+    void copyValues() {
+        selectedColumnsToCopy = table.getSelectedColumns();
+        selectedRowsToCopy = table.getSelectedRows();
+        dataCopied.clear();
+        for (Integer row : selectedRowsToCopy){
+            dataCopied.add(new ArrayList<String>());
+            for (Integer column : selectedColumnsToCopy){
+                dataCopied.get(row).add(data.get(row).get(column));
+            }
+        }
+    }
 
+    void pasteValues() {
+        int[] selectedColumnsToPaste = table.getSelectedColumns();
+        int[] selectedRowsToPaste = table.getSelectedRows();
+
+        int topMostRowSelectedToPaste = getRowCount();
+        for (Integer row : selectedRowsToPaste){
+            if (row<topMostRowSelectedToPaste)
+                topMostRowSelectedToPaste = row;
+        }
+
+        int topMostColumnSelectedToPaste = getColumnCount();
+        for (Integer column : selectedColumnsToPaste){
+            if (column<topMostColumnSelectedToPaste)
+                topMostColumnSelectedToPaste = column;
+        }
+
+        int topMostRowSelectedToCopy = getRowCount();
+        for (Integer row : selectedRowsToCopy){
+            if (row<topMostRowSelectedToCopy)
+                topMostRowSelectedToCopy = row;
+        }
+
+        int topMostColumnSelectedToCopy = getColumnCount();
+        for (Integer column : selectedColumnsToCopy){
+            if (column<topMostColumnSelectedToCopy)
+                topMostColumnSelectedToCopy = column;
+        }
+
+        int rowDifferenceIndex = topMostRowSelectedToPaste - topMostRowSelectedToCopy;
+        int columnDifferenceIndex = topMostColumnSelectedToPaste - topMostColumnSelectedToCopy;
+
+        for (int row = 0; row<dataCopied.size(); row++){
+            for (int column = 0; column<dataCopied.get(row).size(); column++){
+                int targetRow = selectedRowsToCopy[row]-rowDifferenceIndex;
+                int targetColumn = selectedColumnsToCopy[column]-columnDifferenceIndex;
+                if (targetRow < getRowCount() && targetColumn < getColumnCount())
+                    setValueAt(dataCopied.get(row).get(column),targetRow,targetColumn);
+            }
+        }
+    }
+
+    void deleteValues() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
 
 }

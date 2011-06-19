@@ -202,7 +202,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="jLayeredPane2" pref="442" max="32767" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Component id="jMainWindowShowColumnSchemaButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jMainWindowShowInternalDocButton" min="-2" max="-2" attributes="0"/>
@@ -235,7 +235,7 @@
                               </Group>
                           </Group>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -358,7 +358,7 @@
                 <Property name="autoResizeMode" type="int" value="0"/>
                 <Property name="cellSelectionEnabled" type="boolean" value="true"/>
                 <Property name="selectionModel" type="javax.swing.ListSelectionModel" editor="org.netbeans.modules.form.editors2.JTableSelectionModelEditor">
-                  <JTableSelectionModel selectionMode="1"/>
+                  <JTableSelectionModel selectionMode="2"/>
                 </Property>
               </Properties>
             </Component>

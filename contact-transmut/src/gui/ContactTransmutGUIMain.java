@@ -11,6 +11,7 @@
 
 package gui;
 
+import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
 import contacttransmut.InputFilter;
 import contacttransmut.InternalDoc2CompiledDoc;
 import contacttransmut.InternalDocColumnSchema;
@@ -25,9 +26,9 @@ import contacttransmut.VCFTypesEnum;
 import contacttransmut.WriteCSV;
 import contacttransmut.WriteVCF;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -65,6 +66,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 import javax.swing.SwingWorker;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.table.TableColumn;
 
 /**
@@ -95,6 +97,12 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
     /** Creates new form ContactTransmutGUIMain */
     public ContactTransmutGUIMain() {
+        try {
+            UIManager.setLookAndFeel(new NimbusLookAndFeel());
+        } catch (UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(ContactTransmutGUIMain.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         initComponents();
 
         jContactsListTable.setModel(tableModel);
@@ -106,6 +114,19 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         JScrollBar sb1 = jContactsListScrollPane.getHorizontalScrollBar();
         JScrollBar sb2 = jComboBoxesScrollPane.getHorizontalScrollBar();
         sb1.setModel(sb2.getModel());
+
+        jContactsListTable.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                if (evt.getKeyCode() == KeyEvent.VK_COPY){
+                    tableModel.copyValues();
+                } else if (evt.getKeyCode() == KeyEvent.VK_PASTE){
+                    tableModel.pasteValues();
+                } else if (evt.getKeyCode() == KeyEvent.VK_DELETE){
+                    tableModel.deleteValues();
+                }
+            }
+        });
 
     }
 
@@ -422,7 +443,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         ));
         jContactsListTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jContactsListTable.setCellSelectionEnabled(true);
-        jContactsListTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        jContactsListTable.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         jContactsListScrollPane.setViewportView(jContactsListTable);
 
         jComboBoxesScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
@@ -1191,15 +1212,13 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         columnSchema = inputFilter.getColumnSchema();
         //</editor-fold>
        
-        tableModel.initTable(internalDoc, columnSchema);
+        tableModel.initTable(internalDoc, columnSchema, jContactsListTable);
 
         
         comboMgr = new ComboBoxesManager();
         columnSchMgr = new ColumnSchemaManager();
 
         comboMgr.createMainComboBoxes();
-        comboMgr.updateComboBoxesEnabledValues(comboBoxes);
-        comboMgr.updateAddToNumbers();
 
         setVisible(false);
         jMainWindowFrame2.pack();
@@ -1661,7 +1680,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         });
         refreshSwingWorker.execute();
         updateStatusbarSwingWorker.execute();
-
 
     }//GEN-LAST:event_jMainWindowRefreshButton2MouseReleased
 
@@ -2309,7 +2327,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 int column = comboMgr.getIndexOfComboBox(combo);
                 if(column >=0 && columnSchema.isColumnMergedInOther(column) && columnSchema.queryMergeOrder(column) == 1){
                     comboMgr.setComboItemEnabled(combo, comboMgr.getIndexOfValue("DELETE_THIS"), false);
-                } else {
+                } else if (combo.getItemCount() > comboMgr.getIndexOfValue("DELETE_THIS")) {
                     comboMgr.setComboItemEnabled(combo, comboMgr.getIndexOfValue("DELETE_THIS"), true);
                 }
 
@@ -2555,11 +2573,9 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             jColumnToAddLabel.setText("-1");
             jAddToBaseColumnTextField.setText("-1");
 
-            tableModel.initTable(internalDoc, columnSchema);
+            tableModel.initTable(internalDoc, columnSchema, jContactsListTable);
 
             comboMgr.createMainComboBoxes();
-            comboMgr.updateComboBoxesEnabledValues(comboBoxes);
-            comboMgr.updateAddToNumbers();
 
             jRefreshProgressBar2.setVisible(false);
             jMainWindowStopButton2.setVisible(false);
@@ -2717,6 +2733,9 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             setButtonsEnabled(jMainWindowFrame2, true);
 
             jMainWindowFrame2.repaint();
+            jMainWindowFrame2.setVisible(true);
+
+            updateTableWidths();
         }
 
         @Override
@@ -2738,7 +2757,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             }
             return null;
         }
-
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
