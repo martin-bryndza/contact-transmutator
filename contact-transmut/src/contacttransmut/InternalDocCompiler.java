@@ -62,7 +62,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
     public InternalDocCompiler(Document newDocRawReadTextDoc, InternalDocColumnSchema newDocColumnSchema, boolean countColumns) {
         // ignore // System.err.println("blabla5: called");
         docRawReadTextDoc = newDocRawReadTextDoc;
-        docColumnSchema = newDocColumnSchema;
+        docColumnSchema = new InternalDocColumnSchemaReadOnlyCache(newDocColumnSchema);
         outFormValidtr = new VCFHelperImpl(docColumnSchema);
         countAllColumns = countColumns;
 
@@ -210,9 +210,19 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
     private void writeField(Integer contactNumber, String dataType, String contents, boolean canHaveMultipleRecordsOfSameDataType, boolean thisIsOriginalNoteEmbedding, Integer contentsColumnCount) throws DOMException {
         // ignore // System.err.println("long writeField called: Integer contactNumber=" + contactNumber + ", String dataType=" + dataType + ", String contents=" + contents + ", boolean canHaveMultipleRecordsOfSameDataType=" + (canHaveMultipleRecordsOfSameDataType ? "true" : "false") + ", boolean thisIsOriginalNoteEmbedding=" + (thisIsOriginalNoteEmbedding ? "true" : "false"));
         Element field = null;
-        NodeList nodes = returnXPathNodeList(docCompiled, "//contact[@number=\"" + contactNumber + "\"]");
+        //NodeList nodes = returnXPathNodeList(docCompiled, "//contact[@number=\"" + contactNumber + "\"]");
+        //this takes 71% of time according to profiler
+        //XPath must be substitued with w3c dom
+        NodeList nodes0 = rootDocCompiled.getElementsByTagName("contact");
+        Element foundContact0 = null;
+        for (int i = 0; i < nodes0.getLength(); i++) {
+            if ((((Element) nodes0.item(i)).getAttribute("number").trim()).equals(contactNumber.toString())) {
+                foundContact0 = (Element) nodes0.item(i);
+                break;
+            }
+        }
         String writeContents = contents;
-        if (nodes.getLength() == 0) { //create
+        if (/*nodes.getLength() == 0 */ foundContact0 == null) { //create
             // ignore // System.err.println("create hive");
             Element newContact = docCompiled.createElement("contact");
             newContact.setAttribute("number", contactNumber.toString());
@@ -225,7 +235,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
 
         } else { //update
             // ignore // System.err.println("update hive");
-            Element contact = returnFirstElement(nodes);
+            Element contact = /*returnFirstElement(nodes)*/ foundContact0;
             NodeList checkNodes = contact.getElementsByTagName(dataType);
             if (thisIsOriginalNoteEmbedding) {
                 if (checkNodes.getLength() == 0) {
@@ -276,6 +286,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
 
         for (int rawContCount = 0; rawContCount < rawContacts.getLength(); rawContCount++) {
             currentlyProccessingContact = rawContCount;
+            System.err.println("contact " + rawContCount + " from "+ maxContactsEvar);
             Element currentContactElement;
             if (rawContacts.item(rawContCount) instanceof Element) {
                 // ignore // System.err.println("blabla0: " + rawContacts.item(rawContCount).toString());

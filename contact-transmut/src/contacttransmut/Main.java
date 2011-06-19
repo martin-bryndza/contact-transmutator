@@ -35,28 +35,41 @@ public class Main {
         { //this is first basic test - load CSV into InternalDoc
             //This very simple code loads CSV into DOM tree and prints out the DOM tree along with some other information
             
-             System.out.println("Ukazka vstupniho filtru:");
-           
-            //String fileName = "csv.csv";
+            System.out.println("Ukazka vstupniho filtru:");
+
+            String fileName = "TESTkontakty.vcf";
             String encoding = "UTF-8";
-            //InputFilter test = new ReadCSV(fileName, encoding, ",", "\"");
-            
+            InputFilter test = new ReadVCF(fileName, encoding);
+
              //pre test ods xml odkomentuj tieto riadky   --Martina
             //String fileName = "content.xml";
-            String fileName = "odstest.ods";
-            InputFilter test = new ODSInput(fileName);
-            
+            //String fileName = "odstest.ods";
+            //InputFilter test = new ODSInput(fileName);
+
             // Test nacitani VCF
             // String fileName = "test.vcf";
             // InputFilter test = new ReadVCF(fileName, "UTF-8");
-            
+
             Document loadedContacts = test.read();
+            InternalDocColumnSchema columnschema =  test.getColumnSchema();
+            System.out.println(columnschema);
+
+            System.out.println("kompilace");
+
+            InternalDocCompiler compil = new InternalDocCompiler(loadedContacts, columnschema, false);
+            compil.compile();
 
             //print out result
             TransformerFactory tf = TransformerFactory.newInstance();
             Transformer trans = null;
             trans = tf.newTransformer();
             trans.transform(new DOMSource(loadedContacts), new StreamResult(System.out));
+
+            System.out.println();
+            System.out.println("compiled:");
+
+           trans.transform(new DOMSource(compil.getCompiledValidContacts()), new StreamResult(System.out));
+           
 /*
             System.out.println("");
             System.out.println("Ukazka vystupniho filtru (otevri vystupni soubor):");
