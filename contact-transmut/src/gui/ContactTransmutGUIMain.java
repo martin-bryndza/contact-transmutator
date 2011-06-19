@@ -1205,17 +1205,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jMainWindowFrame2.pack();
         jMainWindowFrame2.setVisible(true);
 
-        TableColumn column = null;
-        int width = comboBoxes.get(0).getWidth();
-        for (int i = 0; i < tableModel.getColumnCount(); i++) {
-            column = jContactsListTable.getColumnModel().getColumn(i);
-            column.setWidth(width);
-            column.setMaxWidth(width);
-            column.setMinWidth(width);
-            column.setPreferredWidth(width);
-            column.setResizable(false);
-        }
-        jMainWindowFrame2.repaint();
+        updateTableWidths();
 
 
     
@@ -1673,7 +1663,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         updateStatusbarSwingWorker.execute();
 
 
-
     }//GEN-LAST:event_jMainWindowRefreshButton2MouseReleased
 
     private void jMainWindowStopButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMainWindowStopButton2MouseReleased
@@ -1823,7 +1812,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         comboMgr.updateComboBoxesEnabledValues(splitIntoColumnsTypes);
     }
 
-    public void prepareSplitIntoWindow(int colNumber) {
+    private void prepareSplitIntoWindow(int colNumber) {
         jColumnToSplitLabel.setText(String.valueOf(colNumber));
         jColumnToSplitLabel1.setText(String.valueOf(colNumber));
         jColumnToSplitLabel2.setText(String.valueOf(colNumber));
@@ -1855,7 +1844,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         }
     }
 
-    public void prepareAddToWindow(int columnNumber){
+    private void prepareAddToWindow(int columnNumber){
         jAddToPlusButton.setEnabled(false);
         jColumnToAddLabel.setText(String.valueOf(columnNumber));
         jAddToToolBar.removeAll();
@@ -1867,6 +1856,20 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             jAddToDelimeterTextField.setText(columnSchema.queryMergesetDelimiter(mergsetNumber));
             jAddToSubmitButtonMouseReleasedAction();
         }
+    }
+
+    private void updateTableWidths(){
+        TableColumn column = null;
+        int width = comboBoxes.get(0).getWidth();
+        for (int i = 0; i < tableModel.getColumnCount(); i++) {
+            column = jContactsListTable.getColumnModel().getColumn(i);
+            column.setWidth(width);
+            column.setMaxWidth(width);
+            column.setMinWidth(width);
+            column.setPreferredWidth(width);
+            column.setResizable(false);
+        }
+        jMainWindowFrame2.repaint();
     }
 
     // <editor-fold defaultstate="collapsed" desc="Combo Box">
@@ -2709,10 +2712,11 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 }
             }
 
-            jMainWindowFrame2.repaint();
+            
 
             setButtonsEnabled(jMainWindowFrame2, true);
 
+            jMainWindowFrame2.repaint();
         }
 
         @Override

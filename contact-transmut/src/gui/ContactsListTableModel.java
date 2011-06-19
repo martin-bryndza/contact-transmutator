@@ -91,6 +91,16 @@ public class ContactsListTableModel extends AbstractTableModel{
         return true;
     }
 
+    @Override
+    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        data.get(rowIndex).set(columnIndex, (String) aValue);
+        fireTableCellUpdated(rowIndex, columnIndex);
+        NodeList allDataElements = internalDoc.getElementsByTagName("data");
+        int dataToChange = columnCount*rowIndex + columnIndex;
+        Element dataElement = (Element) allDataElements.item(dataToChange);
+        dataElement.setTextContent((String) aValue);
+    }
+
 
 
 }
