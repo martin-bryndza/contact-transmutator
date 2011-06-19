@@ -298,6 +298,7 @@
               <SubComponents>
                 <Component class="javax.swing.JProgressBar" name="jRefreshProgressBar2">
                   <Properties>
+                    <Property name="maximum" type="int" value="100000"/>
                     <Property name="toolTipText" type="java.lang.String" value=""/>
                     <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
                       <Color id="Wait Cursor"/>
@@ -438,12 +439,11 @@
                               <Component id="jColumnToAddLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                               <Component id="jAddToDelimeterTextField" min="-2" pref="79" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
                           <Component id="jAddToScrollPane" min="-2" pref="542" max="-2" attributes="0"/>
-                          <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
                           <Component id="jAddToPlusButton" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -480,11 +480,11 @@
                       <Component id="jAddToSubmitButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
                       <Component id="jAddToPlusButton" max="32767" attributes="1"/>
-                      <Component id="jAddToScrollPane" alignment="1" pref="30" max="32767" attributes="1"/>
+                      <Component id="jAddToScrollPane" alignment="0" pref="43" max="32767" attributes="1"/>
                   </Group>
-                  <EmptySpace min="-2" pref="32" max="-2" attributes="0"/>
+                  <EmptySpace pref="39" max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jAddToCancelButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jAddToOkButton" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -641,10 +641,10 @@
                           </Group>
                       </Group>
                   </Group>
-                  <EmptySpace pref="196" max="32767" attributes="0"/>
+                  <EmptySpace pref="21" max="32767" attributes="0"/>
               </Group>
               <Group type="102" alignment="1" attributes="0">
-                  <EmptySpace pref="450" max="32767" attributes="0"/>
+                  <EmptySpace pref="275" max="32767" attributes="0"/>
                   <Component id="jSplitIntoOkButton" min="-2" pref="70" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jSplitIntoCancelButton" min="-2" max="-2" attributes="0"/>

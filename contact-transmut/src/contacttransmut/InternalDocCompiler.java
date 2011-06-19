@@ -95,7 +95,7 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
      * Returns current status of compilation. Use with getMaxContacts().
      * @return The number of the currently processed contact
      */
-    public Integer getCurrentStatus() {
+    public synchronized Integer getCurrentStatus() {
         return currentlyProccessingContact;
     }
 
