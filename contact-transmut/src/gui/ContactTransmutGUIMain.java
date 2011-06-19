@@ -28,6 +28,8 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -40,6 +42,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComboBox;
@@ -60,6 +63,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+import javax.swing.SwingWorker;
 
 /**
  *
@@ -79,6 +83,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private ComboBoxesManager comboMgr;
     private ColumnSchemaManager columnSchMgr;
 
+    private RefreshSwingWorker refreshSwingWorker;
+
     boolean updateEnabled = true;
 
     /** Creates new form ContactTransmutGUIMain */
@@ -88,6 +94,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jContactsListTable.setModel(tableModel);
         jContactsListTable.setAutoscrolls(true);
         jMainWindowPanel.setAutoscrolls(true);
+        jRefreshProgressBar2.setVisible(false);
+        jMainWindowStopButton2.setVisible(false);
     }
 
     /** This method is called from within the constructor to
@@ -117,11 +125,14 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jMainWindowShowTextFileButton = new javax.swing.JButton();
         jMainWindowShowColumnSchemaButton = new javax.swing.JButton();
         jMainWindowShowInternalDocButton = new javax.swing.JButton();
+        jLayeredPane2 = new javax.swing.JLayeredPane();
+        jRefreshProgressBar2 = new javax.swing.JProgressBar();
+        jMainWindowRefreshButton2 = new javax.swing.JButton();
+        jMainWindowStopButton2 = new javax.swing.JButton();
         jContactsListScrollPane = new javax.swing.JScrollPane();
         jContactsListTable = new javax.swing.JTable();
         jComboBoxesScrollPane = new javax.swing.JScrollPane();
         jComboBoxesToolBar = new javax.swing.JToolBar();
-        jMainWindowRefreshButton = new javax.swing.JButton();
         jAddToFrame = new javax.swing.JFrame();
         jAddToOkButton = new javax.swing.JButton();
         jAddToCancelButton = new javax.swing.JButton();
@@ -325,12 +336,35 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             }
         });
 
+        jRefreshProgressBar2.setIndeterminate(true);
+        jRefreshProgressBar2.setBounds(0, 10, 350, 35);
+        jLayeredPane2.add(jRefreshProgressBar2, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        jMainWindowRefreshButton2.setText("REFRESH TABLE (apply changes)");
+        jMainWindowRefreshButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jMainWindowRefreshButton2MouseReleased(evt);
+            }
+        });
+        jMainWindowRefreshButton2.setBounds(0, 10, 240, 35);
+        jLayeredPane2.add(jMainWindowRefreshButton2, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        jMainWindowStopButton2.setText("STOP");
+        jMainWindowStopButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jMainWindowStopButton2MouseReleased(evt);
+            }
+        });
+        jMainWindowStopButton2.setBounds(360, 10, 70, 35);
+        jLayeredPane2.add(jMainWindowStopButton2, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
         javax.swing.GroupLayout jMainWindowPanelLayout = new javax.swing.GroupLayout(jMainWindowPanel);
         jMainWindowPanel.setLayout(jMainWindowPanelLayout);
         jMainWindowPanelLayout.setHorizontalGroup(
             jMainWindowPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowPanelLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLayeredPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 442, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jMainWindowShowColumnSchemaButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jMainWindowShowInternalDocButton)
@@ -347,14 +381,17 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jMainWindowPanelLayout.setVerticalGroup(
             jMainWindowPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowPanelLayout.createSequentialGroup()
-                .addContainerGap(12, Short.MAX_VALUE)
-                .addGroup(jMainWindowPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jMainWindowBackButton)
-                    .addComponent(jMainWindowCancelButton)
-                    .addComponent(jMainWindowNextButton)
-                    .addComponent(jMainWindowShowTextFileButton)
-                    .addComponent(jMainWindowShowColumnSchemaButton)
-                    .addComponent(jMainWindowShowInternalDocButton))
+                .addGroup(jMainWindowPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLayeredPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
+                    .addGroup(jMainWindowPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jMainWindowPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jMainWindowShowColumnSchemaButton, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
+                            .addComponent(jMainWindowShowInternalDocButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
+                            .addComponent(jMainWindowShowTextFileButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
+                            .addComponent(jMainWindowBackButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
+                            .addComponent(jMainWindowNextButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
+                            .addComponent(jMainWindowCancelButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE))))
                 .addContainerGap())
         );
 
@@ -379,13 +416,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jComboBoxesToolBar.setRollover(true);
         jComboBoxesScrollPane.setViewportView(jComboBoxesToolBar);
 
-        jMainWindowRefreshButton.setText("REFRESH TABLE (apply changes)");
-        jMainWindowRefreshButton.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jMainWindowRefreshButtonMouseReleased(evt);
-            }
-        });
-
         javax.swing.GroupLayout jMainWindowFrame2Layout = new javax.swing.GroupLayout(jMainWindowFrame2.getContentPane());
         jMainWindowFrame2.getContentPane().setLayout(jMainWindowFrame2Layout);
         jMainWindowFrame2Layout.setHorizontalGroup(
@@ -393,14 +423,11 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             .addGroup(jMainWindowFrame2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jMainWindowFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowFrame2Layout.createSequentialGroup()
-                        .addComponent(jMainWindowRefreshButton, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 225, Short.MAX_VALUE)
-                        .addComponent(jMainWindowPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jMainWindowPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowFrame2Layout.createSequentialGroup()
                         .addGroup(jMainWindowFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jComboBoxesScrollPane, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 1014, Short.MAX_VALUE)
-                            .addComponent(jContactsListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1014, Short.MAX_VALUE))
+                            .addComponent(jContactsListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1014, Short.MAX_VALUE)
+                            .addComponent(jComboBoxesScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1014, Short.MAX_VALUE))
                         .addContainerGap())))
         );
         jMainWindowFrame2Layout.setVerticalGroup(
@@ -409,13 +436,9 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jComboBoxesScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jContactsListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 535, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jMainWindowFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jMainWindowPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowFrame2Layout.createSequentialGroup()
-                        .addComponent(jMainWindowRefreshButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(11, 11, 11))))
+                .addComponent(jContactsListScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 534, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jMainWindowPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         jAddToFrame.setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -1716,59 +1739,29 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jSplitIntoContactsFrame.setVisible(true);
     }//GEN-LAST:event_jSplitIntoContactsSettingsButtonMouseReleased
 
-    private void jMainWindowRefreshButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMainWindowRefreshButtonMouseReleased
-        
+    private void jMainWindowRefreshButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMainWindowRefreshButton2MouseReleased
+
         setButtonsEnabled(jMainWindowFrame2, false);
 
-        //compile
-        InternalDoc2CompiledDoc compiler = new InternalDocCompiler(internalDoc, columnSchema,true);
-        compiler.compile();
-        Document compiledDoc = compiler.getCompiledValidContacts();
+        jMainWindowRefreshButton2.setVisible(false);
+        jRefreshProgressBar2.setVisible(true);
+        jMainWindowStopButton2.setVisible(true);
 
-        //show CompiledDoc
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer trans = null;
-        try {
-            trans = tf.newTransformer();
-            trans.transform(new DOMSource(compiledDoc), new StreamResult(stream));
-        } catch (TransformerException ex) {
-            Logger.getLogger(Document.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        String rawCD = stream.toString();
-        rawCD = rawCD.replaceAll(">", ">\n");
-        rawCD = rawCD.replaceAll("<contacts>", "<contacts>\n");
-        rawCD = rawCD.replaceAll("</contact>", "</contact>\n");
-        jCompiledDocTextArea.setText(rawCD);
-        jCompiledDocTextFrame.pack();
-        jCompiledDocTextFrame.setVisible(true);
+        refreshSwingWorker = new RefreshSwingWorker();
+        refreshSwingWorker.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ("progress".equals(evt.getPropertyName())) {
+                    jRefreshProgressBar2.setValue((Integer) evt.getNewValue());
+                }
+            }
+        });
+        refreshSwingWorker.execute();
+    }//GEN-LAST:event_jMainWindowRefreshButton2MouseReleased
 
-        //load compiled doc
-        InputFilter readCompiledDoc = new ReadCompiledDoc(compiledDoc);
-        internalDoc = readCompiledDoc.read();
-        columnSchema = readCompiledDoc.getColumnSchema();
-
-        //refresh gui
-        comboBoxes.clear();
-        columnsToAdd.clear();
-        splitIntoColumnsTypes.clear();
-        jComboBoxesToolBar.removeAll();
-        jColumnToSplitLabel.setText("-1");
-        jColumnToAddLabel.setText("-1");
-        jAddToBaseColumnTextField.setText("-1");
-
-        tableModel.initTable(internalDoc, columnSchema);
-
-        comboMgr.createMainComboBoxes();
-        comboMgr.updateComboBoxesEnabledValues(comboBoxes);
-        comboMgr.updateAddToNumbers();
-
-        jMainWindowFrame2.setVisible(false);
-        jMainWindowFrame2.setVisible(true);
-
-        setButtonsEnabled(jMainWindowFrame2, true);
-
-    }//GEN-LAST:event_jMainWindowRefreshButtonMouseReleased
+    private void jMainWindowStopButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMainWindowStopButton2MouseReleased
+        JOptionPane.showMessageDialog(this,"Sorry. Not supported operation yet.","Cancel processing.",JOptionPane.INFORMATION_MESSAGE);
+        return;
+    }//GEN-LAST:event_jMainWindowStopButton2MouseReleased
 
 
     /**
@@ -1787,7 +1780,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             jMainWindowBackButton.setEnabled(value);
             jMainWindowCancelButton.setEnabled(value);
             jMainWindowNextButton.setEnabled(value);
-            jMainWindowRefreshButton.setEnabled(value);
+            jMainWindowRefreshButton2.setEnabled(value);
             for (JComboBox box : comboBoxes){
                 box.setEnabled(value);
             }
@@ -1959,7 +1952,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     }
 
     // <editor-fold defaultstate="collapsed" desc="Combo Box">
-    class ComboRenderer extends JLabel implements ListCellRenderer {
+    private class ComboRenderer extends JLabel implements ListCellRenderer {
 
         public ComboRenderer() {
             setOpaque(true);
@@ -1985,7 +1978,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         }
     }
 
-    class ComboListener implements ActionListener {
+    private class ComboListener implements ActionListener {
 
         JComboBox combo;
         Object currentItem;
@@ -2081,7 +2074,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         }
     }
 
-    class ComboItem implements CanEnable {
+    private class ComboItem implements CanEnable {
 
         Object value;
         boolean isEnable;
@@ -2140,7 +2133,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     }
     // </editor-fold>
 
-    class ColumnSchemaManager {
+    private class ColumnSchemaManager {
 
         Stack<InternalDocColumnSchema> columnSchemaStack;
 
@@ -2305,7 +2298,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         }
     }
 
-    class ComboBoxesManager {
+    private class ComboBoxesManager {
 
         public ComboBoxesManager() {
         }
@@ -2583,6 +2576,93 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         }
     }
 
+    private class RefreshSwingWorker extends SwingWorker<List<Object>, Integer>{
+
+        @Override
+        protected List<Object> doInBackground() throws Exception {
+            List<Object> result = new ArrayList<Object>();
+            InternalDoc2CompiledDoc compiler = new InternalDocCompiler(internalDoc, columnSchema,true);
+            compiler.compile();
+            publish(1);
+            Document compiledDoc = compiler.getCompiledValidContacts();
+            InputFilter readCompiledDoc = new ReadCompiledDoc(compiledDoc);
+            result.add(compiledDoc);
+            result.add(readCompiledDoc.read());
+            result.add(readCompiledDoc.getColumnSchema());
+            return result;
+        }
+
+        @Override
+        protected void done() {
+            List<Object> result = null;
+            try {
+                result = refreshSwingWorker.get();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ContactTransmutGUIMain.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ExecutionException ex) {
+                Logger.getLogger(ContactTransmutGUIMain.class.getName()).log(Level.SEVERE, null, ex);
+            }
+          
+            if (result == null) {
+                JOptionPane.showMessageDialog(jMainWindowFrame2,"Error while processing data.","Error",JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            internalDoc = (Document) result.get(1);
+            columnSchema = (InternalDocColumnSchema) result.get(2);
+            Document compiledDoc = (Document) result.get(0);
+
+            //show CompiledDoc
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer trans = null;
+            try {
+                trans = tf.newTransformer();
+                trans.transform(new DOMSource(compiledDoc), new StreamResult(stream));
+            } catch (TransformerException ex) {
+                Logger.getLogger(Document.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            String rawCD = stream.toString();
+            rawCD = rawCD.replaceAll(">", ">\n");
+            rawCD = rawCD.replaceAll("<contacts>", "<contacts>\n");
+            rawCD = rawCD.replaceAll("</contact>", "</contact>\n");
+            jCompiledDocTextArea.setText(rawCD);
+            jCompiledDocTextFrame.pack();
+            jCompiledDocTextFrame.setVisible(true);
+
+            //refresh gui
+            comboBoxes.clear();
+            columnsToAdd.clear();
+            splitIntoColumnsTypes.clear();
+            jComboBoxesToolBar.removeAll();
+            jColumnToSplitLabel.setText("-1");
+            jColumnToAddLabel.setText("-1");
+            jAddToBaseColumnTextField.setText("-1");
+
+            tableModel.initTable(internalDoc, columnSchema);
+
+            comboMgr.createMainComboBoxes();
+            comboMgr.updateComboBoxesEnabledValues(comboBoxes);
+            comboMgr.updateAddToNumbers();
+
+            jRefreshProgressBar2.setVisible(false);
+            jMainWindowStopButton2.setVisible(false);
+            jMainWindowRefreshButton2.setVisible(true);
+
+            jMainWindowFrame2.setVisible(false);
+            jMainWindowFrame2.setVisible(true);
+
+            setButtonsEnabled(jMainWindowFrame2, true);
+
+        }
+
+        @Override
+        protected void process(List<Integer> chunks) {
+            super.process(chunks);
+        }
+
+
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField jAddToBaseColumnTextField;
     private javax.swing.JButton jAddToCancelButton;
@@ -2641,21 +2721,24 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JLayeredPane jLayeredPane2;
     private javax.swing.JLabel jMainLabel1;
     private javax.swing.JButton jMainWindowBackButton;
     private javax.swing.JButton jMainWindowCancelButton;
     private javax.swing.JFrame jMainWindowFrame2;
     private javax.swing.JButton jMainWindowNextButton;
     private javax.swing.JPanel jMainWindowPanel;
-    private javax.swing.JButton jMainWindowRefreshButton;
+    private javax.swing.JButton jMainWindowRefreshButton2;
     private javax.swing.JButton jMainWindowShowColumnSchemaButton;
     private javax.swing.JButton jMainWindowShowInternalDocButton;
     private javax.swing.JButton jMainWindowShowTextFileButton;
+    private javax.swing.JButton jMainWindowStopButton2;
     private javax.swing.JButton jNextButton1;
     private javax.swing.JScrollPane jOriginalFileScrollPane;
     private javax.swing.JTextArea jOriginalFileTextArea;
     private javax.swing.JFrame jOriginalFileTextFrame;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JProgressBar jRefreshProgressBar2;
     private javax.swing.JLabel jSelectInputLabel1;
     private javax.swing.JButton jSplitIntoCancelButton;
     private javax.swing.JCheckBox jSplitIntoContactsAreEmployeesCheckBox;

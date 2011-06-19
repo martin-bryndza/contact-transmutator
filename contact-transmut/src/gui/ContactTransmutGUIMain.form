@@ -169,15 +169,11 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="1" attributes="0">
-                          <Component id="jMainWindowRefreshButton" min="-2" pref="213" max="-2" attributes="0"/>
-                          <EmptySpace pref="225" max="32767" attributes="0"/>
-                          <Component id="jMainWindowPanel" min="-2" max="-2" attributes="0"/>
-                      </Group>
+                      <Component id="jMainWindowPanel" alignment="1" min="-2" max="-2" attributes="0"/>
                       <Group type="102" alignment="1" attributes="0">
                           <Group type="103" groupAlignment="1" attributes="0">
-                              <Component id="jComboBoxesScrollPane" alignment="0" pref="1014" max="32767" attributes="0"/>
                               <Component id="jContactsListScrollPane" alignment="1" pref="1014" max="32767" attributes="0"/>
+                              <Component id="jComboBoxesScrollPane" alignment="1" pref="1014" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -190,16 +186,10 @@
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace min="-2" max="-2" attributes="1"/>
                   <Component id="jComboBoxesScrollPane" min="-2" pref="44" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Component id="jContactsListScrollPane" pref="535" max="32767" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jMainWindowPanel" alignment="1" min="-2" max="-2" attributes="0"/>
-                      <Group type="102" alignment="1" attributes="0">
-                          <Component id="jMainWindowRefreshButton" min="-2" pref="35" max="-2" attributes="0"/>
-                          <EmptySpace min="11" pref="11" max="11" attributes="0"/>
-                      </Group>
-                  </Group>
+                  <Component id="jContactsListScrollPane" min="-2" pref="534" max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
+                  <Component id="jMainWindowPanel" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -211,13 +201,14 @@
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="jLayeredPane2" pref="442" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="jMainWindowShowColumnSchemaButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jMainWindowShowInternalDocButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="jMainWindowShowTextFileButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="jMainWindowBackButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jMainWindowNextButton" min="-2" max="-2" attributes="0"/>
@@ -230,14 +221,19 @@
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace pref="12" max="32767" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jMainWindowBackButton" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jMainWindowCancelButton" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jMainWindowNextButton" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jMainWindowShowTextFileButton" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jMainWindowShowColumnSchemaButton" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="jMainWindowShowInternalDocButton" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="jLayeredPane2" alignment="0" pref="46" max="32767" attributes="0"/>
+                          <Group type="102" alignment="1" attributes="0">
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="1" attributes="0">
+                                  <Component id="jMainWindowShowColumnSchemaButton" alignment="1" pref="35" max="32767" attributes="0"/>
+                                  <Component id="jMainWindowShowInternalDocButton" alignment="0" pref="35" max="32767" attributes="0"/>
+                                  <Component id="jMainWindowShowTextFileButton" alignment="0" pref="35" max="32767" attributes="0"/>
+                                  <Component id="jMainWindowBackButton" alignment="0" pref="35" max="32767" attributes="0"/>
+                                  <Component id="jMainWindowNextButton" alignment="0" pref="35" max="32767" attributes="0"/>
+                                  <Component id="jMainWindowCancelButton" alignment="0" pref="35" max="32767" attributes="0"/>
+                              </Group>
+                          </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -293,6 +289,48 @@
                 <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jMainWindowShowInternalDocButtonMouseReleased"/>
               </Events>
             </Component>
+            <Container class="javax.swing.JLayeredPane" name="jLayeredPane2">
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.support.JLayeredPaneSupportLayout"/>
+              <SubComponents>
+                <Component class="javax.swing.JProgressBar" name="jRefreshProgressBar2">
+                  <Properties>
+                    <Property name="indeterminate" type="boolean" value="true"/>
+                  </Properties>
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JLayeredPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JLayeredPaneSupportLayout$JLayeredPaneConstraintsDescription">
+                      <JLayeredPaneConstraints x="0" y="10" width="350" height="35" layer="0" position="-1"/>
+                    </Constraint>
+                  </Constraints>
+                </Component>
+                <Component class="javax.swing.JButton" name="jMainWindowRefreshButton2">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="REFRESH TABLE (apply changes)"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jMainWindowRefreshButton2MouseReleased"/>
+                  </Events>
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JLayeredPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JLayeredPaneSupportLayout$JLayeredPaneConstraintsDescription">
+                      <JLayeredPaneConstraints x="0" y="10" width="240" height="35" layer="0" position="-1"/>
+                    </Constraint>
+                  </Constraints>
+                </Component>
+                <Component class="javax.swing.JButton" name="jMainWindowStopButton2">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="STOP"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jMainWindowStopButton2MouseReleased"/>
+                  </Events>
+                  <Constraints>
+                    <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JLayeredPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JLayeredPaneSupportLayout$JLayeredPaneConstraintsDescription">
+                      <JLayeredPaneConstraints x="360" y="10" width="70" height="35" layer="0" position="-1"/>
+                    </Constraint>
+                  </Constraints>
+                </Component>
+              </SubComponents>
+            </Container>
           </SubComponents>
         </Container>
         <Container class="javax.swing.JScrollPane" name="jContactsListScrollPane">
@@ -335,14 +373,6 @@
             </Container>
           </SubComponents>
         </Container>
-        <Component class="javax.swing.JButton" name="jMainWindowRefreshButton">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="REFRESH TABLE (apply changes)"/>
-          </Properties>
-          <Events>
-            <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jMainWindowRefreshButtonMouseReleased"/>
-          </Events>
-        </Component>
       </SubComponents>
     </Container>
     <Container class="javax.swing.JFrame" name="jAddToFrame">
