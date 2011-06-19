@@ -1,9 +1,14 @@
 
 package contacttransmut;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -12,6 +17,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 /**
  *  Trieda na nacitavanie informacii zo zuboru typu ODS
@@ -32,7 +38,7 @@ public class ODSInput implements InputFilter {
     private Element outputRoot;
     
     public ODSInput(String nameFile) throws SAXException, ParserConfigurationException, IOException, Exception{
-        
+
         nameOfFile = nameFile;  // zadanie cesty k ODS dokumnetu
         
         //inicializovanie vnutorneho XLM DOMu s korenovym elementom "root"
@@ -47,17 +53,61 @@ public class ODSInput implements InputFilter {
         Element root = document.createElement("root");
         outputRoot = root;
         document.appendChild(root);
-        
+
+
        //nacitanie ODS do pamate; Ak sa nepodari, vyhodi vynimku 
         try{
             factoryODS = DocumentBuilderFactory.newInstance();
             builderODS = factoryODS.newDocumentBuilder();
-            documentODS = builderODS.parse(nameOfFile);
+            documentODS = builderODS.parse(new InputSource(new StringReader(openZIPFile(nameOfFile).toString())));
             
         }catch(Exception ex){
             throw ex;
         }
        
+    }
+
+    /**
+     * Private helper method for opening the .ods (ZIP) file and reading content.xml.
+     * @param nameFile path to file
+     * @return StringBuilder text contents of contents.xml
+     */
+    private StringBuilder openZIPFile(String nameFile) {
+        ZipFile inputods = null;
+        try {
+             inputods = new ZipFile(nameFile);
+        } catch (IOException ex) {
+            Logger.getLogger(ODSInput.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        ZipEntry entry = inputods.getEntry("content.xml");
+                   BufferedReader buffread = null;
+        try {
+            buffread = new BufferedReader(new InputStreamReader(inputods.getInputStream(entry)));
+        } catch (IOException ex) {
+            Logger.getLogger(ODSInput.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            String line;
+            StringBuilder stringbuild = new StringBuilder();
+
+        try {
+            while ((line = buffread.readLine()) != null) {
+                //System.err.println(line);
+                stringbuild.append(line);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(ODSInput.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            buffread.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ODSInput.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            inputods.close();
+        } catch (IOException ex) {
+            Logger.getLogger(ODSInput.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            return stringbuild;
     }
     /**
      * Pomocna metoda, ktora prechadza jednotline listy v dokumente ODS a hlada navyssi pocet stlpcov
