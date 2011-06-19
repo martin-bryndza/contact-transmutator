@@ -30,6 +30,8 @@ public interface InternalDoc2CompiledDoc {
      */
     public void compile();
 
+    public Integer getCurrentStatus();
+
     /**
      * Get compiled valid contacts.
      *

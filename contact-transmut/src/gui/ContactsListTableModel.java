@@ -56,8 +56,6 @@ public class ContactsListTableModel extends AbstractTableModel{
         }
 
         fireTableDataChanged();
-
-
     }
 
     public int getRowCount() {
@@ -87,5 +85,12 @@ public class ContactsListTableModel extends AbstractTableModel{
     public Class<?> getColumnClass(int columnIndex) {
         return String.class;
     }
+
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return true;
+    }
+
+
 
 }

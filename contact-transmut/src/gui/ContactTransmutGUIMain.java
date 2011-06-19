@@ -50,6 +50,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollBar;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
@@ -64,6 +65,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 import javax.swing.SwingWorker;
+import javax.swing.table.TableColumn;
 
 /**
  *
@@ -74,6 +76,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             
     private File inputFile;
     private Document internalDoc = null;
+    private Document compiledDoc = null;
     private InternalDocColumnSchema columnSchema = null;
     private ContactsListTableModel tableModel = new ContactsListTableModel();
     private ArrayList<javax.swing.JComboBox> comboBoxes = new ArrayList<JComboBox>(); // in main
@@ -84,8 +87,11 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private ColumnSchemaManager columnSchMgr;
 
     private RefreshSwingWorker refreshSwingWorker;
+    private UpdateStatusbarSwingWorker updateStatusbarSwingWorker;
+    private InternalDoc2CompiledDoc compiler;
 
     boolean updateEnabled = true;
+    boolean saving = false;
 
     /** Creates new form ContactTransmutGUIMain */
     public ContactTransmutGUIMain() {
@@ -96,6 +102,11 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jMainWindowPanel.setAutoscrolls(true);
         jRefreshProgressBar2.setVisible(false);
         jMainWindowStopButton2.setVisible(false);
+        
+        JScrollBar sb1 = jContactsListScrollPane.getHorizontalScrollBar();
+        JScrollBar sb2 = jComboBoxesScrollPane.getHorizontalScrollBar();
+        sb1.setModel(sb2.getModel());
+
     }
 
     /** This method is called from within the constructor to
@@ -336,7 +347,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             }
         });
 
-        jRefreshProgressBar2.setIndeterminate(true);
+        jRefreshProgressBar2.setToolTipText("null");
+        jRefreshProgressBar2.setCursor(new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
         jRefreshProgressBar2.setBounds(0, 10, 350, 35);
         jLayeredPane2.add(jRefreshProgressBar2, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
@@ -408,6 +420,9 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        jContactsListTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jContactsListTable.setCellSelectionEnabled(true);
+        jContactsListTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         jContactsListScrollPane.setViewportView(jContactsListTable);
 
         jComboBoxesScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
@@ -436,8 +451,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jComboBoxesScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jContactsListScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 534, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jContactsListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 534, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jMainWindowPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -1177,6 +1192,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         //</editor-fold>
        
         tableModel.initTable(internalDoc, columnSchema);
+
         
         comboMgr = new ComboBoxesManager();
         columnSchMgr = new ColumnSchemaManager();
@@ -1184,10 +1200,26 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         comboMgr.createMainComboBoxes();
         comboMgr.updateComboBoxesEnabledValues(comboBoxes);
         comboMgr.updateAddToNumbers();
-    
+
         setVisible(false);
         jMainWindowFrame2.pack();
         jMainWindowFrame2.setVisible(true);
+
+        TableColumn column = null;
+        int width = comboBoxes.get(0).getWidth();
+        for (int i = 0; i < tableModel.getColumnCount(); i++) {
+            column = jContactsListTable.getColumnModel().getColumn(i);
+            column.setWidth(width);
+            column.setMaxWidth(width);
+            column.setMinWidth(width);
+            column.setPreferredWidth(width);
+            column.setResizable(false);
+        }
+        jMainWindowFrame2.repaint();
+
+
+    
+
     }//GEN-LAST:event_jNextButton1MouseReleased
 
     private void jBrowseButton1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jBrowseButton1MouseReleased
@@ -1262,130 +1294,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     }//GEN-LAST:event_jMainWindowCancelButtonMouseReleased
 
     private void jMainWindowNextButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMainWindowNextButtonMouseReleased
-        //choose where to save and the filetype
-        String savePath = "";
-        JFileChooser chooser = new JFileChooser();
-        // <editor-fold defaultstate="collapsed" desc="filter typov suborov">
-        FileFilter filterVCF = new FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                try {
-                    if ((f.isFile() && f.toString().toLowerCase().endsWith("vcf")) || f.isDirectory()) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } catch (Exception e) {
-                    //no idea why it comes out but everything works just OK
-                    return true;
-                }
-            }
-            @Override
-            public String getDescription() {
-                return "VCF files";
-            }
-        };
-        FileFilter filterODS = new FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                try {
-                    if ((f.isFile() && f.toString().toLowerCase().endsWith("ods")) || f.isDirectory()) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } catch (Exception e) {
-                    //no idea why it comes out but everything works just OK
-                    return true;
-                }
-            }
-            @Override
-            public String getDescription() {
-                return "ODS files";
-            }
-        };
-        FileFilter filterCSV = new FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                try {
-                    if ((f.isFile() && f.toString().toLowerCase().endsWith("csv")) || f.isDirectory()) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } catch (Exception e) {
-                    //no idea why it comes out but everything works just OK
-                    return true;
-                }
-            }
-            @Override
-            public String getDescription() {
-                return "CSV files";
-            }
-        };
-        FileFilter filterADR = new FileFilter() {
-            @Override
-            public boolean accept(File f) {
-                try {
-                    if ((f.isFile() && f.toString().toLowerCase().endsWith("adr")) || f.isDirectory()) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } catch (Exception e) {
-                    //no idea why it comes out but everything works just OK
-                    return true;
-                }
-            }
-            @Override
-            public String getDescription() {
-                return "ADR files";
-            }
-        };
-        // </editor-fold>
-        chooser.addChoosableFileFilter(filterCSV);
-        chooser.addChoosableFileFilter(filterADR);
-        chooser.addChoosableFileFilter(filterODS);
-        chooser.addChoosableFileFilter(filterVCF);
-        chooser.addChoosableFileFilter(chooser.getAcceptAllFileFilter());
-        chooser.setDialogTitle("Save as...");
-        chooser.setApproveButtonText("Save");
-        int returnVal = chooser.showOpenDialog(jMainWindowPanel);
-        if(returnVal == JFileChooser.APPROVE_OPTION){
-            savePath = (chooser.getSelectedFile().toString());
-        } else {
-            return;
-        }
-
-        //compile the column schema and data
-        InternalDoc2CompiledDoc compiler = new InternalDocCompiler(internalDoc, columnSchema,false);
-        compiler.compile();
-        Document compiledDoc = compiler.getCompiledValidContacts();
-
-        //TODO: add output encoding options
-        String encoding = jEncodingComboBox1.getSelectedItem().toString();
-        OutputFilter outputFilter = null;
-        if (savePath.toLowerCase().endsWith(".csv")){
-            outputFilter = new WriteCSV(savePath, encoding, ",", "\"", compiledDoc);
-        } else if (savePath.toLowerCase().endsWith(".vcf")){
-            outputFilter = new WriteVCF(savePath, encoding, compiledDoc);
-        } else if (savePath.toLowerCase().endsWith(".ods")){
-            JOptionPane.showMessageDialog(this,"File type not supported yet.","Sorry!",JOptionPane.INFORMATION_MESSAGE);
-            return;
-        } else if (savePath.toLowerCase().endsWith(".adr")){
-            JOptionPane.showMessageDialog(this,"File type not supported yet.","Sorry!",JOptionPane.INFORMATION_MESSAGE);
-            return;
-        } else {
-            JOptionPane.showMessageDialog(this,"Choose a valid file type. (*.csv, *.ods, *.vcf, *.adr)","Invalid file path!",JOptionPane.ERROR_MESSAGE);
-            //return;
-        }
-        outputFilter.write();
-        Object[] options = {"Continue editing...", "Close program."};
-        int n = JOptionPane.showOptionDialog(this, "", "Continue?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-        if (n != 0) {
-            System.exit(0);
-        }
-
+        saving = true;
+        jMainWindowRefreshButton2MouseReleased(evt);
     }//GEN-LAST:event_jMainWindowNextButtonMouseReleased
 
     private void jMainWindowShowTextFileButtonMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMainWindowShowTextFileButtonMouseReleased
@@ -1746,16 +1656,24 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jMainWindowRefreshButton2.setVisible(false);
         jRefreshProgressBar2.setVisible(true);
         jMainWindowStopButton2.setVisible(true);
+        jRefreshProgressBar2.setMaximum(tableModel.getRowCount()-1);
 
         refreshSwingWorker = new RefreshSwingWorker();
-        refreshSwingWorker.addPropertyChangeListener(new PropertyChangeListener() {
+        updateStatusbarSwingWorker = new UpdateStatusbarSwingWorker();
+        updateStatusbarSwingWorker.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ("progress".equals(evt.getPropertyName())) {
-                    jRefreshProgressBar2.setValue((Integer) evt.getNewValue());
+                    int value = (Integer) evt.getNewValue();
+                    jRefreshProgressBar2.setValue(value);
+                    jRefreshProgressBar2.setString(value+"%");
                 }
             }
         });
         refreshSwingWorker.execute();
+        updateStatusbarSwingWorker.execute();
+
+
+
     }//GEN-LAST:event_jMainWindowRefreshButton2MouseReleased
 
     private void jMainWindowStopButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMainWindowStopButton2MouseReleased
@@ -2365,9 +2283,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     int indexToSelect = comboMgr.getIndexOfValue(type);
                     comboBoxes.get(i).setSelectedIndex(indexToSelect);
                 }
-                JLabel columnNumberLable = new JLabel(String.valueOf(i) + ":");
-                columnNumberLable.setFont(new Font("Arial", Font.BOLD, 15));
-                jComboBoxesToolBar.add(columnNumberLable);
                 jComboBoxesToolBar.add(comboBoxes.get(i));
                 comboBoxes.get(i).setVisible(true);
                 updateEnabled = true;
@@ -2581,9 +2496,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         @Override
         protected List<Object> doInBackground() throws Exception {
             List<Object> result = new ArrayList<Object>();
-            InternalDoc2CompiledDoc compiler = new InternalDocCompiler(internalDoc, columnSchema,true);
+            compiler = new InternalDocCompiler(internalDoc, columnSchema,true);
             compiler.compile();
-            publish(1);
             Document compiledDoc = compiler.getCompiledValidContacts();
             InputFilter readCompiledDoc = new ReadCompiledDoc(compiledDoc);
             result.add(compiledDoc);
@@ -2609,7 +2523,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             }
             internalDoc = (Document) result.get(1);
             columnSchema = (InternalDocColumnSchema) result.get(2);
-            Document compiledDoc = (Document) result.get(0);
+            compiledDoc = (Document) result.get(0);
 
             //show CompiledDoc
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -2648,8 +2562,154 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             jMainWindowStopButton2.setVisible(false);
             jMainWindowRefreshButton2.setVisible(true);
 
-            jMainWindowFrame2.setVisible(false);
-            jMainWindowFrame2.setVisible(true);
+            if (saving) {
+                saving = false;
+                //choose where to save and the filetype
+                String savePath = "";
+                JFileChooser chooser = new JFileChooser();
+                // <editor-fold defaultstate="collapsed" desc="filter typov suborov">
+                FileFilter filterVCF = new FileFilter() {
+
+                    @Override
+                    public boolean accept(File f) {
+                        try {
+                            if ((f.isFile() && f.toString().toLowerCase().endsWith("vcf")) || f.isDirectory()) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        } catch (Exception e) {
+                            //no idea why it comes out but everything works just OK
+                            return true;
+                        }
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return "VCF files";
+                    }
+                };
+                FileFilter filterODS = new FileFilter() {
+
+                    @Override
+                    public boolean accept(File f) {
+                        try {
+                            if ((f.isFile() && f.toString().toLowerCase().endsWith("ods")) || f.isDirectory()) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        } catch (Exception e) {
+                            //no idea why it comes out but everything works just OK
+                            return true;
+                        }
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return "ODS files";
+                    }
+                };
+                FileFilter filterCSV = new FileFilter() {
+
+                    @Override
+                    public boolean accept(File f) {
+                        try {
+                            if ((f.isFile() && f.toString().toLowerCase().endsWith("csv")) || f.isDirectory()) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        } catch (Exception e) {
+                            //no idea why it comes out but everything works just OK
+                            return true;
+                        }
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return "CSV files";
+                    }
+                };
+                FileFilter filterADR = new FileFilter() {
+
+                    @Override
+                    public boolean accept(File f) {
+                        try {
+                            if ((f.isFile() && f.toString().toLowerCase().endsWith("adr")) || f.isDirectory()) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        } catch (Exception e) {
+                            //no idea why it comes out but everything works just OK
+                            return true;
+                        }
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return "ADR files";
+                    }
+                };
+                // </editor-fold>
+                chooser.addChoosableFileFilter(filterCSV);
+                chooser.addChoosableFileFilter(filterADR);
+                chooser.addChoosableFileFilter(filterODS);
+                chooser.addChoosableFileFilter(filterVCF);
+                chooser.addChoosableFileFilter(chooser.getAcceptAllFileFilter());
+                chooser.setDialogTitle("Save as...");
+                chooser.setApproveButtonText("Save");
+                int returnVal = chooser.showOpenDialog(jMainWindowPanel);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    savePath = (chooser.getSelectedFile().toString());
+                    if (!chooser.getFileFilter().equals(chooser.getAcceptAllFileFilter())) {
+                        String fileType = chooser.getFileFilter().getDescription();
+                        int index = fileType.indexOf(" ");
+                        fileType = fileType.substring(0, index);
+                        if (!savePath.toLowerCase().endsWith(fileType.toLowerCase())) {
+                            savePath = savePath + "." + fileType.toLowerCase();
+                        }
+                    }
+                } else {
+                    jMainWindowFrame2.repaint();
+                    setButtonsEnabled(jMainWindowFrame2, true);
+                    return;
+                }
+
+                //TODO: add output encoding options
+                String encoding = jEncodingComboBox1.getSelectedItem().toString();
+                String output = "";
+                OutputFilter outputFilter = null;
+                if (savePath.toLowerCase().endsWith(".csv")) {
+                    output = "CSV";
+                } else if (savePath.toLowerCase().endsWith(".vcf")) {
+                    output = "VCF";
+                } else if (savePath.toLowerCase().endsWith(".ods")) {
+                    JOptionPane.showMessageDialog(jMainWindowFrame2, "File type not supported yet.", "Sorry!", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                } else if (savePath.toLowerCase().endsWith(".adr")) {
+                    JOptionPane.showMessageDialog(jMainWindowFrame2, "File type not supported yet.", "Sorry!", JOptionPane.INFORMATION_MESSAGE);
+                    return;
+                } else {
+                    JOptionPane.showMessageDialog(jMainWindowFrame2, "Choose a valid file type. (*.csv, *.ods, *.vcf, *.adr)", "Invalid file path!", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                if (output.equals("CSV")) {
+                    outputFilter = new WriteCSV(savePath, encoding, ",", "\"", compiledDoc);
+                } else if (output.equals("VCF")) {
+                    outputFilter = new WriteVCF(savePath, encoding, compiledDoc);
+                }
+
+                outputFilter.write();
+                Object[] options = {"Continue editing...", "Close program."};
+                int n = JOptionPane.showOptionDialog(jMainWindowFrame2, "Saved to " + savePath, "Continue?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+                if (n != 0) {
+                    System.exit(0);
+                }
+            }
+
+            jMainWindowFrame2.repaint();
 
             setButtonsEnabled(jMainWindowFrame2, true);
 
@@ -2660,6 +2720,20 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             super.process(chunks);
         }
 
+
+    }
+
+    private class UpdateStatusbarSwingWorker extends SwingWorker<Void, Void>{
+
+        @Override
+        protected Void doInBackground() throws Exception {
+            while (!refreshSwingWorker.isDone() || refreshSwingWorker.isCancelled()){
+                if (compiler != null)
+                    setProgress(compiler.getCurrentStatus());
+                Thread.sleep(100);
+            }
+            return null;
+        }
 
     }
 
