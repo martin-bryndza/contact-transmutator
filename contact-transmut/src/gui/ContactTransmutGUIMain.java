@@ -1799,6 +1799,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         } else {
             jRefreshProgressBar2.setMaximum(rowCount);
         }
+        jRefreshProgressBar2.setValue(0);
 
         refreshSwingWorker = new RefreshSwingWorker();
         updateStatusbarSwingWorker = new UpdateStatusbarSwingWorker(divider);
@@ -2111,6 +2112,10 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 combo.setSelectedItem(currentItem);
             } else {
                 combo.setSelectedItem(tempItem);
+                if (!updateEnabled){
+                    currentItem = combo.getSelectedItem();
+                    return;
+                }
                 //get the number of column currently changed
                 int columnNumber = comboMgr.getIndexOfComboBox(combo);
                 
