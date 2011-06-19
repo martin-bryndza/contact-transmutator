@@ -26,7 +26,6 @@ import contacttransmut.VCFTypesEnum;
 import contacttransmut.WriteCSV;
 import contacttransmut.WriteVCF;
 import java.awt.Component;
-import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -42,8 +41,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -68,10 +69,12 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import javax.swing.SwingWorker;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.table.TableColumn;
+import org.w3c.dom.Element;
 
 /**
  *
@@ -149,19 +152,22 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         sb1.setModel(sb2.getModel());
 
         jContactsListTable.addKeyListener(new java.awt.event.KeyAdapter() {
+            private final Set<Character> pressed = new HashSet<Character>();
             @Override
             public void keyPressed(java.awt.event.KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_COPY){
-                    System.err.println(KeyEvent.getKeyText(e.getKeyCode()) + "pressed");
-                    tableModel.copyValues();
-                } else if (e.getKeyCode() == KeyEvent.VK_PASTE){
-                    System.err.println(KeyEvent.getKeyText(e.getKeyCode()) + "pressed");
-                    tableModel.pasteValues();
-                } else if (e.getKeyCode() == KeyEvent.VK_DELETE){
-                    System.err.println(KeyEvent.getKeyText(e.getKeyCode()) + "pressed");
-                    tableModel.deleteValues();
+                pressed.add(e.getKeyChar());
+                System.err.println(e.getKeyChar() + " pressed");
+                System.err.print("Currently pressed: ");
+                for (Character c : pressed){
+                    System.err.print(c + ", ");
                 }
             }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                pressed.remove(e.getKeyChar());
+            }
+
         });
 
         jContactsListTable.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -207,6 +213,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jRefreshProgressBar2 = new javax.swing.JProgressBar();
         jMainWindowRefreshButton2 = new javax.swing.JButton();
         jMainWindowStopButton2 = new javax.swing.JButton();
+        jMainWindowAddColumnButton2 = new javax.swing.JButton();
         jContactsListScrollPane = new javax.swing.JScrollPane();
         jContactsListTable = new javax.swing.JTable();
         jComboBoxesScrollPane = new javax.swing.JScrollPane();
@@ -393,21 +400,21 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             }
         });
 
-        jMainWindowShowTextFileButton.setText("Show text");
+        jMainWindowShowTextFileButton.setText("Input File");
         jMainWindowShowTextFileButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 jMainWindowShowTextFileButtonMouseReleased(evt);
             }
         });
 
-        jMainWindowShowColumnSchemaButton.setText("Show Column Schema");
+        jMainWindowShowColumnSchemaButton.setText("Column Schema");
         jMainWindowShowColumnSchemaButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 jMainWindowShowColumnSchemaButtonMouseReleased(evt);
             }
         });
 
-        jMainWindowShowInternalDocButton.setText("Show Internal Doc");
+        jMainWindowShowInternalDocButton.setText("Internal Doc");
         jMainWindowShowInternalDocButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
                 jMainWindowShowInternalDocButtonMouseReleased(evt);
@@ -437,18 +444,27 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jMainWindowStopButton2.setBounds(360, 10, 70, 35);
         jLayeredPane2.add(jMainWindowStopButton2, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
+        jMainWindowAddColumnButton2.setText("Add column");
+        jMainWindowAddColumnButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jMainWindowAddColumnButton2MouseReleased(evt);
+            }
+        });
+
         javax.swing.GroupLayout jMainWindowPanelLayout = new javax.swing.GroupLayout(jMainWindowPanel);
         jMainWindowPanel.setLayout(jMainWindowPanelLayout);
         jMainWindowPanelLayout.setHorizontalGroup(
             jMainWindowPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowPanelLayout.createSequentialGroup()
                 .addComponent(jLayeredPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 442, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(3, 3, 3)
                 .addComponent(jMainWindowShowColumnSchemaButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jMainWindowShowInternalDocButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jMainWindowShowTextFileButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jMainWindowAddColumnButton2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jMainWindowBackButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -464,13 +480,14 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     .addComponent(jLayeredPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
                     .addGroup(jMainWindowPanelLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(jMainWindowPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(jMainWindowPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE, false)
+                            .addComponent(jMainWindowBackButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jMainWindowAddColumnButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jMainWindowShowTextFileButton, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
+                            .addComponent(jMainWindowShowInternalDocButton, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
                             .addComponent(jMainWindowShowColumnSchemaButton, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
-                            .addComponent(jMainWindowShowInternalDocButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
-                            .addComponent(jMainWindowShowTextFileButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
-                            .addComponent(jMainWindowBackButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
-                            .addComponent(jMainWindowNextButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
-                            .addComponent(jMainWindowCancelButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE))))
+                            .addComponent(jMainWindowNextButton, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
+                            .addComponent(jMainWindowCancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
 
@@ -490,6 +507,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jContactsListTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jContactsListTable.setCellSelectionEnabled(true);
         jContactsListTable.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        jContactsListTable.getTableHeader().setResizingAllowed(false);
+        jContactsListTable.getTableHeader().setReorderingAllowed(false);
         jContactsListScrollPane.setViewportView(jContactsListTable);
 
         jComboBoxesScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
@@ -508,8 +527,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     .addComponent(jMainWindowPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jMainWindowFrame2Layout.createSequentialGroup()
                         .addGroup(jMainWindowFrame2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jContactsListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1014, Short.MAX_VALUE)
-                            .addComponent(jComboBoxesScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1014, Short.MAX_VALUE))
+                            .addComponent(jContactsListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1040, Short.MAX_VALUE)
+                            .addComponent(jComboBoxesScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 1040, Short.MAX_VALUE))
                         .addContainerGap())))
         );
         jMainWindowFrame2Layout.setVerticalGroup(
@@ -1734,6 +1753,40 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         return;
     }//GEN-LAST:event_jMainWindowStopButton2MouseReleased
 
+    private void jMainWindowAddColumnButton2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMainWindowAddColumnButton2MouseReleased
+        
+        columnSchema.addColumn();
+        int columnCount = columnSchema.getColumnCount();
+        
+        NodeList uncategorizedList = internalDoc.getElementsByTagName("uncategorized");
+        for(int i=0; i<uncategorizedList.getLength(); i++){
+            Element uncategorized = (Element) uncategorizedList.item(i);
+            Element newColumn = uncategorized.getOwnerDocument().createElement("data");
+            newColumn.setAttribute("counter", String.valueOf(columnSchema.getColumnCount()-1));
+            uncategorized.appendChild(newColumn);
+        }
+        
+        //refresh gui
+        comboBoxes.clear();
+        columnsToAdd.clear();
+        splitIntoColumnsTypes.clear();
+        jComboBoxesToolBar.removeAll();
+        jColumnToSplitLabel.setText("-1");
+        jColumnToAddLabel.setText("-1");
+        jAddToBaseColumnTextField.setText("-1");
+
+        tableModel.initTable(internalDoc, columnSchema, jContactsListTable);
+
+        comboMgr.createMainComboBoxes();
+
+        jMainWindowFrame2.repaint();
+        jMainWindowFrame2.setVisible(true);
+
+        updateTableWidths();
+
+
+    }//GEN-LAST:event_jMainWindowAddColumnButton2MouseReleased
+
 
     /**
     * @param args the command line arguments
@@ -2737,8 +2790,11 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                         }
                     }
                 } else {
-                    jMainWindowFrame2.repaint();
                     setButtonsEnabled(jMainWindowFrame2, true);
+                    jMainWindowFrame2.repaint();
+                    jMainWindowFrame2.setVisible(true);
+
+                    updateTableWidths();
                     return;
                 }
 
@@ -2865,6 +2921,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JLayeredPane jLayeredPane2;
     private javax.swing.JLabel jMainLabel1;
+    private javax.swing.JButton jMainWindowAddColumnButton2;
     private javax.swing.JButton jMainWindowBackButton;
     private javax.swing.JButton jMainWindowCancelButton;
     private javax.swing.JFrame jMainWindowFrame2;

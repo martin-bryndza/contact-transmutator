@@ -172,8 +172,8 @@
                       <Component id="jMainWindowPanel" alignment="1" min="-2" max="-2" attributes="0"/>
                       <Group type="102" alignment="1" attributes="0">
                           <Group type="103" groupAlignment="1" attributes="0">
-                              <Component id="jContactsListScrollPane" alignment="1" pref="1014" max="32767" attributes="0"/>
-                              <Component id="jComboBoxesScrollPane" alignment="1" pref="1014" max="32767" attributes="0"/>
+                              <Component id="jContactsListScrollPane" alignment="1" pref="1040" max="32767" attributes="0"/>
+                              <Component id="jComboBoxesScrollPane" alignment="1" pref="1040" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -202,12 +202,14 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="jLayeredPane2" pref="442" max="32767" attributes="0"/>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
                       <Component id="jMainWindowShowColumnSchemaButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jMainWindowShowInternalDocButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jMainWindowShowTextFileButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="jMainWindowAddColumnButton2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jMainWindowBackButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -225,13 +227,14 @@
                           <Component id="jLayeredPane2" alignment="0" pref="46" max="32767" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="jMainWindowShowColumnSchemaButton" alignment="1" pref="35" max="32767" attributes="0"/>
-                                  <Component id="jMainWindowShowInternalDocButton" alignment="0" pref="35" max="32767" attributes="0"/>
-                                  <Component id="jMainWindowShowTextFileButton" alignment="0" pref="35" max="32767" attributes="0"/>
-                                  <Component id="jMainWindowBackButton" alignment="0" pref="35" max="32767" attributes="0"/>
-                                  <Component id="jMainWindowNextButton" alignment="0" pref="35" max="32767" attributes="0"/>
-                                  <Component id="jMainWindowCancelButton" alignment="0" pref="35" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="3" max="-2" attributes="0">
+                                  <Component id="jMainWindowBackButton" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
+                                  <Component id="jMainWindowAddColumnButton2" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
+                                  <Component id="jMainWindowShowTextFileButton" alignment="3" pref="35" max="32767" attributes="0"/>
+                                  <Component id="jMainWindowShowInternalDocButton" alignment="3" pref="35" max="32767" attributes="0"/>
+                                  <Component id="jMainWindowShowColumnSchemaButton" alignment="3" pref="35" max="32767" attributes="0"/>
+                                  <Component id="jMainWindowNextButton" alignment="3" pref="35" max="32767" attributes="0"/>
+                                  <Component id="jMainWindowCancelButton" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -267,7 +270,7 @@
             </Component>
             <Component class="javax.swing.JButton" name="jMainWindowShowTextFileButton">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Show text"/>
+                <Property name="text" type="java.lang.String" value="Input File"/>
               </Properties>
               <Events>
                 <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jMainWindowShowTextFileButtonMouseReleased"/>
@@ -275,7 +278,7 @@
             </Component>
             <Component class="javax.swing.JButton" name="jMainWindowShowColumnSchemaButton">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Show Column Schema"/>
+                <Property name="text" type="java.lang.String" value="Column Schema"/>
               </Properties>
               <Events>
                 <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jMainWindowShowColumnSchemaButtonMouseReleased"/>
@@ -283,7 +286,7 @@
             </Component>
             <Component class="javax.swing.JButton" name="jMainWindowShowInternalDocButton">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Show Internal Doc"/>
+                <Property name="text" type="java.lang.String" value="Internal Doc"/>
               </Properties>
               <Events>
                 <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jMainWindowShowInternalDocButtonMouseReleased"/>
@@ -334,6 +337,14 @@
                 </Component>
               </SubComponents>
             </Container>
+            <Component class="javax.swing.JButton" name="jMainWindowAddColumnButton2">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Add column"/>
+              </Properties>
+              <Events>
+                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jMainWindowAddColumnButton2MouseReleased"/>
+              </Events>
+            </Component>
           </SubComponents>
         </Container>
         <Container class="javax.swing.JScrollPane" name="jContactsListScrollPane">
@@ -359,6 +370,9 @@
                 <Property name="cellSelectionEnabled" type="boolean" value="true"/>
                 <Property name="selectionModel" type="javax.swing.ListSelectionModel" editor="org.netbeans.modules.form.editors2.JTableSelectionModelEditor">
                   <JTableSelectionModel selectionMode="2"/>
+                </Property>
+                <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
+                  <TableHeader reorderingAllowed="false" resizingAllowed="false"/>
                 </Property>
               </Properties>
             </Component>

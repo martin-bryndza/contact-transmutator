@@ -219,6 +219,8 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
     }
 
+
+
         /**
          * Returns cloned column schema.
          * Java operates with pointers. Implementing deep copy constructor for this class would be troublesome. This is the best way to make an independent copy of columnschema.
@@ -1070,20 +1072,7 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
 
     //<editor-fold defaultstate="collapsed" desc="added by Martin B.">
     public int getColumnCount(){
-//        int columnCount = 0;
-
         NodeList columnList = returnXPathNodeList("//columnschema/column");
-//        for (int i = 0; i < columnList.getLength(); i++){
-//            Element column = (Element)columnList.item(i);
-//            if(column.getAttribute("mergeInOther").equals("yes")){
-//                //do not increment
-//            } else if(column.getAttribute("aggregated").equals("yes")){
-//                NodeList aggColumnList = column.getElementsByTagName("column");
-//                columnCount += aggColumnList.getLength();
-//            } else {
-//                columnCount++;
-//            }
-//        }
         return columnList.getLength();//columnCount;
     }
 
@@ -1106,6 +1095,17 @@ public class InternalDocColumnSchemaImpl implements InternalDocColumnSchema {
         }
 
         return false;
+    }
+
+    public void addColumn(){
+        Element newColumn = root.getOwnerDocument().createElement("column");
+        int newColumnNumber = getColumnCount();
+        newColumn.setAttribute("number", String.valueOf(newColumnNumber));
+        newColumn.setAttribute("mergedinother", "no");
+        newColumn.setAttribute("aggregated", "no");
+        root.appendChild(newColumn);
+        setSelectedtypeType(newColumnNumber, VCFTypesEnum.Note.toString());
+        setCandidateType(newColumnNumber, VCFTypesEnum.Note.toString());
     }
 
     @Override

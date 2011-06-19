@@ -387,5 +387,7 @@ public interface InternalDocColumnSchema {
     @Override
     public String toString();
 
+    public void addColumn();
+
     //</editor-fold>
 }
