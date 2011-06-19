@@ -113,10 +113,12 @@ public class ContactsListTableModel extends AbstractTableModel{
         selectedColumnsToCopy = table.getSelectedColumns();
         selectedRowsToCopy = table.getSelectedRows();
         dataCopied.clear();
-        for (Integer row : selectedRowsToCopy){
+        for (int row = 0; row<selectedRowsToCopy.length; row++){
             dataCopied.add(new ArrayList<String>());
-            for (Integer column : selectedColumnsToCopy){
-                dataCopied.get(row).add(data.get(row).get(column));
+            for (int column = 0; column<selectedColumnsToCopy.length; column++){
+                int rowIndex = selectedRowsToCopy[row];
+                int columnIndex = selectedColumnsToCopy[column];
+                dataCopied.get(row).add(data.get(rowIndex).get(columnIndex));
             }
         }
     }
@@ -154,8 +156,8 @@ public class ContactsListTableModel extends AbstractTableModel{
 
         for (int row = 0; row<dataCopied.size(); row++){
             for (int column = 0; column<dataCopied.get(row).size(); column++){
-                int targetRow = selectedRowsToCopy[row]-rowDifferenceIndex;
-                int targetColumn = selectedColumnsToCopy[column]-columnDifferenceIndex;
+                int targetRow = selectedRowsToCopy[row]+rowDifferenceIndex;
+                int targetColumn = selectedColumnsToCopy[column]+columnDifferenceIndex;
                 if (targetRow < getRowCount() && targetColumn < getColumnCount())
                     setValueAt(dataCopied.get(row).get(column),targetRow,targetColumn);
             }
@@ -163,7 +165,13 @@ public class ContactsListTableModel extends AbstractTableModel{
     }
 
     void deleteValues() {
-        throw new UnsupportedOperationException("Not yet implemented");
+        int[] selectedColumnsToDelete = table.getSelectedColumns();
+        int[] selectedRowsToDelete = table.getSelectedRows();
+        for(Integer row : selectedRowsToDelete){
+            for (Integer column : selectedColumnsToDelete){
+                setValueAt("", row, column);
+            }
+        }
     }
 
 }

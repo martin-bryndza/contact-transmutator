@@ -26,9 +26,11 @@ import contacttransmut.VCFTypesEnum;
 import contacttransmut.WriteCSV;
 import contacttransmut.WriteVCF;
 import java.awt.Component;
+import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -50,7 +52,9 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollBar;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
@@ -95,6 +99,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     boolean updateEnabled = true;
     boolean saving = false;
 
+    JPopupMenu jPopupMenu;
+
     /** Creates new form ContactTransmutGUIMain */
     public ContactTransmutGUIMain() {
         try {
@@ -104,6 +110,33 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         }
 
         initComponents();
+
+
+        jPopupMenu = new JPopupMenu();
+        JMenuItem menuItemPaste = new JMenuItem("Paste");
+        menuItemPaste.setEnabled(false);
+        menuItemPaste.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tableModel.pasteValues();
+            }
+        });
+        JMenuItem menuItemCopy = new JMenuItem("Copy");
+        menuItemCopy.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ((JMenuItem)jPopupMenu.getSubElements()[1]).setEnabled(true);
+                tableModel.copyValues();
+            }
+        });
+        jPopupMenu.add(menuItemCopy);
+        jPopupMenu.add(menuItemPaste);
+        JMenuItem menuItemDelete = new JMenuItem("Delete");
+        menuItemDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tableModel.deleteValues();
+            }
+        });
+        jPopupMenu.add(menuItemDelete);
+
 
         jContactsListTable.setModel(tableModel);
         jContactsListTable.setAutoscrolls(true);
@@ -117,14 +150,27 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         jContactsListTable.addKeyListener(new java.awt.event.KeyAdapter() {
             @Override
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                if (evt.getKeyCode() == KeyEvent.VK_COPY){
+            public void keyPressed(java.awt.event.KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_COPY){
+                    System.err.println(KeyEvent.getKeyText(e.getKeyCode()) + "pressed");
                     tableModel.copyValues();
-                } else if (evt.getKeyCode() == KeyEvent.VK_PASTE){
+                } else if (e.getKeyCode() == KeyEvent.VK_PASTE){
+                    System.err.println(KeyEvent.getKeyText(e.getKeyCode()) + "pressed");
                     tableModel.pasteValues();
-                } else if (evt.getKeyCode() == KeyEvent.VK_DELETE){
+                } else if (e.getKeyCode() == KeyEvent.VK_DELETE){
+                    System.err.println(KeyEvent.getKeyText(e.getKeyCode()) + "pressed");
                     tableModel.deleteValues();
                 }
+            }
+        });
+
+        jContactsListTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON3){
+                    jPopupMenu.show(jContactsListTable, e.getX(), e.getY());
+                }
+                super.mouseClicked(e);
             }
         });
 
@@ -368,7 +414,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             }
         });
 
-        jRefreshProgressBar2.setToolTipText("null");
+        jRefreshProgressBar2.setToolTipText("");
         jRefreshProgressBar2.setCursor(new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
         jRefreshProgressBar2.setBounds(0, 10, 350, 35);
         jLayeredPane2.add(jRefreshProgressBar2, javax.swing.JLayeredPane.DEFAULT_LAYER);
