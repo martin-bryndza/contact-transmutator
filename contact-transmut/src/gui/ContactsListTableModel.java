@@ -7,8 +7,14 @@ package gui;
 
 import contacttransmut.InternalDocColumnSchema;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -29,8 +35,10 @@ public class ContactsListTableModel extends AbstractTableModel{
     int[] selectedColumnsToCopy;
     int[] selectedRowsToCopy;
     private boolean cellsAreEditable = true;
+    private XPath xpath = XPathFactory.newInstance().newXPath();
 
     public void initTable(Document internalD, InternalDocColumnSchema columnSch, JTable table){
+
         internalDoc = internalD;
         columnSchema = columnSch;
         this.table = table;
@@ -112,14 +120,27 @@ public class ContactsListTableModel extends AbstractTableModel{
         NodeList uncategorizedList = internalDoc.getElementsByTagName("uncategorized");
         Element row = (Element) uncategorizedList.item(rowIndex);
         NodeList dataList = row.getElementsByTagName("data");
-        Element dataElement = (Element) dataList.item(columnIndex);
+        Element dataElement = null;
+        try {
+            dataElement = (Element) xpath.evaluate("data[@counter=\"" + columnIndex + "\"]", row, XPathConstants.NODE);
+        } catch (XPathExpressionException ex) {
+            Logger.getLogger(ContactsListTableModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
         if (dataElement == null){
             for (int i = dataList.getLength(); i < columnIndex+1;i++){
                 Element newdata = row.getOwnerDocument().createElement("data");
                 newdata.setAttribute("counter", String.valueOf(i));
                 row.appendChild(newdata);
             }
-            dataElement = (Element) dataList.item(columnIndex);
+            try {
+                dataElement = (Element) xpath.evaluate("data[@counter=\"" + columnIndex + "\"]", row, XPathConstants.NODE);
+            } catch (XPathExpressionException ex) {
+                Logger.getLogger(ContactsListTableModel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        if (dataElement == null){
+            System.err.println("Error while setting data.");
+            return;
         }
         if (aValue!=null){
             dataElement.setTextContent((String) aValue);
