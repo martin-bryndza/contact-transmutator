@@ -28,6 +28,7 @@ public class ContactsListTableModel extends AbstractTableModel{
     private ArrayList<ArrayList<String>> dataCopied;
     int[] selectedColumnsToCopy;
     int[] selectedRowsToCopy;
+    private boolean cellsAreEditable = true;
 
     public void initTable(Document internalD, InternalDocColumnSchema columnSch, JTable table){
         internalDoc = internalD;
@@ -95,9 +96,14 @@ public class ContactsListTableModel extends AbstractTableModel{
     }
 
     @Override
-    public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return true;
+    public boolean isCellEditable(int rowIndex, int columnIndex) {        
+        return cellsAreEditable;
     }
+
+    public void setCellsAreEditable(boolean cellsAreEditable) {
+        this.cellsAreEditable = cellsAreEditable;
+    }
+
 
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
@@ -106,7 +112,12 @@ public class ContactsListTableModel extends AbstractTableModel{
         NodeList allDataElements = internalDoc.getElementsByTagName("data");
         int dataToChange = columnCount*rowIndex + columnIndex;
         Element dataElement = (Element) allDataElements.item(dataToChange);
-        dataElement.setTextContent((String) aValue);
+        if (aValue!=null){
+            dataElement.setTextContent((String) aValue);
+        }
+        else {
+            dataElement.setTextContent("");
+        }
     }
 
     void copyValues() {
@@ -124,6 +135,9 @@ public class ContactsListTableModel extends AbstractTableModel{
     }
 
     void pasteValues() {
+        if (!cellsAreEditable)
+            return;
+
         int[] selectedColumnsToPaste = table.getSelectedColumns();
         int[] selectedRowsToPaste = table.getSelectedRows();
 
@@ -165,6 +179,9 @@ public class ContactsListTableModel extends AbstractTableModel{
     }
 
     void deleteValues() {
+        if (!cellsAreEditable)
+            return;
+
         int[] selectedColumnsToDelete = table.getSelectedColumns();
         int[] selectedRowsToDelete = table.getSelectedRows();
         for(Integer row : selectedRowsToDelete){

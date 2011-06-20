@@ -172,8 +172,8 @@
                       <Component id="jMainWindowPanel" alignment="1" min="-2" max="-2" attributes="0"/>
                       <Group type="102" alignment="1" attributes="0">
                           <Group type="103" groupAlignment="1" attributes="0">
-                              <Component id="jContactsListScrollPane" alignment="1" pref="1040" max="32767" attributes="0"/>
-                              <Component id="jComboBoxesScrollPane" alignment="1" pref="1040" max="32767" attributes="0"/>
+                              <Component id="jContactsListScrollPane" alignment="1" pref="1060" max="32767" attributes="0"/>
+                              <Component id="jComboBoxesScrollPane" alignment="1" pref="1060" max="32767" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -207,7 +207,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jMainWindowShowInternalDocButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jMainWindowShowTextFileButton" min="-2" max="-2" attributes="0"/>
+                      <Component id="jMainWindowShowCompiledDocButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jMainWindowAddColumnButton2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -230,7 +230,7 @@
                               <Group type="103" groupAlignment="3" max="-2" attributes="0">
                                   <Component id="jMainWindowBackButton" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
                                   <Component id="jMainWindowAddColumnButton2" alignment="3" min="-2" pref="35" max="-2" attributes="0"/>
-                                  <Component id="jMainWindowShowTextFileButton" alignment="3" pref="35" max="32767" attributes="0"/>
+                                  <Component id="jMainWindowShowCompiledDocButton" alignment="3" pref="35" max="32767" attributes="0"/>
                                   <Component id="jMainWindowShowInternalDocButton" alignment="3" pref="35" max="32767" attributes="0"/>
                                   <Component id="jMainWindowShowColumnSchemaButton" alignment="3" pref="35" max="32767" attributes="0"/>
                                   <Component id="jMainWindowNextButton" alignment="3" pref="35" max="32767" attributes="0"/>
@@ -268,12 +268,12 @@
                 <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jMainWindowNextButtonMouseReleased"/>
               </Events>
             </Component>
-            <Component class="javax.swing.JButton" name="jMainWindowShowTextFileButton">
+            <Component class="javax.swing.JButton" name="jMainWindowShowCompiledDocButton">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Input File"/>
+                <Property name="text" type="java.lang.String" value="Compiled Doc"/>
               </Properties>
               <Events>
-                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jMainWindowShowTextFileButtonMouseReleased"/>
+                <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jMainWindowShowCompiledDocButtonMouseReleased"/>
               </Events>
             </Component>
             <Component class="javax.swing.JButton" name="jMainWindowShowColumnSchemaButton">
