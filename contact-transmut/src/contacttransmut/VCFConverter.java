@@ -1,5 +1,7 @@
 package contacttransmut;
 
+import java.util.ArrayList;
+
 /**
  * Class containing two static methods that helps convert VCF names to natural names and the other way around.
  *
@@ -7,39 +9,226 @@ package contacttransmut;
  */
 public class VCFConverter {
 
-    /* TO DO: return name by specified by TYPE
-     * Method returns natural name for VCF tag.
+    /*
+     * Method returns natural names for VCF tag considering property TYPE.
+     * If no property TYPE present returns simple name, otherwise returns home/work/both variations.
+     * Process is the same with secondary properties. Returns simple name or text/phone/voice../all variations.
      *
      * @param VCF tag to convert
-     * @return Natural name for VCF tag.
+     * @return Natural names for VCF tag.
      */
-    public static String VCFNameToNaturalName(String VCFName) {
-        String naturalName = "Note";
+    public static ArrayList<String> VCFNameToNaturalName(String VCFName, int VCFVersion) {
+        
+        ArrayList<String> naturalName = new ArrayList<String>();
 
+        boolean home = false;
+        boolean work = false;
+        boolean text = false;
+        boolean voice = false;
+        boolean fax = false;
+        boolean cell = false;
+        boolean video = false;
+        boolean pager = false;
+        boolean textphone = false;
+        boolean uri = false;
+        boolean utc_offset = false;
+
+        // Split string containing type;property;property..
         String[] arr = VCFName.split(";");
-        VCFName = arr[0];
+        VCFName = arr[0].toUpperCase();
 
-        if (VCFName.compareToIgnoreCase("N") == 0)          naturalName = "Name";
-        if (VCFName.compareToIgnoreCase("FN") == 0)         naturalName = "Formatted_Name";
-        if (VCFName.compareToIgnoreCase("NICKNAME") == 0)   naturalName = "Nickname";
-        if (VCFName.compareToIgnoreCase("PHOTO") == 0)      naturalName = "Photograph";
-        if (VCFName.compareToIgnoreCase("BDAY") == 0)       naturalName = "Birthday";
-        if (VCFName.compareToIgnoreCase("ADR") == 0)        naturalName = "Delivery_Address";
-        if (VCFName.compareToIgnoreCase("LABEL") == 0)      naturalName = "Label_Address";
-        if (VCFName.compareToIgnoreCase("TEL") == 0)        naturalName = "Telephone";
-        if (VCFName.compareToIgnoreCase("EMAIL") == 0)      naturalName = "Email";
-        if (VCFName.compareToIgnoreCase("MAILER") == 0)     naturalName = "Email_Program";
-        if (VCFName.compareToIgnoreCase("TZ") == 0)         naturalName = "Time_Zone";
-        if (VCFName.compareToIgnoreCase("GEO") == 0)        naturalName = "Global_Positioning";
-        if (VCFName.compareToIgnoreCase("TITLE") == 0)      naturalName = "Title";
-        if (VCFName.compareToIgnoreCase("ROLE") == 0)       naturalName = "Role_or_occupation";
-        if (VCFName.compareToIgnoreCase("ORG") == 0)        naturalName = "Organization_Name_or_Organizational_unit";
-        if (VCFName.compareToIgnoreCase("NOTE") == 0)       naturalName = "Note";
-        if (VCFName.compareToIgnoreCase("REV") == 0)        naturalName = "Last_Revision";
-        if (VCFName.compareToIgnoreCase("SOUND") == 0)      naturalName = "Sound";
-        if (VCFName.compareToIgnoreCase("URL") == 0)        naturalName = "URL";
-        if (VCFName.compareToIgnoreCase("UID") == 0)        naturalName = "Unique_Identifier";
-        if (VCFName.compareToIgnoreCase("KEY") == 0)        naturalName = "Public_Key";
+        if (VCFVersion == 3) {
+            // For ever property
+            for (int i = 1; i < arr.length; i++) {
+                // If it's TYPE property (we ignore the others)
+                if (arr[i].toUpperCase().startsWith("TYPE=")) {
+                    // Get property values
+                    String[] values = arr[i].substring(5).split(",");
+                    for (String property : values) {
+                        if (property.compareToIgnoreCase("home") == 0)          home = true;
+                        if (property.compareToIgnoreCase("work") == 0)          work = true;
+                        if (property.compareToIgnoreCase("text") == 0)          text = true;
+                        if (property.compareToIgnoreCase("voice") == 0)         voice = true;
+                        if (property.compareToIgnoreCase("fax") == 0)           fax = true;
+                        if (property.compareToIgnoreCase("cell") == 0)          cell = true;
+                        if (property.compareToIgnoreCase("video") == 0)         video = true;
+                        if (property.compareToIgnoreCase("pager") == 0)         pager = true;
+                        if (property.compareToIgnoreCase("textphone") == 0)     textphone = true;
+                        if (property.compareToIgnoreCase("uri") == 0)           uri = true;
+                        if (property.compareToIgnoreCase("utc_offset") == 0)    utc_offset = true;
+                    }
+                }
+            }
+        }
+
+        if (VCFName.compareTo("N") == 0)        naturalName.add("Name");
+        if (VCFName.compareTo("FN") == 0)       naturalName.add("Formatted_Name");
+        if (VCFName.compareTo("NICKNAME") == 0) {
+            if (work || home) {
+                if (work)   naturalName.add("Nickname_work");
+                if (home)   naturalName.add("Nickname_home");
+            } else {
+                            naturalName.add("Nickname");
+            }
+        }
+        if (VCFName.compareTo("PHOTO") == 0) {
+            if (work || home) {
+                if (work)   naturalName.add("Photograph_work");
+                if (home)   naturalName.add("Photograph_home");
+            } else {
+                            naturalName.add("Photograph");
+            }
+        }
+        if (VCFName.compareTo("BDAY") == 0)     naturalName.add("Birthday");
+        if (VCFName.compareTo("ADR") == 0) {
+            if (work || home) {
+                if (work)   naturalName.add("Delivery_Address_work");
+                if (home)   naturalName.add("Delivery_Address_home");
+            } else {
+                            naturalName.add("Delivery_Address");
+            }
+        }
+        if (VCFName.compareTo("LABEL") == 0) {
+            if (work || home) {
+                if (work)   naturalName.add("Label_Address_work");
+                if (home)   naturalName.add("Label_Address_home");
+            } else {
+                            naturalName.add("Label_Address");
+            }
+        }
+        if (VCFName.compareTo("TEL") == 0) {
+            if (work || home) {
+                if (work) {
+                    if (text || voice || fax || cell || video || pager || textphone) {
+                        if (text)       naturalName.add("Telephone_work_text");
+                        if (voice)      naturalName.add("Telephone_work_voice");
+                        if (fax)        naturalName.add("Telephone_work_fax");
+                        if (cell)       naturalName.add("Telephone_work_cell");
+                        if (video)      naturalName.add("Telephone_work_video");
+                        if (pager)      naturalName.add("Telephone_work_pager");
+                        if (textphone)  naturalName.add("Telephone_work_textphone");
+                    } else {
+                                        naturalName.add("Telephone_work");
+                    }
+                }
+                if (home) {
+                    if (text || voice || fax || cell || video || pager || textphone) {
+                        if (text)       naturalName.add("Telephone_home_text");
+                        if (voice)      naturalName.add("Telephone_home_voice");
+                        if (fax)        naturalName.add("Telephone_home_fax");
+                        if (cell)       naturalName.add("Telephone_home_cell");
+                        if (video)      naturalName.add("Telephone_home_video");
+                        if (pager)      naturalName.add("Telephone_home_pager");
+                        if (textphone)  naturalName.add("Telephone_home_textphone");
+                    } else {
+                                        naturalName.add("Telephone_home");
+                    }
+                }
+            } else {
+                if (text || voice || fax || cell || video || pager || textphone) {
+                    if (text)       naturalName.add("Telephone_text");
+                    if (voice)      naturalName.add("Telephone_voice");
+                    if (fax)        naturalName.add("Telephone_fax");
+                    if (cell)       naturalName.add("Telephone_cell");
+                    if (video)      naturalName.add("Telephone_video");
+                    if (pager)      naturalName.add("Telephone_pager");
+                    if (textphone)  naturalName.add("Telephone_textphone");
+                } else {
+                                    naturalName.add("Telephone");
+                }
+            }
+        }
+        if (VCFName.compareTo("EMAIL") == 0) {
+            if (work || home) {
+                if (work)   naturalName.add("Email_work");
+                if (home)   naturalName.add("Email_home");
+            } else {
+                            naturalName.add("Email");
+            }
+        }
+        if (VCFName.compareTo("MAILER") == 0)     naturalName.add("Email_Program");
+        if (VCFName.compareTo("TZ") == 0) {
+            if (text)       naturalName.add("Time_Zone_text");
+            if (uri)        naturalName.add("Time_Zone_uri");
+            if (utc_offset) naturalName.add("Time_Zone_utc_offset");
+        }
+        if (VCFName.compareTo("GEO") == 0) {
+            if (work || home) {
+                if (work)   naturalName.add("Global_Positioning_work");
+                if (home)   naturalName.add("Global_Positioning_home");
+            } else {
+                            naturalName.add("Global_Positioning");
+            }
+        }
+        if (VCFName.compareTo("TITLE") == 0) {
+            if (work || home) {
+                if (work)   naturalName.add("Title_work");
+                if (home)   naturalName.add("Title_home");
+            } else {
+                            naturalName.add("Title");
+            }
+        }
+        if (VCFName.compareTo("ROLE") == 0) {
+            if (work || home) {
+                if (work)   naturalName.add("Role_or_occupation_work");
+                if (home)   naturalName.add("Role_or_occupation_home");
+            } else {
+                            naturalName.add("Role_or_occupation");
+            }
+        }
+        if (VCFName.compareTo("LOGO") == 0) {
+            if (work || home) {
+                if (work)   naturalName.add("Logo_work");
+                if (home)   naturalName.add("Logo_home");
+            } else {
+                            naturalName.add("Logo");
+            }
+        }
+        if (VCFName.compareTo("ORG") == 0) {
+            if (work || home) {
+                if (work)   naturalName.add("Organization_Name_or_Organizational_unit_work");
+                if (home)   naturalName.add("Organization_Name_or_Organizational_unit_home");
+            } else {
+                            naturalName.add("Organization_Name_or_Organizational_unit");
+            }
+        }
+        if (VCFName.compareTo("NOTE") == 0) {
+            if (work || home) {
+                if (work)   naturalName.add("Note_work");
+                if (home)   naturalName.add("Note_home");
+            } else {
+                            naturalName.add("Note");
+            }
+        }
+        if (VCFName.compareTo("REV") == 0)     naturalName.add("Last_Revision");
+        if (VCFName.compareTo("SOUND") == 0) {
+            if (work || home) {
+                if (work)   naturalName.add("Sound_work");
+                if (home)   naturalName.add("Sound_home");
+            } else {
+                            naturalName.add("Sound");
+            }
+        }
+        if (VCFName.compareTo("REV") == 0)     naturalName.add("Last_Revision");
+        if (VCFName.compareTo("URL") == 0) {
+            if (work || home) {
+                if (work)   naturalName.add("URL_work");
+                if (home)   naturalName.add("URL_home");
+            } else {
+                            naturalName.add("URL");
+            }
+        }
+        if (VCFName.compareTo("UID") == 0)     naturalName.add("Unique_Identifier");
+        if (VCFName.compareTo("KEY") == 0) {
+            if (work || home) {
+                if (work)   naturalName.add("Public_Key_work");
+                if (home)   naturalName.add("Public_Key_home");
+            } else {
+                            naturalName.add("Public_Key");
+            }
+        }
+
+        if (naturalName.isEmpty()) naturalName.add("Note");
 
         return naturalName;
     }

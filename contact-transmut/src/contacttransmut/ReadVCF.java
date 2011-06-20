@@ -49,6 +49,7 @@ public class ReadVCF implements InputFilter {
         String line = "";
         Scanner scanner = null;
         boolean parsingContact = false;
+        int VCFVersion = 3;
         Element thisContact = null;
         Element thisContactUncat = null;
         Element thisProperty = null;
@@ -79,6 +80,8 @@ public class ReadVCF implements InputFilter {
                     }
 
                     parsingContact = true;
+                    VCFVersion = 3;
+                    indexLastModified = -1;
 
                 } else if (parsingContact) {
                     if (line.equals("END:VCARD")) {
@@ -89,38 +92,48 @@ public class ReadVCF implements InputFilter {
                         // New property detected
                         if (contactLine.length > 1) {
                             if (!contactLine[0].equals("VERSION")) {
-                                String naturalName = VCFConverter.VCFNameToNaturalName(contactLine[0]);
-                                boolean mpInstAllowed = helper.vcfCanHaveMultipleInstances(naturalName);
-                                boolean newType = true;
+                                ArrayList<String> naturalNames = VCFConverter.VCFNameToNaturalName(contactLine[0], VCFVersion);
 
-                                // We will go through all columns and try to fill the first empty column with the type of our property
-                                for (int i = 0; i < detectedTypes.size(); i++) {
-                                    if (detectedTypes.get(i).equals(naturalName)) {
-                                        Node property = thisContactUncat.getChildNodes().item(i);
-                                        
-                                        // If column is empty
-                                        if (property.getTextContent().equals("")) {
-                                            property.setTextContent(contactLine[1]);
-                                            indexLastModified = i;
-                                            newType = false;
-                                            break;
-                                        // Column isn't empty, but there is allowed only one instance of this type
-                                        } else if (!mpInstAllowed) {
-                                            property.setTextContent(property.getTextContent() + ";" + contactLine[1]);
+                                for (int j = 0; j < naturalNames.size(); j++) {
+                                    String naturalName = naturalNames.get(j);
+                                    boolean mpInstAllowed = helper.vcfCanHaveMultipleInstances(naturalName);
+                                    boolean newType = true;
+
+                                    // We will go through all columns and try to fill the first empty column with the type of our property
+                                    for (int i = 0; i < detectedTypes.size(); i++) {
+                                        if (detectedTypes.get(i).equals(naturalName)) {
+                                            Node property = thisContactUncat.getChildNodes().item(i);
+
+                                            // If column is empty
+                                            if (property.getTextContent().equals("")) {
+                                                property.setTextContent(contactLine[1]);
+                                                indexLastModified = i;
+                                                newType = false;
+                                                break;
+                                            // Column isn't empty, but there is allowed only one instance of this type
+                                            } else if (!mpInstAllowed) {
+                                                property.setTextContent(property.getTextContent() + ";" + contactLine[1]);
+                                            }
                                         }
                                     }
-                                }
 
-                                // If all columns with the type of our property are filled or there is no such column
-                                // make new one and fill it with data
-                                if (newType) {
-                                    detectedTypes.add(naturalName);
-                                    thisProperty = this.doc.createElement("data");
-                                    thisProperty.setAttribute("counter", Integer.toString(maxCounter));
-                                    thisProperty.setTextContent(contactLine[1]);
-                                    thisContactUncat.appendChild(thisProperty);
-                                    indexLastModified = maxCounter;
-                                    maxCounter++;
+                                    // If all columns with the type of our property are filled or there is no such column
+                                    // make new one and fill it with data
+                                    if (newType) {
+                                        detectedTypes.add(naturalName);
+                                        thisProperty = this.doc.createElement("data");
+                                        thisProperty.setAttribute("counter", Integer.toString(maxCounter));
+                                        thisProperty.setTextContent(contactLine[1]);
+                                        thisContactUncat.appendChild(thisProperty);
+                                        indexLastModified = maxCounter;
+                                        maxCounter++;
+                                    }
+                                }
+                            } else {
+                                if (contactLine[1].compareTo("2.1") == 0) {
+                                    VCFVersion = 2;
+                                } else {
+                                    VCFVersion = 3;
                                 }
                             }
                         // Multi-line value or broken file

@@ -1,26 +1,35 @@
 BEGIN:VCARD
-asnbfjdka
-VERSION:2.1
-N:Gump;Forrest
-FN:Forrest Gump
-FN:NextName
-N:Blue
-BDAY:1995-05-06
-TEL;TYPE=HOME:+220547152
+this isnt supposed to be here, lets skip it
+VERSION:3.0
+N:Dawg;Johny
+FN:Johny Dawg
+TEL;TYPE=HOME,work:+123 456 789
+ADR:This is multiline address
+Doghouse Street 487
+Detroit
+240 000
+NICKNAME:Dogie
 END:VCARD
 
 BEGIN:VCARD
+this isnt supposed to be here, lets skip it
 VERSION:2.1
-FN:Norrest Nump
+N:Dawg;Johny
+FN:Johny Dawg
+TEL;TYPE=HOME,work,video:+123 456 789
+ADR:This is multiline address
+Doghouse Street 487
+Detroit
+240 000
+NICKNAME:Dogie
+END:VCARD
 
-BDAY:1990-05-06
-N:Nump;Norrest
+BEGIN:VCARD
+There is no version specified, tag that doesnt exist, this line isnt supposed to be here
+BDAY:1991-11-17
+N:Contact;Broken
+FN:Broken Contact
 ANOTHER:weee;deee
 mooogooo
-END:VCARD
-BEGIN:VCARD
-VERSION:2.1
-N:Wee;Dee
-FN:Dee Wee
-BDAY:1991-05-06
+TEL;TYPE=home,work:0118999881999119725-3
 END:VCARD
