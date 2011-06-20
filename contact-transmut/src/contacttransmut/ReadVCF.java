@@ -1,7 +1,15 @@
 package contacttransmut;
 
+import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.MimeUtility;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -31,14 +39,14 @@ public class ReadVCF implements InputFilter {
         this.fileName = pFileName;
         this.fileEncoding = pEncoding;
         this.detectedTypes = new ArrayList();
-        
+
         dbf = DocumentBuilderFactory.newInstance();
         try {
             db = dbf.newDocumentBuilder();
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(ReadVCF.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         this.doc = db.newDocument();
         Element root = this.doc.createElement("root");
         this.doc.appendChild(root);
@@ -88,6 +96,35 @@ public class ReadVCF implements InputFilter {
                         this.doc.getFirstChild().appendChild(thisContact);
                         parsingContact = false;
                     } else {
+                        try { //if input file is vCard 2.1 with quoted-printable characters, we’ll assume it’s in UTF-8 and try to convert it into readable form
+                            if (VCFVersion == 2) {
+                                InputStream stringStreamConvQuot = new ByteArrayInputStream(line.getBytes("UTF-8"));
+                                InputStream outputConvQuot = MimeUtility.decode(stringStreamConvQuot, "quoted-printable");
+                                String unquotedLine = "";
+
+                                if (outputConvQuot != null) {
+                                    Writer writerConvQuot = new StringWriter();
+
+                                    char[] bufferConvQuot = new char[1024];
+                                    try {
+                                        Reader readerConvQuot = new BufferedReader(new InputStreamReader(outputConvQuot,
+                                                "UTF-8"));
+                                        Integer outputConvQuotBuffCount;
+                                        while ((outputConvQuotBuffCount = readerConvQuot.read(bufferConvQuot)) != -1) {
+                                            writerConvQuot.write(bufferConvQuot, 0, outputConvQuotBuffCount);
+                                        }
+                                    } finally {
+                                        outputConvQuot.close();
+                                    }
+                                    unquotedLine = writerConvQuot.toString();
+                                }
+
+                                line = unquotedLine;
+                            }
+                        } catch (Exception e) {
+                            //pssssssst :-)
+                        }
+
                         String[] contactLine = line.split(":");
                         // New property detected
                         if (contactLine.length > 1) {
@@ -110,7 +147,7 @@ public class ReadVCF implements InputFilter {
                                                 indexLastModified = i;
                                                 newType = false;
                                                 break;
-                                            // Column isn't empty, but there is allowed only one instance of this type
+                                                // Column isn't empty, but there is allowed only one instance of this type
                                             } else if (!mpInstAllowed) {
                                                 property.setTextContent(property.getTextContent() + ";" + contactLine[1]);
                                             }
@@ -136,7 +173,7 @@ public class ReadVCF implements InputFilter {
                                     VCFVersion = 3;
                                 }
                             }
-                        // Multi-line value or broken file
+                            // Multi-line value or broken file
                         } else {
                             if (indexLastModified > -1 && !contactLine[0].equals("")) {
                                 String textContent = thisContactUncat.getChildNodes().item(indexLastModified).getTextContent();
@@ -146,7 +183,7 @@ public class ReadVCF implements InputFilter {
                     }
                 }
             }
-            
+
             this.doc.getDocumentElement().setAttribute("maxColumnNumber", Integer.toString(maxCounter));
 
             // For every contact
@@ -160,9 +197,9 @@ public class ReadVCF implements InputFilter {
                     contact.getFirstChild().appendChild(thisProperty);
                 }
             }
-         } finally {
-             scanner.close();
-         }
+        } finally {
+            scanner.close();
+        }
 
         return doc;
     }
@@ -174,5 +211,4 @@ public class ReadVCF implements InputFilter {
         }
         return schema;
     }
-    
 }
