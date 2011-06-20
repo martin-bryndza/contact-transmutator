@@ -189,6 +189,10 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 } else if (e.getKeyCode() == KeyEvent.VK_DELETE) {
                     compiled = false;
                     tableModel.deleteValues();
+                } else if (e.getKeyCode() == KeyEvent.VK_X) {
+                    compiled = false;
+                    tableModel.copyValues();
+                    tableModel.deleteValues();
                 }
             }
         });
