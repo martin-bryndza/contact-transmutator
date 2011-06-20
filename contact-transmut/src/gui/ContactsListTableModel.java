@@ -114,7 +114,12 @@ public class ContactsListTableModel extends AbstractTableModel{
         NodeList dataList = row.getElementsByTagName("data");
         Element dataElement = (Element) dataList.item(columnIndex);
         if (dataElement == null){
-            return;
+            for (int i = dataList.getLength(); i < columnIndex+1;i++){
+                Element newdata = row.getOwnerDocument().createElement("data");
+                newdata.setAttribute("counter", String.valueOf(i));
+                row.appendChild(newdata);
+            }
+            dataElement = (Element) dataList.item(columnIndex);
         }
         if (aValue!=null){
             dataElement.setTextContent((String) aValue);
