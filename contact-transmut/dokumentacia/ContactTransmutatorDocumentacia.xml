@@ -1,0 +1,651 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book>
+  <bookinfo>
+    <title>Contact Transmutator</title>
+
+    <author>
+      <firstname>Jakub</firstname>
+
+      <surname>Svoboda</surname>
+    </author>
+
+    <author>
+      <firstname>Martina</firstname>
+
+      <surname>Hlinková</surname>
+    </author>
+
+    <author>
+      <firstname>Martin</firstname>
+
+      <surname>Bryndza</surname>
+    </author>
+
+    <author>
+      <firstname>Martin</firstname>
+
+      <surname>Molnár</surname>
+    </author>
+
+    <pubdate></pubdate>
+  </bookinfo>
+
+  <chapter>
+    <title>Úvod a špecifikácia projektu</title>
+
+    <section>
+      <title>Úvod</title>
+
+      <para>Projekt Contact Transmutator vznikol ako súčasť výuky predmetu
+      PB138 - Moderní značkovací jazyky a jejich aplikace vyučovanej na
+      fakulte informatiky Masarykovej univerzity počas obdobia jarného
+      semestru 2011 pod vedenim doc. RNDr. Tomáša Pitnera Ph.D.</para>
+
+      <para>Cieľom projektu bolo naučit sa pracovať s profesionálnymi
+      nástrojmi pre komunitný vývoj, schopnosť pracovať a spracovávať
+      dokumenty vo formátoch XML a osvojenie si práce so základnými
+      štandardami a technológiami moderných značkovacích jazykov na báze XML a
+      ich aplikacií.</para>
+    </section>
+
+    <section>
+      <title>Členovia projektu, náplň práce a umiestnenie projektu</title>
+
+      <para>Členovia vývoja tohto projektu sú:<itemizedlist>
+          <listitem>
+            <para>Jakub Svoboda <note>
+                <para>základná kostra projektu, jeho základných rozhraní a
+                implementácií funkcii; príprava filtrov pre CSV</para>
+              </note></para>
+          </listitem>
+
+          <listitem>
+            <para>Martin Bryndza<note>
+                <para>programovanie grafického GUI; príprava filtrov pre
+                CompiledDoc</para>
+              </note></para>
+          </listitem>
+
+          <listitem>
+            <para>Martina Hlinková<note>
+                <para>príprava filtrov pre ODS (Open Document Format -
+                spreadsheets); dokumentácia v DocBook</para>
+              </note></para>
+          </listitem>
+
+          <listitem>
+            <para>Martin Molnár<note>
+                <para>príprava filtrov pre VCF; testovacie nástroje</para>
+              </note></para>
+          </listitem>
+        </itemizedlist></para>
+
+      <para>Projekt je umiestnený na hostovskej stránke Google Code: <link
+      linkend="???">http://code.google.com/p/contact-transmutator</link> , kde
+      sa dajú zhliadnuť wikistránky a návod, prípadne stiahnúť projekt.</para>
+    </section>
+
+    <section>
+      <title>Motivácia</title>
+
+      <para>Adresáre s kontaktami sú neoddelitelnou súčasťou moderného spôsobu
+      života. V dnešnej dobe avšak existuje nepreberné množstvo formátov na
+      uchovávanie kontaktov, adries, čísel, poznámok atď. Problém nastáva ak
+      isté zariadenia preferujú len jeden z formátov. Prenos týchto citlivých
+      dát sa preto stáva nepríjemne zdĺhavou zálezitosťou. ďalsí problém
+      nastáva s mentalitou konkrétnych užívateľov a ich potrieb. Každý jeden
+      užívateľ múže svoje kontakty zaznamenávať inými spôsobmi nielen
+      softwérovo ale i logicky.</para>
+
+      <para>Náš program Contact Transmutator je navrhnutý na riešenie tohoto
+      problému, ako transformáciu formátov tak logické tiedenie informácií v
+      štruktúre kontaktov.</para>
+    </section>
+
+    <section>
+      <title>Špecifikácia</title>
+
+      <para>Contact Transmutator parsuje neštandardne uložené dáta (napr. meno
+      a číslo mobilného telefónu v jednom stĺpci záznamu formátoch VCF, ODS,
+      CSV). Aplikácia je schopná automaticky detekovať rôzne typy dát a ich
+      hodnoty a rozparsovať ich do interného XML formátu. Užívateľovi je tiež
+      umožnené určiť istú základnú parsovaciu logiku pomocou jednoduchého a
+      intuitívneho grafického rozhrania. Navyše si užívateľ môže určiť v akom
+      formáte sa uložia jeho kontakty.</para>
+
+      <example>
+        <title>Príklad operácie aplikácie</title>
+
+        <para>Používateľ má kontakty v MS Office Excel. V dokumente neexistuje
+        takmer žiadna globálna logika (jeden riadok záznamu obsahuje niekoľko
+        kontaktov, ktoré majú spolu neurčený vzťah, telefónne čísla a mená sú
+        zmixované v jednom stĺpci, niektoré významné informácie sú v podobe
+        poznámok). Užívateľ chce importovať tieto dáta do svojho mobilného
+        telefónu. Ako prvý krok vyexportuje dáta z MS Office Excel do formátu
+        CSV a použije aplikáciu Contact Transmutator pre zadelenie kontaktov
+        do istej logickej štruktúry a uloženie do formátu, ktorý podporuje
+        jeho mobilný telefón.</para>
+      </example>
+    </section>
+  </chapter>
+
+  <chapter>
+    <title>Štruktúra projektu</title>
+
+    <section>
+      <title>Vysvetlenie niektorých pojmov</title>
+
+      <para><itemizedlist>
+          <listitem>
+            <para><emphasis>InternalDoc</emphasis> = Vnútorný XML dokument,
+            ktorý sa používa na načítanie informácií do Contact Transmutator.
+            Dáta zo vstupných súborov sa parsujú do tohoto jednoduchšieho XML
+            dokumentu. Funguje ako medzičlánok ku CompiledDoc. Neobsahuje
+            informácie o type dát, ktoré sa v ňom nachádzajú.</para>
+          </listitem>
+
+          <listitem>
+            <para><emphasis>CompiledDoc</emphasis> = Vnútorý XML dokument,
+            ktorý sa používa na spracovávanie informácií a ich parsovanie do
+            výstupných filtrov. Obsahuje informácie o typoch dát v
+            jednotlivých stĺpcoch/bunkách zoznamu kontaktov.</para>
+          </listitem>
+
+          <listitem>
+            <para><emphasis>Stĺpcové schéma</emphasis> = Pomocné XML, ktoré
+            obsahuje informácie o jednotlivých stĺpcoch zoznamu.</para>
+          </listitem>
+        </itemizedlist></para>
+    </section>
+
+    <section>
+      <title>Štruktúra</title>
+
+      <para>Projekt sa delí na niekoľko samostaných častí, ktoré spolu
+      komunikujú pomocou vnútorných XML dokumentov zmienených vo vysvetlení
+      niektorých pojmov.</para>
+
+      <para>Prvá časť, Input, zahŕňa všetky vstupné filtry, ktoré berú zvolený
+      dokument, načítavajú a parsujú z neho informácie, ktoré následne
+      vypisujú do InternalDoc(resp. CompiledDoc pri vCard). V tejto časti sa
+      nehľadí na obsah jednotlivých dokumentov. Z CSV sa parsujú informácie
+      tak, že každý textový reťazec medzi čiarkami sa vloží do jednej položky
+      neformátovaného kontaku a jeden riadok vždy značí jeden kontakt. Z ODS
+      sa otvorí zip a z XML content.xml (nesie informácie len o základnom
+      formátovaní a obsahy jednotlivých tabuliek) sa načítajú informácie
+      taktiež do InternalDoc. Každý riadok tabuliek predstavuje jeden kontakt
+      a text každej bunky sa uloží do samostatnej položky. Výnimkou je VCF,
+      pretože jeho štruktúra umožnuje získavanie informácíí o každej položke v
+      kontakte. Tieto informácie (na začiatku každého riadku) sa ľahko čítajú
+      a je možné vytvorenie CompiledDoc bez medzistupňa.</para>
+
+      <para>Druhá časť je úzko spojená s GUI programu. Zahrňuje prevod
+      InternalDoc do CompiledDoc. To znamená, že podľa výberu užívateľa v GUI
+      sa mení XML stĺpcového schématu a následne sa podľa neho
+      upravuje/vytvára CompiledDoc. Táto časť sa môže opakovať ľubovolný počet
+      krát, kým užívateľ nie je spokojný.</para>
+
+      <para>Posledná výstupná časť, Output, sa stará o prevod CompiledDoc do
+      zvoleného formátu na miesto určené užívateľom.</para>
+    </section>
+  </chapter>
+
+  <chapter>
+    <title>Informácie o použitých formátoch vstupných/výstupných dát</title>
+
+    <section>
+      <title>CSV</title>
+
+      <para>CSV(Comma-seperated values, hodnoty oddelené čiarkami) je
+      jednoduchý súborový formát pre výmenu tabulkových dát. Súbor vo formáte
+      CSV pozostáva z riadkov, v ktorých sú jednotlivé položky oddelené znakom
+      čiarka (,). Hodnoty položiek môžu byť uzavreté do úvodzoviek (""), čo
+      umožňuje, aby text položky obsahoval čiarku. Ak text položky obsahuje
+      úvodzovky, sú zdvojené.</para>
+
+      <para>Keďže sa v niektorých jazykoch čiarka používa ako oddelovač
+      desatinných miest, existujú varianty, ktoré používajú iný znak pre
+      oddelovanie položiek než čiarku, najčastejšie bodkočiarku, prípadne
+      tabulátor (taká varianta sa potom označuje ako TSV, Tab-separated
+      values). Variantu s bodkočiarkou používa napríklad Microsoft
+      Excel.</para>
+
+      <para>Pre tento formát neexistuje špecifikácia, popis formátu sa však
+      nachádza v RFC 4180. <link
+      linkend="???">http://tools.ietf.org/html/rfc4180</link></para>
+
+      <example>
+        <title>Priklad CSV</title>
+
+        <para>1995,Opel,Vectra,"klimatizácia, strešné okno",45000</para>
+
+        <para>1998,Škoda,"Felicia ""Fun""",,80000</para>
+
+        <para>2002,Škoda,Octavia,"klimatizácia, ABS poškodená",70000</para>
+      </example>
+    </section>
+
+    <section>
+      <title>ODS</title>
+
+      <para>ODS je tabuľkový formát, ktorý je časťou The Open Dokument Format
+      pre kancelárske aplikácie. ODF je opensource špecifikácia založená na
+      XML formáte, vyvinutá organizáciou OASIS a implementovaná v
+      OpenOffice.</para>
+
+      <para>ODS je formát vyvinutý pre tabuľkový program Calc, ktorý je
+      súčasťou StarOffice alebo OpenOffice.Tento typ formátu pozostáva z
+      tabuliek schopných nachádzať informácie, používať rôzne deklarácie,
+      pracovať s numerickými dátami, matematickými formulami a grafmi. Každá
+      tabuľka a jej analýza je uzavretá v dokumentovom prelúdiu a epilógu.
+      Prelúdium pozostáva z formátovacích dát, možností použitia matematických
+      formulý, pravidiel pre bunkový obsah, informáciách o zmenách atď.
+      Rozsahy databázy, mená deklarácii a operácií a linky sú uvedené v
+      epilógu.</para>
+    </section>
+
+    <section>
+      <title>VCF</title>
+
+      <para>vCard je súborový formát pre výmenu osobných dát, predovšetkým
+      elektronické obchodné vizitky. vCards sú najčastejšie priložené v e-mail
+      správach, ale môžu sa vymieňať aj inými cestami, najčastešie
+      prostredníctvom WWW stránok. Môžu obsahovať meno a priezvisko, adresy,
+      telefónne čísla, URL adresy, logá, fotografie ako aj audio klipy. Súbory
+      vCard sú ukladané vo formáte vcf, v ktorých sa ukladajú aj kontakty
+      napríklad v mobilných telefónoch značky Nokia.</para>
+
+      <para>Verzia 2.1 je široko využívaná a podporovaná e-mailovými
+      klientami. Verzia formátu vCrad 3.0 je štandardizovaná IETF a jej návrh
+      je obsiahnutý v RFC2425 a RFC2426. <link
+      linkend="???">http://tools.ietf.org/html/rfc2425</link><link
+      linkend="???">http://tools.ietf.org/html/rfc2426</link></para>
+
+      <example>
+        <title>Príklad vCard 3.0</title>
+
+        <para>BEGIN:VCARD</para>
+
+        <para>VERSION:3.0</para>
+
+        <para>N:Gump;Forrest</para>
+
+        <para>FN:Forrest Gump</para>
+
+        <para>ORG:Bubba Gump Shrimp Co.</para>
+
+        <para>TITLE:Shrimp Man</para>
+
+        <para>PHOTO;VALUE=URL;TYPE=GIF:http://www.example.com/dir_photos/my_photo.gif</para>
+
+        <para>TEL;TYPE=WORK,VOICE:(111) 555-1212</para>
+
+        <para>TEL;TYPE=HOME,VOICE:(404) 555-1212</para>
+
+        <para>ADR;TYPE=WORK:;;100 Waters Edge;Baytown;LA;30314;United States
+        of America</para>
+
+        <para>LABEL;TYPE=WORK:100 Waters Edge\nBaytown, LA 30314\nUnited
+        States of America</para>
+
+        <para>ADR;TYPE=HOME:;;42 Plantation St.;Baytown;LA;30314;United States
+        of America</para>
+
+        <para>LABEL;TYPE=HOME:42 Plantation St.\nBaytown, LA 30314\nUnited
+        States of America</para>
+
+        <para>EMAIL;TYPE=PREF,INTERNET:forrestgump@example.com</para>
+
+        <para>REV:20080424T195243Z</para>
+
+        <para>END:VCARD</para>
+      </example>
+    </section>
+  </chapter>
+
+  <chapter>
+    <title>Špecifikácia jednotlivých implementácií</title>
+
+    <section>
+      <title>InputFilter</title>
+
+      <subtitle>rozhranie</subtitle>
+
+      <para>Rozhranie vstupného filtru, ktorého konštruktor s parametrami na
+      nastavenie možností pre načitanie vstupného súboru. Ak sa načíta súbor,
+      ktorý nie je v žiadnom validnom a používanom formáte XML (myslí sa tým
+      formát používaný v Contact Transmutator), vytvorí sa nový prázdny
+      dokument a metóda getColumnSchema() vráti NULL. Ak sa načíta súbor,
+      ktorý je vo validnom a používanom formate XML, pri použití metódy read()
+      sa vygeneruje InternalDocColumnSchema a metóda getColumnSchema vracia
+      túto vygenerovanú schému.</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>public Document read()</para>
+
+          <para>Metóda načítavajúca informácie zo zvoleného súboru a
+          vytvárajúca InternalDoc pre ODS a CSV alebo priamo CompiledDoc v
+          pripade VCF .</para>
+
+          <para>Return - Dokument v tvare InternalDoc alebo
+          CompiledDoc.</para>
+        </listitem>
+
+        <listitem>
+          <para>public InternalDocColumnSchema getColumnSchema()</para>
+
+          <para>Táto metóda vracia schému dokumentu.</para>
+
+          <para>Return - Logicka schéma dokumentu.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title>InternalDocColumnSchema</title>
+
+      <subtitle>rozhranie</subtitle>
+
+      <para>Metódy tohoto rozhrania popisujú a pracujú s datovými typmi v
+      stĺpcoch i InternalDoc:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>čo sa nachádza v jednotlivych stĺpcoch</para>
+        </listitem>
+
+        <listitem>
+          <para>ktoré stĺpce by sa mali rozdeliť a ako</para>
+        </listitem>
+
+        <listitem>
+          <para>ktoré stĺpce by sa mali spojiť a ako</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Na svoju práco využíva vnútorný privátny XML DOM. Tiedy tohoto
+      rozhrania dokážu vytvoriť, meniť a pýtať sa na vlastnisti stĺpcovej
+      schémy interného XML (InternalDoc).</para>
+    </section>
+
+    <section>
+      <title>InternalDoc2CompiledDoc</title>
+
+      <subtitle>rozhranie</subtitle>
+
+      <para>Metódy tohoto rozhrania vezmú InternalDoc s
+      InternalDocColumnSchema a prevedu ho do CompiledDoc. InternalDoc aj
+      CompiledDoc sú dne formy XML, pomocou ktorých sa v Contact Transmutátore
+      pracuje s dátami. Najdôležitejšími metódami sú:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis>getCompiledValidContacts() </emphasis>Vracia správne
+          zostavený CompiledDoc (zodpoveda približnej štruktúre VCF alebo
+          ľahko prevediteľnej do VFC).</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis>getCompiledInvalidContacts() </emphasis>Vracia
+          rovnaký formát ale predchádzajúca metóda, ale obsahuje i niektoré
+          chyby typu: Informácie sú v dvoch rozdielnych poliach miesto toho
+          aby boli v jednom.</para>
+        </listitem>
+      </itemizedlist>
+    </section>
+
+    <section>
+      <title>InternalDocAutodetectFormat</title>
+
+      <subtitle>rozhranie</subtitle>
+
+      <para>Triedy tohoto rozhrania vytvárajú z InternalDoc
+      InternalDocColumnSchema s kadidátnymi typmi autodetekcie.</para>
+    </section>
+
+    <section>
+      <title>OutputFilter</title>
+
+      <subtitle>rozhranie</subtitle>
+
+      <para>Rozhranie tried, ktoré vytvárajú jeden z výstupných formátov.
+      Triedy nedetekujú chyby v dátach, túto funkciu zastáva GUI ešte predtým,
+      než sa zavolá OutputFilter. Konštruktor umožňuje zvolenie mena
+      výstupného súboru a cestu k nemu, kódovanie a niektoré špecifické
+      parametre.</para>
+    </section>
+
+    <section>
+      <title>VCFHelper</title>
+
+      <subtitle>rozhranie</subtitle>
+
+      <para>Trieda je zodpovedná za rozoznávanie, či môže existovať viac polí
+      jedneho typu pre jeden kontakt.</para>
+    </section>
+
+    <section>
+      <title>ReadCSV</title>
+
+      <subtitle>trieda implementujúca rozhranie InputFilter</subtitle>
+
+      <para>Trieda, ktorá nastavuje štruktúru interného XML dokumentu a
+      následné rozparsovanie dát z pôvodného CSV do interného XML dokumentu.
+      Ďalej vytvára novú internú stĺpovú schému.</para>
+    </section>
+
+    <section>
+      <title>ODSInput</title>
+
+      <subtitle>trieda implementujúca rozhranie InputFilter</subtitle>
+
+      <para>Trieda na načítavanie informácií zo súboru typu ODS do interného
+      XML a následné rozparsovanie dát z pôvodného ODS do interného XML
+      dokumentu. Ďalej vytvára novú internú stĺpovú schému.</para>
+    </section>
+
+    <section>
+      <title>ReadVCF</title>
+
+      <subtitle>trieda implementujúca rozhranie InputFilter</subtitle>
+
+      <para>Trieda na načítavanie informácií zo súboru typu VCF do interného
+      XML a následné rozparsovanie dát z pôvodného VCF do interného XML
+      dokumentu. Ďalej vytvára novú internú stĺpovú schému.</para>
+    </section>
+
+    <section>
+      <title>ReadCompiledDoc</title>
+
+      <subtitle>trieda implementujúca rozhranie InputFilter</subtitle>
+
+      <para>Trieda na načítavanie informácií z XML vyvinutého a používaného na
+      spracovávanie informácií v Contact Transmutatore. Ďalej vytvára novú
+      internú stĺpovú schému.</para>
+    </section>
+
+    <section>
+      <title>InternalDocColumnSchemaImpl</title>
+
+      <subtitle>trieda implementujúca rozhranie
+      InternalDocColumnSchema</subtitle>
+
+      <para>Vytvára W3C XML DOM pre pracu so stĺpcami:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>umožňuje autodetekciu</para>
+        </listitem>
+
+        <listitem>
+          <para>využíva sa pri grafickom rozhraní pre užívateľa</para>
+        </listitem>
+
+        <listitem>
+          <para>využíva ju kompilátor pre výstupné informácie</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Metódy tejto triedy dokážu rozoznať všetky možné kombinácie dát,
+      spájať ich a rozdeľovať. Použitie XML DOM zaručuje robustnosť,
+      flexibilitu a ľahké používanie.</para>
+    </section>
+
+    <section>
+      <title>InternalDocAutodetectFormatImpl</title>
+
+      <subtitle>trieda implementujúca rozhranie
+      InternalDocAutodetectFormat</subtitle>
+
+      <para></para>
+    </section>
+
+    <section>
+      <title>InternalDocCompiler</title>
+
+      <subtitle>trieda implementujúca rozhranie
+      InternalDoc2CompiledDoc</subtitle>
+
+      <para></para>
+    </section>
+
+    <section>
+      <title>VCFConverter</title>
+
+      <subtitle>trieda</subtitle>
+
+      <para>Pomocná trieda, ktrorá prevádza názvy typov dát z VCF formy do
+      podoby, ktorej by mal užívateľ rozumieť.</para>
+    </section>
+
+    <section>
+      <title>VCFHelperImpl</title>
+
+      <subtitle>trieda implementujúca rozhranie VCFHelper</subtitle>
+
+      <para>VCF podporuje mnoho rôznych úloh, ale len niektoré sa bežne
+      používajú. Kvôli používaniu tagov ľudmi sa využívajú identifikátory,
+      ktoré sú ľahko pochopiteľné pre ľudské chápanie. GUI dokáže pomocou
+      metód tejto triedy previesť identifikátory na ľahko zrozumiteľné
+      texty.</para>
+    </section>
+
+    <section>
+      <title>WriteCSV</title>
+
+      <subtitle>trieda implementujúca rozhranie OutputFilter</subtitle>
+
+      <para>Tieda obsahuje metódy, ktoré z CompiledDoc vytvárajú CVS súbor so
+      štruktúrou, ktorú požaduje užívateľ a zapisuje ho na vybrane
+      miesto.</para>
+    </section>
+
+    <section>
+      <title>ODSWrite</title>
+
+      <subtitle>trieda implementujúca rozhranie OutputFilter</subtitle>
+
+      <para>Tieda obsahuje metódy, ktoré z CompiledDoc vytvárajú ODS súbor so
+      štruktúrou, ktorú požaduje užívateľ a zapisuje ho na vybrane
+      miesto.</para>
+    </section>
+
+    <section>
+      <title>WriteVCF</title>
+
+      <subtitle>trieda implementujúca rozhranie OutputFilter</subtitle>
+
+      <para>Tieda obsahuje metódy, ktoré z CompiledDoc vytvárajú VFC súbor so
+      štruktúrou, ktorú požaduje užívateľ a zapisuje ho na vybrane
+      miesto.</para>
+    </section>
+
+    <section>
+      <title>VCFTypesEnum</title>
+
+      <subtitle>výčet</subtitle>
+
+      <para>Pomocný výčet pre prácu s textovými identikátormi, ktoré sa
+      nachádzajú napríklad v VCFHelper.</para>
+    </section>
+  </chapter>
+
+  <chapter>
+    <title>Návod na použitie</title>
+
+    <section>
+      <title>Návod na použitie</title>
+
+      <para>Po spustení programu sa na obrazovke vykreslí okno Contack
+      Transmutator. Pre transformáciu dokumentu je potrebné zvoliť cestu k
+      tomuto dokumentu. To sa dá dvomi spôsobmi.<itemizedlist>
+          <listitem>
+            <para>Vypísaním celej cesty do riadku.</para>
+          </listitem>
+
+          <listitem>
+            <para>Kliknutím na Browse a vyhladaním cesty k tomuto
+            súboru.</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <para>Po nájdení/vypísaní cesty je potrebené vybrať v zozname vhodné
+      kódovanie a kliknúť na tlačidlo Next.</para>
+
+      <para>V ďalšom okne sa vypíše zoznam, ktorý sa vytvoril z dát vybraného
+      súboru. V hornej lište je nastapotrebné nastaviť, aké informácie sa
+      vypisujú v ktorom stĺpci.</para>
+
+      <para>Pokiaľ stĺpec nemá byť vo výslednom zozname, stačí v zozname pre
+      konkrétny stĺpec zadať "Delete this".</para>
+
+      <para>Pokiaľ jeden stĺpec obsahu informácie, ktoré by mali byť v dvoch
+      alebo viacerých stĺpcoch, v zozname treba zvoliť funkciu "Split into".
+      Po zvolení sa otvorí nové okno, kde je možne uviesť na koľko stĺpcov sa
+      má zvolený stĺpec rozdeliť a v settings treba určiť určiť, ktorý stĺpec
+      má obsahovať aký typ informácií.</para>
+
+      <para>Podobne ako rozdeliť sa dajú aj spojiť stĺpce. Stačí len vybrať
+      možnosť "Add to column" v stĺpci, ktorého obsah chceme presunúť. Otvorí
+      sa okno, kde sa určuje spájaný stĺpec, do ktorého sa majú dopisovať
+      informácie a znak, ktorým sa oddelia informácie. Ďalej je potrebné
+      liknúť na "submit". V tomto výbere je možné vybrať i ďalšie stĺpce,
+      ktoré sa majú pripojiť k spojeniu a taktiež ich poradie.</para>
+
+      <para>Na spodnej časti okna sú daľšie tlačitlá na ovládanie
+      programu.</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis>Refresh Table</emphasis> - výber z vrchnej časti
+          okna sa spracuje a tabulka sa nanovo vypíše.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis>Add Column</emphasis> - pridá nový prázdny stĺpec na
+          konci zoznamu.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis>Back</emphasis> - návrat na výber súboru a
+          kódovania</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis>Next</emphasis> - dokončenie zmien na
+          zozname.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis>Cancel</emphasis> - zrušenie aplikácie.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Po kliknutí na "Next" sa otvorí okno s výzvom na zadanie cesty,
+      mena a typu výstupného dokumentu.</para>
+    </section>
+  </chapter>
+</book>
