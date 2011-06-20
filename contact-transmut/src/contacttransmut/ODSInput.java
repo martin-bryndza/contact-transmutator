@@ -82,7 +82,7 @@ public class ODSInput implements InputFilter {
         ZipEntry entry = inputods.getEntry("content.xml");
                    BufferedReader buffread = null;
         try {
-            buffread = new BufferedReader(new InputStreamReader(inputods.getInputStream(entry)));
+            buffread = new BufferedReader(new InputStreamReader(inputods.getInputStream(entry), "UTF-8"));
         } catch (IOException ex) {
             Logger.getLogger(ODSInput.class.getName()).log(Level.SEVERE, null, ex);
         }
