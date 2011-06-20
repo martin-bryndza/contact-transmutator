@@ -99,8 +99,6 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private RefreshSwingWorker refreshSwingWorker;
     //swing worker for updatin statusbar -> runs simultaneously with refreshSwingWorker
     private UpdateStatusbarSwingWorker updateStatusbarSwingWorker;
-    //swing worker for adding a column
-    private AddColumnSwingWorker addColumnSwingWorker;
     private InternalDoc2CompiledDoc compiler;
 
     //to disable updating of CS aso. -> for example when just creating combo boxes
@@ -1897,45 +1895,25 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         if (!jMainWindowAddColumnButton2.isEnabled())
             return;
+        columnSchema.addColumn();
 
-        setButtonsEnabled(jMainWindowFrame2, false);
+        //refresh gui
+        comboBoxes.clear();
+        columnsToAdd.clear();
+        splitIntoColumnsTypes.clear();
+        jComboBoxesToolBar.removeAll();
+        jColumnToSplitLabel.setText("-1");
+        jColumnToAddLabel.setText("-1");
+        jAddToBaseColumnTextField.setText("-1");
 
-        tableModel.setCellsAreEditable(false);
+        tableModel.initTable(internalDoc, columnSchema, jContactsListTable);
 
-        jMainWindowRefreshButton2.setVisible(false);
-        jRefreshProgressBar2.setVisible(true);
-        jMainWindowStopButton2.setVisible(true);
-        jRefreshProgressBar2.setIndeterminate(false);
+        comboMgr.createMainComboBoxes();
 
-        int rowCount = tableModel.getRowCount();
-        int divider = 1;
-        if (rowCount > 100){
-            jRefreshProgressBar2.setMaximum(100);
-            divider = rowCount/100;
-        } else {
-            jRefreshProgressBar2.setMaximum(rowCount);
-        }
-        jRefreshProgressBar2.setValue(0);
+        jMainWindowFrame2.repaint();
+        jMainWindowFrame2.setVisible(true);
 
-        addColumnSwingWorker = new AddColumnSwingWorker(divider);
-        addColumnSwingWorker.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                if ("progress".equals(evt.getPropertyName())) {
-                    int value = (Integer) evt.getNewValue();
-                    jRefreshProgressBar2.setValue(value);
-                    if (value >= 99){
-                        jRefreshProgressBar2.setIndeterminate(true);
-                        jRefreshProgressBar2.setToolTipText("Refreshing table, please wait!");
-                        jRefreshProgressBar2.setString("Refreshing table, please wait!");
-                    } else {
-                        jRefreshProgressBar2.setToolTipText(value+"%");
-                        jRefreshProgressBar2.setString(value+"%");
-                    }
-                }
-            }
-        });
-        
-        addColumnSwingWorker.execute();
+        updateTableWidths();
 
 
     }//GEN-LAST:event_jMainWindowAddColumnButton2MouseReleased
@@ -3064,63 +3042,9 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         }
     }
 
-    private class AddColumnSwingWorker extends SwingWorker<Void, Void>{
-
-        private int divider = 1;
-
-        public AddColumnSwingWorker(int divider){
-            this.divider = divider;
-        }
 
 
-        @Override
-        protected Void doInBackground() throws Exception {
-            columnSchema.addColumn();
-            int columnCount = columnSchema.getColumnCount();
-            NodeList uncategorizedList = internalDoc.getElementsByTagName("uncategorized");
-            for (int i = 0; i < uncategorizedList.getLength(); i++) {
-                Element uncategorized = (Element) uncategorizedList.item(i);
-                Element newColumn = uncategorized.getOwnerDocument().createElement("data");
-                newColumn.setAttribute("counter", String.valueOf(columnCount - 1));
-                uncategorized.appendChild(newColumn);
-                setProgress(i/divider);
-            }
 
-            return null;
-        }
-
-        @Override
-        protected void done() {
-            //refresh gui
-            comboBoxes.clear();
-            columnsToAdd.clear();
-            splitIntoColumnsTypes.clear();
-            jComboBoxesToolBar.removeAll();
-            jColumnToSplitLabel.setText("-1");
-            jColumnToAddLabel.setText("-1");
-            jAddToBaseColumnTextField.setText("-1");
-
-            tableModel.initTable(internalDoc, columnSchema, jContactsListTable);
-
-            comboMgr.createMainComboBoxes();
-
-            jRefreshProgressBar2.setVisible(false);
-            jMainWindowStopButton2.setVisible(false);
-            jMainWindowRefreshButton2.setVisible(true);
-            jMainWindowFrame2.repaint();
-            jMainWindowFrame2.setVisible(true);
-
-            jMainWindowFrame2.repaint();
-            jMainWindowFrame2.setVisible(true);
-
-            updateTableWidths();
-
-            setButtonsEnabled(jMainWindowFrame2, true);
-            tableModel.setCellsAreEditable(true);
-        }
-
-
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField jAddToBaseColumnTextField;

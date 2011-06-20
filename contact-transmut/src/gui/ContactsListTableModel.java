@@ -112,6 +112,9 @@ public class ContactsListTableModel extends AbstractTableModel{
         NodeList allDataElements = internalDoc.getElementsByTagName("data");
         int dataToChange = columnCount*rowIndex + columnIndex;
         Element dataElement = (Element) allDataElements.item(dataToChange);
+        if (dataElement == null){
+            return;
+        }
         if (aValue!=null){
             dataElement.setTextContent((String) aValue);
         }
