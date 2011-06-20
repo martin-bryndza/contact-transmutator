@@ -1,6 +1,5 @@
 package contacttransmut;
 
-import com.sun.xml.internal.messaging.saaj.packaging.mime.internet.MimeUtility;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
@@ -96,10 +95,10 @@ public class ReadVCF implements InputFilter {
                         this.doc.getFirstChild().appendChild(thisContact);
                         parsingContact = false;
                     } else {
-                        try { //if input file is vCard 2.1 with quoted-printable characters, we’ll assume it’s in UTF-8 and try to convert it into readable form
+                       try { //if input file is vCard 2.1 with quoted-printable characters, we’ll assume it’s in UTF-8 and try to convert it into readable form
                             if (VCFVersion == 2) {
                                 InputStream stringStreamConvQuot = new ByteArrayInputStream(line.getBytes("UTF-8"));
-                                InputStream outputConvQuot = MimeUtility.decode(stringStreamConvQuot, "quoted-printable");
+                                InputStream outputConvQuot = new QPDecoderStream(stringStreamConvQuot);
                                 String unquotedLine = "";
 
                                 if (outputConvQuot != null) {
@@ -123,7 +122,7 @@ public class ReadVCF implements InputFilter {
                             }
                         } catch (Exception e) {
                             //pssssssst :-)
-                        }
+                        } 
 
                         String[] contactLine = line.split(":");
                         // New property detected
