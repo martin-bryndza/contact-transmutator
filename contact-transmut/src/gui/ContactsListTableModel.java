@@ -109,9 +109,10 @@ public class ContactsListTableModel extends AbstractTableModel{
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         data.get(rowIndex).set(columnIndex, (String) aValue);
         fireTableCellUpdated(rowIndex, columnIndex);
-        NodeList allDataElements = internalDoc.getElementsByTagName("data");
-        int dataToChange = columnCount*rowIndex + columnIndex;
-        Element dataElement = (Element) allDataElements.item(dataToChange);
+        NodeList uncategorizedList = internalDoc.getElementsByTagName("uncategorized");
+        Element row = (Element) uncategorizedList.item(rowIndex);
+        NodeList dataList = row.getElementsByTagName("data");
+        Element dataElement = (Element) dataList.item(columnIndex);
         if (dataElement == null){
             return;
         }
