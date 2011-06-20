@@ -32,6 +32,8 @@ public interface InternalDoc2CompiledDoc {
 
     public Integer getCurrentStatus();
 
+    public Integer getMaxContacts();
+
     /**
      * Get compiled valid contacts.
      *

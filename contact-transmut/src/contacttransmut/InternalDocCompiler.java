@@ -286,7 +286,6 @@ public class InternalDocCompiler implements InternalDoc2CompiledDoc {
 
         for (int rawContCount = 0; rawContCount < rawContacts.getLength(); rawContCount++) {
             currentlyProccessingContact = rawContCount;
-            System.err.println("contact " + rawContCount + " from "+ maxContactsEvar);
             Element currentContactElement;
             if (rawContacts.item(rawContCount) instanceof Element) {
                 // ignore // System.err.println("blabla0: " + rawContacts.item(rawContCount).toString());

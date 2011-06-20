@@ -350,7 +350,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         jInternalDocTextArea.setColumns(20);
         jInternalDocTextArea.setEditable(false);
-        jInternalDocTextArea.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jInternalDocTextArea.setFont(new java.awt.Font("Arial", 0, 12));
         jInternalDocTextArea.setRows(5);
         jInternalDocScrollPane.setViewportView(jInternalDocTextArea);
 
@@ -377,7 +377,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         jColumnSchemaTextArea.setColumns(20);
         jColumnSchemaTextArea.setEditable(false);
-        jColumnSchemaTextArea.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jColumnSchemaTextArea.setFont(new java.awt.Font("Arial", 0, 12));
         jColumnSchemaTextArea.setRows(5);
         jColumnSchemaScrollPane.setViewportView(jColumnSchemaTextArea);
 
@@ -451,6 +451,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jRefreshProgressBar2.setMaximum(100000);
         jRefreshProgressBar2.setToolTipText("");
         jRefreshProgressBar2.setCursor(new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
+        jRefreshProgressBar2.setStringPainted(true);
         jRefreshProgressBar2.setBounds(0, 10, 350, 35);
         jLayeredPane2.add(jRefreshProgressBar2, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
@@ -1103,7 +1104,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         jCompiledDocTextArea.setColumns(20);
         jCompiledDocTextArea.setEditable(false);
-        jCompiledDocTextArea.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jCompiledDocTextArea.setFont(new java.awt.Font("Arial", 0, 12));
         jCompiledDocTextArea.setRows(5);
         jCompiledDocScrollPane.setViewportView(jCompiledDocTextArea);
 
@@ -1154,7 +1155,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         setTitle("Contact Transmutator 1.0");
         setResizable(false);
 
-        jMainLabel1.setFont(new java.awt.Font("Chiller", 1, 48)); // NOI18N
+        jMainLabel1.setFont(new java.awt.Font("Chiller", 1, 48));
         jMainLabel1.setText("Contact Transmutator");
 
         jBrowseButton1.setText("Browse...");
@@ -1854,6 +1855,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             jRefreshProgressBar2.setMaximum(rowCount);
         }
         jRefreshProgressBar2.setValue(0);
+        jRefreshProgressBar2.setIndeterminate(false);
 
         refreshSwingWorker = new RefreshSwingWorker();
         updateStatusbarSwingWorker = new UpdateStatusbarSwingWorker(divider);
@@ -1862,7 +1864,14 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 if ("progress".equals(evt.getPropertyName())) {
                     int value = (Integer) evt.getNewValue();
                     jRefreshProgressBar2.setValue(value);
-                    jRefreshProgressBar2.setToolTipText(value+"%");
+                    if (value >= 99){
+                        jRefreshProgressBar2.setIndeterminate(true);
+                        jRefreshProgressBar2.setToolTipText("Refreshing table, please wait!");
+                        jRefreshProgressBar2.setString("Refreshing table, please wait!");
+                    } else {
+                        jRefreshProgressBar2.setToolTipText(value+"%");
+                        jRefreshProgressBar2.setString(value+"%");
+                    }
                 }
             }
         });
@@ -1896,6 +1905,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jMainWindowRefreshButton2.setVisible(false);
         jRefreshProgressBar2.setVisible(true);
         jMainWindowStopButton2.setVisible(true);
+        jRefreshProgressBar2.setIndeterminate(false);
 
         int rowCount = tableModel.getRowCount();
         int divider = 1;
@@ -1913,7 +1923,14 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 if ("progress".equals(evt.getPropertyName())) {
                     int value = (Integer) evt.getNewValue();
                     jRefreshProgressBar2.setValue(value);
-                    jRefreshProgressBar2.setToolTipText(value+"%");
+                    if (value >= 99){
+                        jRefreshProgressBar2.setIndeterminate(true);
+                        jRefreshProgressBar2.setToolTipText("Refreshing table, please wait!");
+                        jRefreshProgressBar2.setString("Refreshing table, please wait!");
+                    } else {
+                        jRefreshProgressBar2.setToolTipText(value+"%");
+                        jRefreshProgressBar2.setString(value+"%");
+                    }
                 }
             }
         });
@@ -2994,6 +3011,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
             jMainWindowFrame2.setVisible(true);
 
             updateTableWidths();
+            compiler = null;
         }
 
         @Override
@@ -3016,10 +3034,31 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
 
         @Override
         protected Void doInBackground() throws Exception {
-            while (!refreshSwingWorker.isDone() || refreshSwingWorker.isCancelled()){
-                if (compiler != null)
-                    setProgress(compiler.getCurrentStatus()/divider);
-                Thread.sleep(100);
+            int counter = 0;
+            while (compiler == null && counter<10000){
+                Thread.sleep(10);
+                counter++;
+            }
+
+            if (compiler == null){
+                System.err.println("Compiler not initialized");
+                return null;
+            }
+
+            int maxNumberOfStatus = compiler.getMaxContacts();
+
+            counter = 0;
+            while (maxNumberOfStatus == 0 && counter <10000){
+                Thread.sleep(10);
+                maxNumberOfStatus = compiler.getMaxContacts();
+            }
+
+            int progress = 0;
+
+            while (progress < maxNumberOfStatus){
+                progress = compiler.getCurrentStatus();
+                setProgress(progress/divider);
+                Thread.sleep(10);
             }
             return null;
         }
