@@ -228,7 +228,8 @@ public class ODSInput implements InputFilter {
 
         //Vytvorenie schemy
 //        InternalDocColumnSchema novaSchema = new InternalDocColumnSchemaImpl(maxStlpcov);
-        InternalDocColumnSchema novaSchema = new InternalDocColumnSchemaImpl(maxColumns);
+        InternalDocColumnSchema novaSchema = new InternalDocColumnSchemaImpl(maxColumns+1);
+        
         return novaSchema;
     }
     
