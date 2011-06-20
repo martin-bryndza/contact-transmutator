@@ -26,6 +26,7 @@ import contacttransmut.VCFTypesEnum;
 import contacttransmut.WriteCSV;
 import contacttransmut.WriteVCF;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -34,19 +35,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -354,7 +349,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jInternalDocTextFrame.setTitle("InternalDoc");
 
         jInternalDocTextArea.setColumns(20);
-        jInternalDocTextArea.setFont(new java.awt.Font("Arial", 0, 12));
+        jInternalDocTextArea.setEditable(false);
+        jInternalDocTextArea.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jInternalDocTextArea.setRows(5);
         jInternalDocScrollPane.setViewportView(jInternalDocTextArea);
 
@@ -380,7 +376,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         );
 
         jColumnSchemaTextArea.setColumns(20);
-        jColumnSchemaTextArea.setFont(new java.awt.Font("Arial", 0, 12));
+        jColumnSchemaTextArea.setEditable(false);
+        jColumnSchemaTextArea.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jColumnSchemaTextArea.setRows(5);
         jColumnSchemaScrollPane.setViewportView(jColumnSchemaTextArea);
 
@@ -572,6 +569,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jMainWindowPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
+
+        jMainWindowFrame2.getAccessibleContext().setAccessibleName("Contact Transmutator");
 
         jAddToFrame.setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         jAddToFrame.setTitle("Add to..."); // NOI18N
@@ -1103,7 +1102,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         );
 
         jCompiledDocTextArea.setColumns(20);
-        jCompiledDocTextArea.setFont(new java.awt.Font("Arial", 0, 12));
+        jCompiledDocTextArea.setEditable(false);
+        jCompiledDocTextArea.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jCompiledDocTextArea.setRows(5);
         jCompiledDocScrollPane.setViewportView(jCompiledDocTextArea);
 
@@ -1154,8 +1154,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         setTitle("Contact Transmutator 1.0");
         setResizable(false);
 
-        jMainLabel1.setFont(new java.awt.Font("Chiller", 1, 48));
-        jMainLabel1.setText("Contact Transmutator 1.0");
+        jMainLabel1.setFont(new java.awt.Font("Chiller", 1, 48)); // NOI18N
+        jMainLabel1.setText("Contact Transmutator");
 
         jBrowseButton1.setText("Browse...");
         jBrowseButton1.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -1194,7 +1194,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(80, 80, 80)
+                .addGap(154, 154, 154)
                 .addComponent(jMainLabel1)
                 .addContainerGap(80, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
@@ -1265,7 +1265,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
     private void jNextButton1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jNextButton1MouseReleased
 
         //TODO: statusbar
-       
+
+        setCursor(Cursor.WAIT_CURSOR);
 
         String filePath = jInputFileTextField1.getText();
 
@@ -1307,7 +1308,7 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         columnSchema = inputFilter.getColumnSchema();
         //</editor-fold>
 
-        jMainWindowFrame2.setTitle("Contact Transmutator 1.0 - " + filePath);
+        jMainWindowFrame2.setTitle("Contact Transmutator - " + filePath);
        
         tableModel.initTable(internalDoc, columnSchema, jContactsListTable);
 
@@ -1372,6 +1373,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
         if (!jMainWindowBackButton.isEnabled())
             return;
 
+        setCursor(Cursor.DEFAULT_CURSOR);
+
         Object[] options = {"OK", "Cancel"};
         int n = JOptionPane.showOptionDialog(this, "All changes will be lost!", "Warning!", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE,null, options, options[1]);
         if (n != 0){
@@ -1435,10 +1438,12 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                 Logger.getLogger(Document.class.getName()).log(Level.SEVERE, null, ex);
             }
             String rawCD = stream.toString();
-            rawCD = rawCD.replaceAll(">", ">\n");
+            rawCD = rawCD.replaceAll("<", "\n<");
             rawCD = rawCD.replaceAll("<contacts>", "<contacts>\n");
-            rawCD = rawCD.replaceAll("</contact>", "</contact>\n");
-            rawCD = rawCD.replaceAll("\">\n", "\">");
+            rawCD = rawCD.replaceAll("</contacts>", "\n</contacts>");
+            rawCD = rawCD.replaceAll("</contact>", "\n</contact>\n");
+            rawCD = rawCD.replaceAll("\n</", "</");
+            rawCD = rawCD.replaceAll("</root>", "\n</root>");
             jCompiledDocTextArea.setText(rawCD);
         }       
 
