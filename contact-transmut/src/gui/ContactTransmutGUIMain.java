@@ -2942,6 +2942,8 @@ public class ContactTransmutGUIMain extends javax.swing.JFrame {
                     jMainWindowFrame2.repaint();
                     jMainWindowFrame2.setVisible(true);
 
+                    tableModel.setCellsAreEditable(true);
+
                     updateTableWidths();
                     return;
                 }
