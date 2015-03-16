@@ -1,0 +1,4 @@
+Parses non-standard data (e.g. name and mobile phone in the same column)(VCF, CSV, ODS). Application is able to automatically detect data values and parse them into internal XML format. User is also able to set some basic parsing logic in an simple and intuitive user interface. Afterwards, application is able to save the data in various formats (VCF, CSV, ADR(Opera), ODS).
+
+Examle of operation:
+User has contacts in MS Office Excel. There is almost no global logic (a line contains multiple contacts that have some relation, phone numbers and names are mixed in one column, some important data are in notes). User wants to import these data into his mobile phone. First, he exports them from MS Office Excel into CSV format and uses the application to bring some logic into the data and then save them in a format his mobile phone supports.
